@@ -1,16 +1,18 @@
 import React from 'react';
 import { StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
-import { colors, radius, spacing } from './tokens';
+import { colors, radius, shadows, spacing } from './tokens';
 
 interface CardProps {
   children: React.ReactNode;
-  variant?: 'default' | 'filled' | 'accent';
+  variant?: 'default' | 'filled' | 'accent' | 'secondary';
   style?: StyleProp<ViewStyle>;
 }
 
 export function Card({ children, variant = 'default', style }: CardProps) {
   return (
-    <View style={[styles.base, styles[variant], style]}>{children}</View>
+    <View style={[styles.base, styles[variant], variant === 'default' && shadows.sm, style]}>
+      {children}
+    </View>
   );
 }
 
@@ -21,8 +23,7 @@ const styles = StyleSheet.create({
     padding: spacing.md,
   },
   default: {
-    borderWidth: 1,
-    borderColor: colors.border,
+    borderWidth: 0,
   },
   filled: {
     backgroundColor: colors.surfaceSecondary,
@@ -30,5 +31,10 @@ const styles = StyleSheet.create({
   },
   accent: {
     backgroundColor: colors.primary,
+    borderWidth: 0,
+  },
+  secondary: {
+    backgroundColor: colors.secondaryLight,
+    borderWidth: 0,
   },
 });

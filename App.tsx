@@ -1,19 +1,19 @@
 import React from 'react';
-import { SafeAreaView, StyleSheet } from 'react-native';
-import { CalculatorScreen } from './src/ui/screens/CalculatorScreen';
-import { colors } from './src/ui/theme';
+import { StatusBar } from 'expo-status-bar';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { NavigationContainer } from '@react-navigation/native';
+import { CalculatorProvider } from './src/ui/context/CalculatorContext';
+import { AppNavigator } from './src/ui/navigation/AppNavigator';
 
 export default function App() {
   return (
-    <SafeAreaView style={styles.container}>
-      <CalculatorScreen />
-    </SafeAreaView>
+    <SafeAreaProvider>
+      <CalculatorProvider>
+        <NavigationContainer>
+          <StatusBar style="dark" />
+          <AppNavigator />
+        </NavigationContainer>
+      </CalculatorProvider>
+    </SafeAreaProvider>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-});

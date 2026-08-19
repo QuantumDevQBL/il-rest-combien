@@ -1,5 +1,5 @@
 /**
- * Design tokens — Reste vraiment.
+ * Design tokens — Il reste combien.
  *
  * Toutes les valeurs visuelles de l'application sont centralisées ici.
  * Aucune constante de couleur, d'espacement ou de rayon ne doit être écrite
@@ -8,59 +8,64 @@
 
 export const colors = {
   // Fonds
-  background: '#FAFAF8',
+  background: '#E8F5E9',
   surface: '#FFFFFF',
-  surfaceSecondary: '#F3F4F6',
+  surfaceSecondary: '#F0FDF4',
 
   // Encre
-  ink: '#111827',
-  inkSecondary: '#4B5563',
-  inkTertiary: '#9CA3AF',
+  ink: '#0F172A',
+  inkSecondary: '#475569',
+  inkTertiary: '#94A3B8',
 
   // Bordures
-  border: '#E5E7EB',
-  borderFocused: '#111827',
+  border: '#E2E8F0',
+  borderFocused: '#059669',
 
   // Accents
-  primary: '#15803D',
-  primaryLight: '#DCFCE7',
-  negative: '#9F2B2B',
+  primary: '#059669',
+  primaryLight: '#D1FAE5',
+  primaryDark: '#047857',
+  secondary: '#F97316',
+  secondaryLight: '#FFEDD5',
+  tertiary: '#7C3AED',
+  tertiaryLight: '#EDE9FE',
+  negative: '#DC2626',
   negativeLight: '#FEE2E2',
-  alert: '#B45309',
+  alert: '#D97706',
   alertLight: '#FEF3C7',
-  info: '#1D4ED8',
+  info: '#2563EB',
   infoLight: '#DBEAFE',
 
   // État
-  disabled: '#D1D5DB',
-  overlay: 'rgba(17, 24, 39, 0.5)',
+  disabled: '#CBD5E1',
+  overlay: 'rgba(15, 23, 42, 0.5)',
 } as const;
 
 import { TextStyle } from 'react-native';
 
 export const typography = {
   hero: {
-    fontSize: 56,
-    fontWeight: '300' as const,
-    lineHeight: 64,
+    fontSize: 64,
+    fontWeight: '700' as const,
+    lineHeight: 72,
     fontFamily: 'System',
   },
   h1: {
-    fontSize: 28,
-    fontWeight: '700' as const,
-    lineHeight: 34,
+    fontSize: 32,
+    fontWeight: '800' as const,
+    lineHeight: 38,
     fontFamily: 'System',
   },
   h2: {
-    fontSize: 20,
-    fontWeight: '600' as const,
-    lineHeight: 26,
+    fontSize: 24,
+    fontWeight: '700' as const,
+    lineHeight: 30,
     fontFamily: 'System',
   },
   h3: {
-    fontSize: 17,
-    fontWeight: '600' as const,
-    lineHeight: 22,
+    fontSize: 18,
+    fontWeight: '700' as const,
+    lineHeight: 24,
     fontFamily: 'System',
   },
   body: {
@@ -77,26 +82,26 @@ export const typography = {
   },
   caption: {
     fontSize: 12,
-    fontWeight: '500' as const,
+    fontWeight: '600' as const,
     lineHeight: 16,
     fontFamily: 'System',
   },
   overline: {
     fontSize: 11,
-    fontWeight: '700' as const,
+    fontWeight: '800' as const,
     letterSpacing: 1.2,
     textTransform: 'uppercase' as const,
     fontFamily: 'System',
   },
   amount: {
     fontSize: 16,
-    fontWeight: '600' as const,
+    fontWeight: '700' as const,
     fontVariant: ['tabular-nums'] as TextStyle['fontVariant'],
     fontFamily: 'System',
   },
   amountLarge: {
-    fontSize: 20,
-    fontWeight: '700' as const,
+    fontSize: 22,
+    fontWeight: '800' as const,
     fontVariant: ['tabular-nums'] as TextStyle['fontVariant'],
     fontFamily: 'System',
   },
@@ -114,26 +119,33 @@ export const spacing = {
 } as const;
 
 export const radius = {
-  sm: 6,
-  md: 10,
-  lg: 16,
-  xl: 24,
+  sm: 8,
+  md: 12,
+  lg: 20,
+  xl: 28,
   full: 9999,
 } as const;
 
 export const shadows = {
   sm: {
-    shadowColor: '#111827',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 1,
+    shadowColor: '#0F172A',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 4,
+    elevation: 2,
   },
   md: {
-    shadowColor: '#111827',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 6,
-    elevation: 3,
+    shadowColor: '#0F172A',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 5,
+  },
+  lg: {
+    shadowColor: '#0F172A',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.12,
+    shadowRadius: 24,
+    elevation: 8,
   },
 } as const;

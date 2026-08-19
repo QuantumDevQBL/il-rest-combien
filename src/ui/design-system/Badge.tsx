@@ -4,14 +4,16 @@ import { colors, radius, spacing, typography } from './tokens';
 
 interface BadgeProps {
   label: string;
-  variant?: 'success' | 'alert' | 'info' | 'error';
+  variant?: 'success' | 'alert' | 'info' | 'error' | 'secondary' | 'tertiary';
 }
 
 const VARIANTS = {
-  success: { bg: colors.primaryLight, text: colors.primary },
+  success: { bg: colors.primaryLight, text: colors.primaryDark },
   alert: { bg: colors.alertLight, text: colors.alert },
   info: { bg: colors.infoLight, text: colors.info },
   error: { bg: colors.negativeLight, text: colors.negative },
+  secondary: { bg: colors.secondaryLight, text: colors.secondary },
+  tertiary: { bg: colors.tertiaryLight, text: colors.tertiary },
 };
 
 export function Badge({ label, variant = 'info' }: BadgeProps) {
@@ -32,6 +34,6 @@ const styles = StyleSheet.create({
   },
   text: {
     ...typography.caption,
-    fontWeight: '700',
+    fontWeight: '800',
   },
 });

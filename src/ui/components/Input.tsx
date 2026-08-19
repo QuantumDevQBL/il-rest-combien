@@ -1,11 +1,6 @@
 import React, { useState } from 'react';
-import {
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from 'react-native';
-import { couleurs, spacing, type } from '../theme';
+import { StyleSheet, Text, TextInput, View } from 'react-native';
+import { colors, radius, spacing, typography } from '../theme';
 
 interface InputProps {
   label: string;
@@ -51,7 +46,7 @@ export function Input({
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
           placeholder={placeholder}
-          placeholderTextColor={couleurs.encreFaible}
+          placeholderTextColor={colors.inkTertiary}
           keyboardType={keyboardType}
           accessibilityLabel={accessibilityLabel ?? label}
           accessibilityLabelledBy={`${label}-label`}
@@ -66,45 +61,50 @@ export function Input({
 
 const styles = StyleSheet.create({
   container: {
-    marginVertical: spacing.sm,
+    marginVertical: spacing.xs,
   },
   label: {
-    ...type.label,
-    marginBottom: spacing.xs,
+    ...typography.caption,
+    color: colors.inkSecondary,
+    marginBottom: spacing.xxs,
   },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: couleurs.ligne,
-    borderRadius: 4,
+    backgroundColor: colors.surfaceSecondary,
+    borderRadius: radius.md,
     paddingHorizontal: spacing.md,
-    minHeight: 48,
+    minHeight: 52,
+    borderWidth: 1,
+    borderColor: 'transparent',
   },
   inputContainerFocused: {
-    borderColor: couleurs.encre,
+    borderColor: colors.ink,
+    backgroundColor: colors.surface,
   },
   inputContainerError: {
-    borderColor: couleurs.ponction,
+    borderColor: colors.negative,
+    backgroundColor: colors.negativeLight,
   },
   input: {
     flex: 1,
-    ...type.montant,
-    color: couleurs.encre,
-    paddingVertical: spacing.md,
+    ...typography.amount,
+    color: colors.ink,
+    paddingVertical: spacing.sm,
   },
   suffix: {
-    ...type.montant,
-    color: couleurs.encreFaible,
-    marginLeft: spacing.sm,
+    ...typography.amount,
+    color: colors.inkTertiary,
+    marginLeft: spacing.xs,
   },
   helper: {
-    ...type.mention,
-    marginTop: spacing.xs,
+    ...typography.caption,
+    color: colors.inkTertiary,
+    marginTop: spacing.xxs,
   },
   error: {
-    ...type.mention,
-    color: couleurs.ponction,
-    marginTop: spacing.xs,
+    ...typography.caption,
+    color: colors.negative,
+    marginTop: spacing.xxs,
   },
 });

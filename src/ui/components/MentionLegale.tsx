@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { couleurs, spacing, type } from '../theme';
+import { colors, spacing, typography } from '../theme';
 
 export function MentionLegale() {
   return (
@@ -17,12 +17,13 @@ export function MentionLegale() {
 
 const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: spacing.lg,
+    paddingHorizontal: spacing.md,
     paddingVertical: spacing.xl,
   },
   text: {
-    ...type.mention,
+    ...typography.caption,
+    color: colors.inkTertiary,
     textAlign: 'center',
-    marginBottom: spacing.sm,
+    marginBottom: spacing.xs,
   },
 });

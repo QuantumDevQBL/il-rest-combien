@@ -6,7 +6,7 @@ import {
   View,
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
-import { couleurs, spacing, type } from '../theme';
+import { colors, radius, spacing, typography } from '../theme';
 
 interface SelectOption<T extends string> {
   value: T;
@@ -58,24 +58,25 @@ export function Select<T extends string>({
 
 const styles = StyleSheet.create({
   container: {
-    marginVertical: spacing.sm,
+    marginVertical: spacing.xs,
   },
   label: {
-    ...type.label,
-    marginBottom: spacing.xs,
+    ...typography.caption,
+    color: colors.inkSecondary,
+    marginBottom: spacing.xxs,
   },
   pickerContainer: {
-    borderWidth: 1,
-    borderColor: couleurs.ligne,
-    borderRadius: 4,
-    minHeight: 48,
+    backgroundColor: colors.surfaceSecondary,
+    borderRadius: radius.md,
+    minHeight: 52,
     justifyContent: 'center',
   },
   picker: {
-    color: couleurs.encre,
+    ...typography.body,
+    color: colors.ink,
   },
   pickerItem: {
-    fontSize: 15,
+    fontSize: 16,
     height: 120,
   },
 });

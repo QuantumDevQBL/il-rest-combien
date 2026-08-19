@@ -32,6 +32,11 @@
     },
     "plugins": [
       "./plugins/withRemovePermissions.js"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "0d4a754b-679b-4c29-95cb-8ea8ea497090"
+      }
+    }
   }
 }

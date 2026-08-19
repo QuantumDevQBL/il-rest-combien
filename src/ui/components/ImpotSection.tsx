@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { Section } from './Section';
+import { Card, Icon } from '../design-system';
+import { colors, spacing, typography } from '../theme';
 import { Input } from './Input';
-import { couleurs, spacing, type } from '../theme';
 import { extractFieldErrors } from '../utils/errors';
 import { ValidationError } from '../../engine/types';
 
@@ -25,7 +25,7 @@ export function ImpotSection({
   const errors = extractFieldErrors(error);
 
   return (
-    <Section title="Impôt — deux options">
+    <Card style={styles.card}>
       <Pressable
         onPress={() => setExpanded(!expanded)}
         accessibilityRole="button"
@@ -36,20 +36,22 @@ export function ImpotSection({
         }
         style={styles.toggle}
       >
-        <Text style={styles.toggleText}>
-          {expanded
-            ? 'Masquer les options d\'imposition'
-            : 'Comparer barème et versement libératoire'}
-        </Text>
-        <Text style={styles.chevron}>{expanded ? '▲' : '▼'}</Text>
+        <View style={styles.toggleText}>
+          <Text style={styles.title}>Impôt — deux options</Text>
+          <Text style={styles.subtitle}>
+            Renseigne ton avis d'imposition 2025 pour comparer barème et
+            versement libératoire.
+          </Text>
+        </View>
+        <Icon
+          name={expanded ? 'chevronUp' : 'chevronDown'}
+          size={20}
+          color={colors.inkSecondary}
+        />
       </Pressable>
 
       {expanded && (
         <View style={styles.content}>
-          <Text style={styles.explanation}>
-            Pour comparer le barème progressif et le versement libératoire,
-            renseigne les données de ton avis d'imposition 2025 (revenus 2024).
-          </Text>
           <Input
             label="Revenu fiscal de référence N-2"
             value={rfrN2}
@@ -70,31 +72,36 @@ export function ImpotSection({
           />
         </View>
       )}
-    </Section>
+    </Card>
   );
 }
 
 const styles = StyleSheet.create({
+  card: {
+    marginBottom: spacing.lg,
+  },
   toggle: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: spacing.md,
     minHeight: 44,
   },
   toggleText: {
-    ...type.corps,
-    color: couleurs.encre,
+    flex: 1,
+    marginRight: spacing.sm,
   },
-  chevron: {
-    ...type.corps,
-    color: couleurs.encreFaible,
+  title: {
+    ...typography.h3,
+  },
+  subtitle: {
+    ...typography.caption,
+    color: colors.inkSecondary,
+    marginTop: spacing.xxs,
   },
   content: {
     paddingTop: spacing.md,
-  },
-  explanation: {
-    ...type.mention,
-    marginBottom: spacing.md,
+    marginTop: spacing.md,
+    borderTopWidth: 1,
+    borderTopColor: colors.border,
   },
 });

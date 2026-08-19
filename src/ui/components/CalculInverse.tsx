@@ -1,10 +1,10 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { Section } from './Section';
-import { Input } from './Input';
+import { Card } from '../design-system';
 import { JOURS_FACTURES_REFERENCE } from '../constants';
-import { couleurs, spacing, type } from '../theme';
+import { colors, spacing, typography } from '../theme';
 import { formatMontant } from '../utils/format';
+import { Input } from './Input';
 
 interface CalculInverseProps {
   objectifNetMensuel: string;
@@ -20,7 +20,8 @@ export function CalculInverse({
   tjmRequis,
 }: CalculInverseProps) {
   return (
-    <Section title="Objectif de revenu">
+    <Card style={styles.card}>
+      <Text style={styles.title}>Objectif de revenu</Text>
       <Text style={styles.explanation}>
         Combien dois-tu facturer pour atteindre un revenu net cible ?
       </Text>
@@ -48,7 +49,7 @@ export function CalculInverse({
           {tjmRequis !== null && (
             <View style={styles.resultLine}>
               <Text style={styles.resultLabel}>
-                TJM indicatif — base {JOURS_FACTURES_REFERENCE} jours facturés par an
+                TJM indicatif — base {JOURS_FACTURES_REFERENCE} jours/an
               </Text>
               <Text style={styles.resultAmount}>
                 {formatMontant(tjmRequis)}
@@ -57,20 +58,28 @@ export function CalculInverse({
           )}
         </View>
       )}
-    </Section>
+    </Card>
   );
 }
 
 const styles = StyleSheet.create({
+  card: {
+    marginBottom: spacing.lg,
+  },
+  title: {
+    ...typography.h3,
+    marginBottom: spacing.sm,
+  },
   explanation: {
-    ...type.mention,
+    ...typography.bodySmall,
+    color: colors.inkSecondary,
     marginBottom: spacing.md,
   },
   resultContainer: {
     marginTop: spacing.md,
     paddingTop: spacing.md,
     borderTopWidth: 1,
-    borderTopColor: couleurs.ligne,
+    borderTopColor: colors.border,
   },
   resultLine: {
     flexDirection: 'row',
@@ -79,11 +88,13 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.sm,
   },
   resultLabel: {
-    ...type.corps,
-    color: couleurs.encre,
+    ...typography.bodySmall,
+    color: colors.inkSecondary,
+    flex: 1,
+    marginRight: spacing.sm,
   },
   resultAmount: {
-    ...type.montant,
-    color: couleurs.reste,
+    ...typography.amount,
+    color: colors.primary,
   },
 });

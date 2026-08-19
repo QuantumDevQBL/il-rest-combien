@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { couleurs, spacing, type } from '../theme';
+import { colors, spacing, typography } from '../theme';
 import { formatMontant } from '../utils/format';
 import { ResultatMicro } from '../../engine/types';
 
@@ -37,8 +37,8 @@ function Line({
 
 export function Decompte({ result }: DecompteProps) {
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Le décompte</Text>
+    <View>
+      <Text style={styles.sectionTitle}>Le décompte</Text>
 
       <Line label="Chiffre d'affaires" amount={result.caAnnuelHT} />
       <View style={styles.separator} />
@@ -57,11 +57,7 @@ export function Decompte({ result }: DecompteProps) {
       />
 
       <View style={styles.separatorDouble} />
-      <Line
-        label="Il te reste"
-        amount={result.revenuNetDisponible}
-        isTotal
-      />
+      <Line label="Il te reste" amount={result.revenuNetDisponible} isTotal />
 
       <View style={styles.monthlyContainer}>
         <Text style={styles.monthlyLabel}>Soit par mois</Text>
@@ -74,15 +70,11 @@ export function Decompte({ result }: DecompteProps) {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    backgroundColor: couleurs.papier,
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.xl,
-  },
-  title: {
-    ...type.eyebrow,
-    color: couleurs.encreFaible,
-    marginBottom: spacing.lg,
+  sectionTitle: {
+    ...typography.overline,
+    color: colors.inkSecondary,
+    marginBottom: spacing.md,
+    marginHorizontal: spacing.md,
   },
   line: {
     flexDirection: 'row',
@@ -94,32 +86,31 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.md,
   },
   label: {
-    ...type.corps,
-    color: couleurs.encre,
+    ...typography.body,
+    color: colors.ink,
   },
   labelTotal: {
-    ...type.titre,
+    ...typography.h3,
   },
   amount: {
-    ...type.montant,
-    color: couleurs.encre,
+    ...typography.amount,
+    color: colors.ink,
   },
   amountTotal: {
-    ...type.montant,
-    fontWeight: '700',
-    color: couleurs.reste,
+    ...typography.amountLarge,
+    color: colors.primary,
   },
   amountPonction: {
-    color: couleurs.ponction,
+    color: colors.negative,
   },
   separator: {
     height: 1,
-    backgroundColor: couleurs.ligne,
+    backgroundColor: colors.border,
     marginVertical: spacing.sm,
   },
   separatorDouble: {
     height: 2,
-    backgroundColor: couleurs.encre,
+    backgroundColor: colors.ink,
     marginVertical: spacing.md,
   },
   monthlyContainer: {
@@ -129,13 +120,14 @@ const styles = StyleSheet.create({
     marginTop: spacing.lg,
     paddingTop: spacing.lg,
     borderTopWidth: 1,
-    borderTopColor: couleurs.ligne,
+    borderTopColor: colors.border,
   },
   monthlyLabel: {
-    ...type.label,
+    ...typography.caption,
+    color: colors.inkSecondary,
   },
   monthlyAmount: {
-    ...type.montant,
-    color: couleurs.encreFaible,
+    ...typography.amount,
+    color: colors.inkSecondary,
   },
 });

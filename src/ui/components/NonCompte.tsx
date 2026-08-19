@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { couleurs, spacing, type } from '../theme';
+import { Card, Icon } from '../design-system';
+import { colors, spacing, typography } from '../theme';
 
 export function NonCompte() {
   const [expanded, setExpanded] = useState(false);
@@ -14,7 +15,7 @@ export function NonCompte() {
   ];
 
   return (
-    <View style={styles.container}>
+    <Card style={styles.card}>
       <Pressable
         onPress={() => setExpanded(!expanded)}
         accessibilityRole="button"
@@ -25,30 +26,36 @@ export function NonCompte() {
         }
         style={styles.toggle}
       >
-        <Text style={styles.toggleText}>Ce qui n'est pas compté</Text>
-        <Text style={styles.chevron}>{expanded ? '▲' : '▼'}</Text>
+        <View style={styles.toggleText}>
+          <Text style={styles.title}>Ce qui n'est pas compté</Text>
+          <Text style={styles.subtitle}>
+            Charges et dispositifs non pris en compte dans cette estimation.
+          </Text>
+        </View>
+        <Icon
+          name={expanded ? 'chevronUp' : 'chevronDown'}
+          size={20}
+          color={colors.inkSecondary}
+        />
       </Pressable>
 
       {expanded && (
         <View style={styles.content}>
           {items.map((item, index) => (
-            <Text key={index} style={styles.item}>
-              • {item}
-            </Text>
+            <View key={index} style={styles.item}>
+              <Text style={styles.bullet}>•</Text>
+              <Text style={styles.itemText}>{item}</Text>
+            </View>
           ))}
         </View>
       )}
-    </View>
+    </Card>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.xl,
-    borderTopWidth: 1,
-    borderBottomWidth: 1,
-    borderColor: couleurs.ligne,
+  card: {
+    marginBottom: spacing.lg,
   },
   toggle: {
     flexDirection: 'row',
@@ -57,19 +64,36 @@ const styles = StyleSheet.create({
     minHeight: 44,
   },
   toggleText: {
-    ...type.corps,
-    color: couleurs.encre,
+    flex: 1,
+    marginRight: spacing.sm,
   },
-  chevron: {
-    ...type.corps,
-    color: couleurs.encreFaible,
+  title: {
+    ...typography.h3,
+  },
+  subtitle: {
+    ...typography.caption,
+    color: colors.inkSecondary,
+    marginTop: spacing.xxs,
   },
   content: {
     paddingTop: spacing.md,
+    marginTop: spacing.md,
+    borderTopWidth: 1,
+    borderTopColor: colors.border,
   },
   item: {
-    ...type.mention,
+    flexDirection: 'row',
     marginBottom: spacing.sm,
-    lineHeight: 18,
+  },
+  bullet: {
+    ...typography.bodySmall,
+    color: colors.inkTertiary,
+    marginRight: spacing.sm,
+  },
+  itemText: {
+    ...typography.bodySmall,
+    color: colors.inkSecondary,
+    lineHeight: 20,
+    flex: 1,
   },
 });

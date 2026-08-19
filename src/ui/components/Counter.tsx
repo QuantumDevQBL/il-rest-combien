@@ -7,29 +7,39 @@ import {
   Text,
   View,
 } from 'react-native';
-import { couleurs, spacing, type } from '../theme';
+import { Card, ProgressBar } from '../design-system';
+import { colors, spacing, typography } from '../theme';
 import { formatMontantBrut } from '../utils/format';
 
 interface CounterProps {
   resteSurCent: number;
   totalPrelevements: number;
+  tauxPrelevementGlobal: number;
 }
 
 const IS_TEST_ENV = process.env.NODE_ENV === 'test';
 
-export function Counter({ resteSurCent, totalPrelevements }: CounterProps) {
-  const [displayValue, setDisplayValue] = useState(0);
+export function Counter({
+  resteSurCent,
+  totalPrelevements,
+  tauxPrelevementGlobal,
+}: CounterProps) {
+  const [displayValue, setDisplayValue] = useState(
+    IS_TEST_ENV ? resteSurCent : 0
+  );
   const animationRef = useRef(new Animated.Value(0)).current;
   const reduceMotionRef = useRef(false);
 
   useEffect(() => {
+    if (IS_TEST_ENV) return;
+
     let isMounted = true;
     let removeListener: (() => void) | null = null;
 
     const startAnimation = () => {
       if (!isMounted) return;
 
-      if (reduceMotionRef.current || IS_TEST_ENV) {
+      if (reduceMotionRef.current) {
         setDisplayValue(resteSurCent);
         return;
       }
@@ -69,51 +79,57 @@ export function Counter({ resteSurCent, totalPrelevements }: CounterProps) {
   }, [resteSurCent, animationRef]);
 
   return (
-    <View style={styles.container}>
+    <Card variant="accent" style={styles.card}>
       <Text style={styles.eyebrow}>Sur 100 € facturés</Text>
       <Text style={styles.amount}>{formatMontantBrut(displayValue)} €</Text>
       <Text style={styles.subtitle}>dans ta poche</Text>
-      <View style={styles.separator} />
+
+      <View style={styles.barContainer}>
+        <ProgressBar
+          segments={[
+            { ratio: resteSurCent, color: colors.surface },
+            { ratio: 100 - resteSurCent, color: 'rgba(255,255,255,0.35)' },
+          ]}
+          height={8}
+        />
+      </View>
+
       <Text style={styles.prelevements}>
         {formatMontantBrut(totalPrelevements)} € de cotisations et d'impôt
+        {' · '}{formatMontantBrut(tauxPrelevementGlobal * 100)} %
       </Text>
-    </View>
+    </Card>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    backgroundColor: couleurs.encre,
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.xxl,
+  card: {
+    marginHorizontal: spacing.md,
+    marginBottom: spacing.lg,
+    padding: spacing.xl,
     alignItems: 'center',
   },
   eyebrow: {
-    ...type.eyebrow,
-    color: couleurs.papier,
-    opacity: 0.7,
-    marginBottom: spacing.md,
+    ...typography.overline,
+    color: 'rgba(255,255,255,0.8)',
+    marginBottom: spacing.sm,
   },
   amount: {
-    ...type.compteur,
-    color: couleurs.papier,
+    ...typography.hero,
+    color: colors.surface,
   },
   subtitle: {
-    ...type.corps,
-    color: couleurs.papier,
-    opacity: 0.8,
-    marginTop: spacing.xs,
+    ...typography.body,
+    color: 'rgba(255,255,255,0.9)',
+    marginTop: spacing.xxs,
   },
-  separator: {
+  barContainer: {
     width: '100%',
-    height: 1,
-    backgroundColor: couleurs.papier,
-    opacity: 0.2,
-    marginVertical: spacing.lg,
+    marginTop: spacing.lg,
+    marginBottom: spacing.sm,
   },
   prelevements: {
-    ...type.corps,
-    color: couleurs.papier,
-    opacity: 0.7,
+    ...typography.caption,
+    color: 'rgba(255,255,255,0.85)',
   },
 });

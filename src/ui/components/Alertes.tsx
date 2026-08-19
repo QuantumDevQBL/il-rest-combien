@@ -1,18 +1,26 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { couleurs, spacing, type } from '../theme';
+import { Card, Icon } from '../design-system';
+import { colors, spacing, typography } from '../theme';
 import { ResultatMicro } from '../../engine/types';
 
 interface AlertesProps {
   result: ResultatMicro;
 }
 
+interface AlerteItem {
+  key: string;
+  message: string;
+  variant: 'alert' | 'info';
+}
+
 export function Alertes({ result }: AlertesProps) {
-  const alertes: { key: string; message: string }[] = [];
+  const alertes: AlerteItem[] = [];
 
   if (result.depasseSeuilBaseTVA) {
     alertes.push({
       key: 'tva-base',
+      variant: 'info',
       message:
         'Tu dépasses le seuil de franchise de TVA. Tu devras la facturer à partir du 1er janvier prochain.',
     });
@@ -21,6 +29,7 @@ export function Alertes({ result }: AlertesProps) {
   if (result.depasseSeuilMajoreTVA) {
     alertes.push({
       key: 'tva-majore',
+      variant: 'alert',
       message:
         'Tu dépasses le seuil majoré de TVA. Elle est due dès le 1er jour du mois de dépassement.',
     });
@@ -29,6 +38,7 @@ export function Alertes({ result }: AlertesProps) {
   if (result.depassePlafondMicro) {
     alertes.push({
       key: 'plafond-micro',
+      variant: 'alert',
       message:
         'Tu dépasses le plafond du régime micro. La sortie n\'intervient qu\'après deux années consécutives de dépassement.',
     });
@@ -40,11 +50,30 @@ export function Alertes({ result }: AlertesProps) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Seuils</Text>
+      <Text style={styles.sectionTitle}>Seuils</Text>
       {alertes.map((alerte) => (
-        <View key={alerte.key} style={styles.alerte}>
-          <Text style={styles.alerteText}>{alerte.message}</Text>
-        </View>
+        <Card
+          key={alerte.key}
+          variant="filled"
+          style={[
+            styles.alerte,
+            alerte.variant === 'alert' ? styles.alerteWarning : undefined,
+          ]}
+        >
+          <Icon
+            name={alerte.variant === 'alert' ? 'warning' : 'informationCircle'}
+            size={20}
+            color={alerte.variant === 'alert' ? colors.alert : colors.info}
+          />
+          <Text
+            style={[
+              styles.alerteText,
+              alerte.variant === 'alert' && styles.alerteTextWarning,
+            ]}
+          >
+            {alerte.message}
+          </Text>
+        </Card>
       ))}
     </View>
   );
@@ -52,24 +81,31 @@ export function Alertes({ result }: AlertesProps) {
 
 const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.xl,
-  },
-  title: {
-    ...type.eyebrow,
-    color: couleurs.encreFaible,
     marginBottom: spacing.lg,
   },
+  sectionTitle: {
+    ...typography.overline,
+    color: colors.inkSecondary,
+    marginBottom: spacing.sm,
+    marginHorizontal: spacing.md,
+  },
   alerte: {
-    borderLeftWidth: 3,
-    borderLeftColor: couleurs.alerte,
-    paddingLeft: spacing.md,
-    paddingVertical: spacing.sm,
-    marginBottom: spacing.md,
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: spacing.sm,
+    backgroundColor: colors.infoLight,
+  },
+  alerteWarning: {
+    backgroundColor: colors.alertLight,
   },
   alerteText: {
-    ...type.corps,
-    color: couleurs.encre,
-    lineHeight: 22,
+    ...typography.bodySmall,
+    color: colors.ink,
+    lineHeight: 20,
+    marginLeft: spacing.sm,
+    flex: 1,
+  },
+  alerteTextWarning: {
+    color: colors.alert,
   },
 });

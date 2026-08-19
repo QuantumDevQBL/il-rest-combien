@@ -9,6 +9,7 @@ import {
   ResultatMicro,
   ValidationError,
 } from '../../engine/types';
+import { JOURS_FACTURES_REFERENCE } from '../constants';
 import { getActivityConfig } from '../mapping';
 import { CalculatorForm, DEFAULT_FORM } from '../types';
 import { parseMontantSaisi } from '../utils/format';
@@ -185,7 +186,11 @@ export function useCalculator(): CalculatorState & CalculatorActions {
     try {
       const baseInputs = buildBaseInputs(form);
       const objectifAnnuel = objectifMensuel * 12;
-      const { caRequis: ca, tjm } = calculerCARequis(objectifAnnuel, baseInputs, 220);
+      const { caRequis: ca, tjm } = calculerCARequis(
+        objectifAnnuel,
+        baseInputs,
+        JOURS_FACTURES_REFERENCE
+      );
       setCaRequis(ca);
       setTjmRequis(tjm);
     } catch {

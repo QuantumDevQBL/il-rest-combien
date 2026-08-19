@@ -2,6 +2,7 @@ import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Section } from './Section';
 import { Input } from './Input';
+import { JOURS_FACTURES_REFERENCE } from '../constants';
 import { couleurs, spacing, type } from '../theme';
 import { formatMontant } from '../utils/format';
 
@@ -46,7 +47,9 @@ export function CalculInverse({
           </View>
           {tjmRequis !== null && (
             <View style={styles.resultLine}>
-              <Text style={styles.resultLabel}>TJM indicatif (220 j/an)</Text>
+              <Text style={styles.resultLabel}>
+                TJM indicatif — base {JOURS_FACTURES_REFERENCE} jours facturés par an
+              </Text>
               <Text style={styles.resultAmount}>
                 {formatMontant(tjmRequis)}
               </Text>

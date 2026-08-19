@@ -18,6 +18,7 @@ import { RepartitionBar } from '../components/RepartitionBar';
 import { Comparaison } from '../components/Comparaison';
 import { Alertes } from '../components/Alertes';
 import { CalculInverse } from '../components/CalculInverse';
+import { MentionLegale } from '../components/MentionLegale';
 import { ACTIVITY_OPTIONS, ActivityChoice } from '../mapping';
 import { EmptyState } from '../design-system';
 import { RootTabParamList } from '../navigation/AppNavigator';
@@ -109,6 +110,8 @@ export function SimulatorScreen() {
           caRequis={caRequis}
           tjmRequis={tjmRequis}
         />
+
+        <MentionLegale />
       </ScrollView>
     </View>
   );

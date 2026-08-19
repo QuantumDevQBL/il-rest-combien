@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "Calculateur de rentabilité",
-    "slug": "calculateur-de-rentabilite",
+    "name": "Reste vraiment",
+    "slug": "reste-vraiment",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -16,18 +16,22 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "fr.quantumdev.calculateurderentabilite"
+      "bundleIdentifier": "fr.quantumdev.restevraiment"
     },
     "android": {
+      "package": "fr.quantumdev.restevraiment",
+      "versionCode": 1,
+      "permissions": [],
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FBFAF7"
-      },
-      "package": "fr.quantumdev.calculateurderentabilite"
+      }
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "plugins": []
+    "plugins": [
+      "./plugins/withRemovePermissions.js"
+    ]
   }
 }

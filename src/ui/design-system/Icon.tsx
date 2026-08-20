@@ -19,7 +19,23 @@ export type IconName =
   | 'chevronDown'
   | 'chevronUp'
   | 'menu'
-  | 'helpCircle';
+  | 'helpCircle'
+  | 'settings'
+  | 'time'
+  | 'home'
+  | 'arrowBack'
+  | 'close'
+  | 'search'
+  | 'statsChart'
+  | 'sparkles'
+  | 'shieldCheckmark'
+  | 'swapHorizontal'
+  | 'bag'
+  | 'hammer'
+  | 'medical'
+  | 'school'
+  | 'business'
+  | 'download';
 
 const ICON_MAP: Record<IconName, keyof typeof Ionicons.glyphMap> = {
   wallet: 'wallet-outline',
@@ -39,6 +55,22 @@ const ICON_MAP: Record<IconName, keyof typeof Ionicons.glyphMap> = {
   chevronUp: 'chevron-up-outline',
   menu: 'menu-outline',
   helpCircle: 'help-circle-outline',
+  settings: 'settings-outline',
+  time: 'time-outline',
+  home: 'home-outline',
+  arrowBack: 'arrow-back-outline',
+  close: 'close-outline',
+  search: 'search-outline',
+  statsChart: 'stats-chart-outline',
+  sparkles: 'sparkles-outline',
+  shieldCheckmark: 'shield-checkmark-outline',
+  swapHorizontal: 'swap-horizontal-outline',
+  bag: 'bag-outline',
+  hammer: 'hammer-outline',
+  medical: 'medical-outline',
+  school: 'school-outline',
+  business: 'business-outline',
+  download: 'download-outline',
 };
 
 interface IconProps {

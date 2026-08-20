@@ -1,62 +1,110 @@
-import React from 'react';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { Ionicons } from '@expo/vector-icons';
-import { SimulatorScreen } from '../screens/SimulatorScreen';
-import { HistoryScreen } from '../screens/HistoryScreen';
-import { SettingsScreen } from '../screens/SettingsScreen';
+import React, { useEffect, useState } from 'react';
+import { createStackNavigator, TransitionPresets } from '@react-navigation/stack';
+import { useOnboarding } from '../hooks/useOnboarding';
 import { useHistorySync } from '../hooks/useHistorySync';
-import { colors, typography } from '../theme';
+import { OnboardingScreen } from '../screens/OnboardingScreen';
+import { HomeScreen } from '../screens/HomeScreen';
+import { ResultScreen } from '../screens/ResultScreen';
+import { SettingsModal } from '../modals/SettingsModal';
+import { HistoryModal } from '../modals/HistoryModal';
+import { InverseModal } from '../modals/InverseModal';
+import { DetailModal } from '../modals/DetailModal';
+import { colors } from '../theme';
 
-export type RootTabParamList = {
-  Simulateur: undefined;
-  Historique: undefined;
-  Parametres: undefined;
+export type RootStackParamList = {
+  Onboarding: undefined;
+  Home: undefined;
+  Result: undefined;
+  SettingsModal: undefined;
+  HistoryModal: undefined;
+  InverseModal: undefined;
+  DetailModal: undefined;
 };
 
-const Tab = createBottomTabNavigator<RootTabParamList>();
+const Stack = createStackNavigator<RootStackParamList>();
+
+function HistorySync() {
+  useHistorySync();
+  return null;
+}
 
 export function AppNavigator() {
-  useHistorySync();
+  const { hasSeenOnboarding, isLoading, markAsSeen } = useOnboarding();
+  const [isReady, setIsReady] = useState(false);
+
+  useEffect(() => {
+    if (!isLoading) {
+      setIsReady(true);
+    }
+  }, [isLoading]);
+
+  if (!isReady) {
+    return null;
+  }
+
+  const initialRouteName = hasSeenOnboarding ? 'Home' : 'Onboarding';
+
   return (
-    <Tab.Navigator
-      screenOptions={({ route }) => ({
-        headerShown: false,
-        tabBarIcon: ({ focused, color, size }) => {
-          let iconName: keyof typeof Ionicons.glyphMap = 'calculator';
+    <>
+      <HistorySync />
+      <Stack.Navigator
+        initialRouteName={initialRouteName}
+        screenOptions={{
+          headerShown: false,
+          cardStyle: { backgroundColor: colors.background },
+        }}
+      >
+        <Stack.Screen name="Onboarding">
+          {({ navigation }) => (
+            <OnboardingScreen
+              onComplete={() => {
+                void markAsSeen();
+                navigation.replace('Home');
+              }}
+            />
+          )}
+        </Stack.Screen>
 
-          if (route.name === 'Simulateur') {
-            iconName = focused ? 'calculator' : 'calculator-outline';
-          } else if (route.name === 'Historique') {
-            iconName = focused ? 'time' : 'time-outline';
-          } else if (route.name === 'Parametres') {
-            iconName = focused ? 'settings' : 'settings-outline';
-          }
+        <Stack.Screen name="Home">
+          {({ navigation }) => (
+            <HomeScreen onCalculate={() => navigation.navigate('Result')} />
+          )}
+        </Stack.Screen>
 
-          return <Ionicons name={iconName} size={size} color={color} />;
-        },
-        tabBarActiveTintColor: colors.primary,
-        tabBarInactiveTintColor: colors.inkTertiary,
-        tabBarStyle: {
-          backgroundColor: colors.surface,
-          borderTopWidth: 0,
-          elevation: 8,
-          shadowColor: '#0F172A',
-          shadowOffset: { width: 0, height: -2 },
-          shadowOpacity: 0.06,
-          shadowRadius: 8,
-          height: 64,
-          paddingBottom: 10,
-          paddingTop: 10,
-        },
-        tabBarLabelStyle: {
-          ...typography.caption,
-          fontWeight: '600',
-        },
-      })}
-    >
-      <Tab.Screen name="Simulateur" component={SimulatorScreen} />
-      <Tab.Screen name="Historique" component={HistoryScreen} />
-      <Tab.Screen name="Parametres" component={SettingsScreen} />
-    </Tab.Navigator>
+        <Stack.Screen name="Result">
+          {({ navigation }) => (
+            <ResultScreen
+              onReset={() => navigation.navigate('Home')}
+              onOpenSettings={() => navigation.navigate('SettingsModal')}
+              onOpenHistory={() => navigation.navigate('HistoryModal')}
+              onOpenInverse={() => navigation.navigate('InverseModal')}
+              onOpenDetail={() => navigation.navigate('DetailModal')}
+            />
+          )}
+        </Stack.Screen>
+
+        <Stack.Group
+          screenOptions={{
+            ...TransitionPresets.ModalSlideFromBottomIOS,
+            presentation: 'modal',
+            gestureEnabled: true,
+            gestureDirection: 'vertical',
+          }}
+        >
+          <Stack.Screen name="SettingsModal">
+            {({ navigation }) => <SettingsModal onClose={() => navigation.goBack()} />}
+          </Stack.Screen>
+          <Stack.Screen name="HistoryModal">
+            {({ navigation }) => <HistoryModal onClose={() => navigation.goBack()} />}
+          </Stack.Screen>
+          <Stack.Screen name="InverseModal">
+            {({ navigation }) => <InverseModal onClose={() => navigation.goBack()} />}
+          </Stack.Screen>
+          <Stack.Screen name="DetailModal">
+            {({ navigation }) => <DetailModal onClose={() => navigation.goBack()} />}
+          </Stack.Screen>
+        </Stack.Group>
+      </Stack.Navigator>
+    </>
   );
 }

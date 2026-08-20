@@ -5,48 +5,49 @@ import {
   Text,
   View,
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useCalculatorContext } from '../context/CalculatorContext';
 import { Input } from '../components/Input';
 import { Select } from '../components/Select';
 import { Toggle } from '../components/Toggle';
-import { Button } from '../design-system';
+import { Button, Icon } from '../design-system';
+import { PressableScale } from '../components/PressableScale';
 import { colors, spacing, typography } from '../theme';
 import { extractFieldErrors } from '../utils/errors';
+
+interface SettingsModalProps {
+  onClose: () => void;
+}
 
 const SITUATION_OPTIONS = [
   { value: 'celibataire' as const, label: 'Célibataire' },
   { value: 'couple' as const, label: 'Couple' },
 ];
 
-export function SettingsScreen() {
-  const {
-    form,
-    error,
-    setFormField,
-    resetForm,
-  } = useCalculatorContext();
-  const insets = useSafeAreaInsets();
+export function SettingsModal({ onClose }: SettingsModalProps) {
+  const { form, error, setFormField, resetForm } = useCalculatorContext();
   const errors = extractFieldErrors(error);
-
   const parentIsoleApplicable = form.situationFamiliale === 'celibataire' && Number(form.nbEnfants) > 0;
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
+    <SafeAreaView style={styles.container}>
+      <View style={styles.header}>
+        <Text style={styles.title}>Paramètres fiscaux</Text>
+        <PressableScale onPress={onClose} scale={0.9}>
+          <View style={styles.closeButton}>
+            <Icon name="close" size={24} color={colors.ink} />
+          </View>
+        </PressableScale>
+      </View>
+
       <ScrollView
         style={styles.scrollView}
-        contentContainerStyle={[
-          styles.content,
-          { paddingBottom: insets.bottom + spacing.xxxl },
-        ]}
+        contentContainerStyle={styles.content}
         keyboardShouldPersistTaps="handled"
       >
-        <View style={styles.header}>
-          <Text style={styles.title}>Paramètres fiscaux</Text>
-          <Text style={styles.subtitle}>
-            Ces données permettent de calculer l'impôt au barème et de tester l'éligibilité au versement libératoire.
-          </Text>
-        </View>
+        <Text style={styles.intro}>
+          Ces données servent à calculer l'impôt au barème et à tester l'éligibilité au versement libératoire.
+        </Text>
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Situation familiale</Text>
@@ -55,14 +56,12 @@ export function SettingsScreen() {
             value={form.situationFamiliale}
             options={SITUATION_OPTIONS}
             onChange={(value) => setFormField('situationFamiliale', value)}
-            accessibilityLabel="Situation familiale"
           />
           <Input
             label="Enfants à charge"
             value={form.nbEnfants}
             onChangeText={(value) => setFormField('nbEnfants', value)}
             placeholder="0"
-            accessibilityLabel="Nombre d'enfants à charge"
             error={errors.nbEnfants}
           />
           <Toggle
@@ -70,7 +69,6 @@ export function SettingsScreen() {
             value={parentIsoleApplicable && form.parentIsole}
             onChange={(value) => setFormField('parentIsole', value)}
             disabled={!parentIsoleApplicable}
-            accessibilityLabel="Case parent isolé"
           />
           <Input
             label="Autres revenus imposables du foyer"
@@ -78,7 +76,6 @@ export function SettingsScreen() {
             onChangeText={(value) => setFormField('autresRevenus', value)}
             placeholder="0"
             suffix="€"
-            accessibilityLabel="Autres revenus imposables du foyer"
             error={errors.autresRevenusNetsImposablesFoyer}
             helper="Montant net imposable figurant sur l'avis d'imposition du foyer."
           />
@@ -92,7 +89,6 @@ export function SettingsScreen() {
             onChangeText={(value) => setFormField('rfrN2', value)}
             placeholder="0"
             suffix="€"
-            accessibilityLabel="Revenu fiscal de référence N-2"
             error={errors.rfrN2Foyer}
             helper="Figure sur l'avis d'imposition de l'année N-2."
           />
@@ -101,7 +97,6 @@ export function SettingsScreen() {
             value={form.partsFiscalesN2}
             onChangeText={(value) => setFormField('partsFiscalesN2', value)}
             placeholder="1"
-            accessibilityLabel="Nombre de parts fiscales N-2"
             error={errors.partsFiscalesN2}
             helper="Distinct du nombre de parts calculé sur la situation actuelle."
           />
@@ -115,19 +110,23 @@ export function SettingsScreen() {
             onChangeText={(value) => setFormField('chargesFixesAnnuelles', value)}
             placeholder="0"
             suffix="€"
-            accessibilityLabel="Charges fixes annuelles"
             error={errors.chargesFixesAnnuelles}
-            helper="Dépenses réelles non déductibles du calcul, soustraites en fin de décompte."
+            helper="Dépenses réelles non déductibles, soustraites en fin de décompte."
           />
         </View>
 
         <Button
-          label="Réinitialiser tous les paramètres"
+          label="Réinitialiser"
           onPress={resetForm}
-          variant="tertiary"
+          variant="ghost"
+          size="md"
         />
       </ScrollView>
-    </View>
+
+      <View style={styles.footer}>
+        <Button label="Enregistrer" onPress={onClose} variant="primary" size="lg" />
+      </View>
+    </SafeAreaView>
   );
 }
 
@@ -136,31 +135,53 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
   },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.md,
+    paddingBottom: spacing.md,
+  },
+  title: {
+    ...typography.h2,
+    color: colors.ink,
+  },
+  closeButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: colors.surfaceSolid,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
   scrollView: {
     flex: 1,
   },
   content: {
-    paddingHorizontal: spacing.md,
+    paddingHorizontal: spacing.lg,
+    paddingBottom: spacing.xl,
   },
-  header: {
-    paddingTop: spacing.xl,
-    paddingBottom: spacing.lg,
-  },
-  title: {
-    ...typography.h1,
-    color: colors.ink,
-  },
-  subtitle: {
-    ...typography.body,
-    color: colors.inkSecondary,
-    marginTop: spacing.xs,
+  intro: {
+    ...typography.bodySmall,
+    color: colors.inkTertiary,
+    marginBottom: spacing.xl,
   },
   section: {
-    marginBottom: spacing.lg,
+    marginBottom: spacing.xl,
   },
   sectionTitle: {
     ...typography.overline,
-    color: colors.inkSecondary,
-    marginBottom: spacing.sm,
+    color: colors.primary,
+    marginBottom: spacing.md,
+  },
+  footer: {
+    paddingHorizontal: spacing.lg,
+    paddingBottom: spacing.xl,
+    borderTopWidth: 1,
+    borderTopColor: colors.border,
+    paddingTop: spacing.md,
   },
 });

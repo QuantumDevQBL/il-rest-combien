@@ -1,106 +1,116 @@
 /**
  * Design tokens — Il reste combien.
  *
- * Toutes les valeurs visuelles de l'application sont centralisées ici.
- * Aucune constante de couleur, d'espacement ou de rayon ne doit être écrite
- * en dur dans les composants.
+ * Direction premium : fond sombre, accents dorés, glassmorphism léger.
+ * Toutes les valeurs visuelles sont centralisées ici.
  */
 
 export const colors = {
   // Fonds
-  background: '#E8F5E9',
-  surface: '#FFFFFF',
-  surfaceSecondary: '#F0FDF4',
+  background: '#0B1220',
+  backgroundElevated: '#111827',
+  surface: 'rgba(30, 41, 59, 0.85)',
+  surfaceSolid: '#1E293B',
+  surfaceSecondary: 'rgba(51, 65, 85, 0.6)',
 
   // Encre
-  ink: '#0F172A',
-  inkSecondary: '#475569',
+  ink: '#F8FAFC',
+  inkSecondary: '#CBD5E1',
   inkTertiary: '#94A3B8',
 
   // Bordures
-  border: '#E2E8F0',
-  borderFocused: '#059669',
+  border: 'rgba(148, 163, 184, 0.2)',
+  borderFocused: '#F5B700',
 
   // Accents
-  primary: '#059669',
-  primaryLight: '#D1FAE5',
-  primaryDark: '#047857',
-  secondary: '#F97316',
-  secondaryLight: '#FFEDD5',
-  tertiary: '#7C3AED',
-  tertiaryLight: '#EDE9FE',
-  negative: '#DC2626',
-  negativeLight: '#FEE2E2',
-  alert: '#D97706',
-  alertLight: '#FEF3C7',
-  info: '#2563EB',
-  infoLight: '#DBEAFE',
+  primary: '#F5B700',
+  primaryLight: '#FEF3C7',
+  primaryDark: '#D97706',
+  success: '#34D399',
+  successLight: 'rgba(52, 211, 153, 0.15)',
+  info: '#60A5FA',
+  infoLight: 'rgba(96, 165, 250, 0.15)',
+  negative: '#F87171',
+  negativeLight: 'rgba(248, 113, 113, 0.15)',
+  alert: '#FB923C',
+  alertLight: 'rgba(251, 146, 60, 0.15)',
 
   // État
-  disabled: '#CBD5E1',
-  overlay: 'rgba(15, 23, 42, 0.5)',
+  disabled: '#475569',
+  overlay: 'rgba(0, 0, 0, 0.6)',
+
+  // Gradients
+  gradientStart: '#F5B700',
+  gradientEnd: '#F97316',
 } as const;
 
 import { TextStyle } from 'react-native';
 
 export const typography = {
+  display: {
+    fontSize: 72,
+    fontWeight: '800' as const,
+    lineHeight: 80,
+    fontFamily: 'System',
+  },
   hero: {
-    fontSize: 64,
-    fontWeight: '700' as const,
-    lineHeight: 72,
+    fontSize: 56,
+    fontWeight: '800' as const,
+    lineHeight: 64,
     fontFamily: 'System',
   },
   h1: {
-    fontSize: 32,
+    fontSize: 34,
     fontWeight: '800' as const,
-    lineHeight: 38,
+    lineHeight: 40,
     fontFamily: 'System',
   },
   h2: {
-    fontSize: 24,
+    fontSize: 26,
     fontWeight: '700' as const,
-    lineHeight: 30,
+    lineHeight: 32,
     fontFamily: 'System',
   },
   h3: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: '700' as const,
-    lineHeight: 24,
+    lineHeight: 26,
     fontFamily: 'System',
   },
   body: {
-    fontSize: 16,
-    fontWeight: '400' as const,
-    lineHeight: 22,
+    fontSize: 17,
+    fontWeight: '500' as const,
+    lineHeight: 24,
     fontFamily: 'System',
   },
   bodySmall: {
-    fontSize: 14,
-    fontWeight: '400' as const,
-    lineHeight: 20,
+    fontSize: 15,
+    fontWeight: '500' as const,
+    lineHeight: 22,
     fontFamily: 'System',
   },
   caption: {
-    fontSize: 12,
-    fontWeight: '600' as const,
-    lineHeight: 16,
+    fontSize: 13,
+    fontWeight: '700' as const,
+    lineHeight: 18,
     fontFamily: 'System',
+    letterSpacing: 0.3,
   },
   overline: {
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: '800' as const,
-    letterSpacing: 1.2,
+    letterSpacing: 1.5,
     textTransform: 'uppercase' as const,
     fontFamily: 'System',
   },
   amount: {
-    fontSize: 16,
-    fontWeight: '700' as const,
+    fontSize: 18,
+    fontWeight: '800' as const,
     fontVariant: ['tabular-nums'] as TextStyle['fontVariant'],
     fontFamily: 'System',
   },
   amountLarge: {
-    fontSize: 22,
+    fontSize: 24,
     fontWeight: '800' as const,
     fontVariant: ['tabular-nums'] as TextStyle['fontVariant'],
     fontFamily: 'System',
@@ -119,33 +129,40 @@ export const spacing = {
 } as const;
 
 export const radius = {
-  sm: 8,
-  md: 12,
-  lg: 20,
-  xl: 28,
+  sm: 12,
+  md: 16,
+  lg: 24,
+  xl: 32,
   full: 9999,
 } as const;
 
 export const shadows = {
   sm: {
-    shadowColor: '#0F172A',
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 4,
-    elevation: 2,
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
   },
   md: {
-    shadowColor: '#0F172A',
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 12,
-    elevation: 5,
+    shadowOpacity: 0.25,
+    shadowRadius: 16,
+    elevation: 8,
   },
   lg: {
-    shadowColor: '#0F172A',
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.12,
-    shadowRadius: 24,
+    shadowOpacity: 0.3,
+    shadowRadius: 28,
+    elevation: 12,
+  },
+  glow: {
+    shadowColor: '#F5B700',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.4,
+    shadowRadius: 20,
     elevation: 8,
   },
 } as const;

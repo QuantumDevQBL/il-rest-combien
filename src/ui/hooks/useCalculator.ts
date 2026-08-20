@@ -105,8 +105,11 @@ function formToInputs(form: CalculatorForm): InputsMicroEntreprise {
   };
 }
 
-export function useCalculator(): CalculatorState & CalculatorActions {
-  const [form, setForm] = useState<CalculatorForm>(DEFAULT_FORM);
+export function useCalculator(initialForm?: Partial<CalculatorForm>): CalculatorState & CalculatorActions {
+  const [form, setForm] = useState<CalculatorForm>({
+    ...DEFAULT_FORM,
+    ...initialForm,
+  });
   const [result, setResult] = useState<ResultatMicro | null>(null);
   const [error, setError] = useState<ValidationError | null>(null);
   const [caRequis, setCaRequis] = useState<number | null>(null);

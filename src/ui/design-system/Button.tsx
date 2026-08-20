@@ -5,17 +5,19 @@ import { colors, radius, shadows, spacing, typography } from './tokens';
 interface ButtonProps {
   label: string;
   onPress: () => void;
-  variant?: 'primary' | 'secondary' | 'tertiary' | 'danger';
-  disabled?: boolean;
+  variant?: 'primary' | 'secondary' | 'ghost' | 'danger';
   size?: 'md' | 'lg';
+  disabled?: boolean;
+  icon?: React.ReactNode;
 }
 
 export function Button({
   label,
   onPress,
   variant = 'primary',
+  size = 'lg',
   disabled = false,
-  size = 'md',
+  icon,
 }: ButtonProps) {
   return (
     <Pressable
@@ -25,10 +27,11 @@ export function Button({
         styles.base,
         styles[size],
         styles[variant],
+        variant === 'primary' && !pressed && !disabled && shadows.glow,
         (pressed || disabled) && styles.disabled,
-        variant === 'primary' && !pressed && !disabled && shadows.md,
       ]}
     >
+      {icon}
       <Text style={[styles.text, styles[`${variant}Text` as const], styles[`${size}Text` as const]]}>
         {label}
       </Text>
@@ -38,53 +41,57 @@ export function Button({
 
 const styles = StyleSheet.create({
   base: {
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: radius.full,
-    minHeight: 48,
+    minHeight: 56,
+    gap: spacing.sm,
   },
   md: {
     paddingVertical: spacing.sm,
     paddingHorizontal: spacing.lg,
+    minHeight: 48,
   },
   lg: {
     paddingVertical: spacing.md,
     paddingHorizontal: spacing.xl,
+    minHeight: 60,
   },
   primary: {
     backgroundColor: colors.primary,
   },
   secondary: {
     backgroundColor: colors.surface,
-    borderWidth: 2,
-    borderColor: colors.primary,
+    borderWidth: 1,
+    borderColor: colors.border,
   },
-  tertiary: {
+  ghost: {
     backgroundColor: 'transparent',
   },
   danger: {
     backgroundColor: colors.negativeLight,
   },
   disabled: {
-    opacity: 0.5,
+    opacity: 0.45,
   },
   text: {
     ...typography.body,
-    fontWeight: '700',
+    fontWeight: '800',
   },
   mdText: {
-    fontSize: 16,
+    fontSize: 15,
   },
   lgText: {
-    fontSize: 18,
+    fontSize: 17,
   },
   primaryText: {
-    color: colors.surface,
+    color: colors.background,
   },
   secondaryText: {
-    color: colors.primary,
+    color: colors.ink,
   },
-  tertiaryText: {
+  ghostText: {
     color: colors.primary,
   },
   dangerText: {

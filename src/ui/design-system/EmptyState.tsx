@@ -1,18 +1,19 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { colors, spacing, typography } from './tokens';
-import { Icon } from './Icon';
 
 interface EmptyStateProps {
   icon?: React.ReactNode;
+  iconName?: keyof typeof Ionicons.glyphMap;
   title: string;
   description: string;
 }
 
-export function EmptyState({ icon, title, description }: EmptyStateProps) {
+export function EmptyState({ icon, iconName = 'calculator', title, description }: EmptyStateProps) {
   return (
     <View style={styles.container}>
-      {icon ?? <Icon name="calculator" size={48} color={colors.inkTertiary} />}
+      {icon ?? <Ionicons name={iconName} size={56} color={colors.primary} />}
       <Text style={styles.title}>{title}</Text>
       <Text style={styles.description}>{description}</Text>
     </View>
@@ -28,13 +29,14 @@ const styles = StyleSheet.create({
   },
   title: {
     ...typography.h3,
-    marginTop: spacing.md,
+    color: colors.ink,
+    marginTop: spacing.lg,
     textAlign: 'center',
   },
   description: {
     ...typography.bodySmall,
-    color: colors.inkSecondary,
-    marginTop: spacing.xs,
+    color: colors.inkTertiary,
+    marginTop: spacing.sm,
     textAlign: 'center',
   },
 });

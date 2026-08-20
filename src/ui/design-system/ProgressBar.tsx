@@ -40,7 +40,7 @@ const styles = StyleSheet.create({
   track: {
     flexDirection: 'row',
     width: '100%',
-    backgroundColor: colors.border,
+    backgroundColor: colors.surfaceSecondary,
     borderRadius: radius.full,
     overflow: 'hidden',
   },

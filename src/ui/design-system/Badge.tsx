@@ -4,16 +4,15 @@ import { colors, radius, spacing, typography } from './tokens';
 
 interface BadgeProps {
   label: string;
-  variant?: 'success' | 'alert' | 'info' | 'error' | 'secondary' | 'tertiary';
+  variant?: 'primary' | 'success' | 'info' | 'danger' | 'alert';
 }
 
 const VARIANTS = {
-  success: { bg: colors.primaryLight, text: colors.primaryDark },
-  alert: { bg: colors.alertLight, text: colors.alert },
+  primary: { bg: colors.primaryLight, text: colors.background },
+  success: { bg: colors.successLight, text: colors.success },
   info: { bg: colors.infoLight, text: colors.info },
-  error: { bg: colors.negativeLight, text: colors.negative },
-  secondary: { bg: colors.secondaryLight, text: colors.secondary },
-  tertiary: { bg: colors.tertiaryLight, text: colors.tertiary },
+  danger: { bg: colors.negativeLight, text: colors.negative },
+  alert: { bg: colors.alertLight, text: colors.alert },
 };
 
 export function Badge({ label, variant = 'info' }: BadgeProps) {
@@ -28,12 +27,12 @@ export function Badge({ label, variant = 'info' }: BadgeProps) {
 const styles = StyleSheet.create({
   container: {
     alignSelf: 'flex-start',
-    paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.xxs,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.xs,
     borderRadius: radius.full,
   },
   text: {
     ...typography.caption,
-    fontWeight: '800',
+    fontWeight: '900',
   },
 });

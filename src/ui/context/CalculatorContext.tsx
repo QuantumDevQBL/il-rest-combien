@@ -1,14 +1,16 @@
 import React, { createContext, useContext, ReactNode } from 'react';
 import { useCalculator, CalculatorState, CalculatorActions } from '../hooks/useCalculator';
+import { CalculatorForm } from '../types';
 
 const CalculatorContext = createContext<(CalculatorState & CalculatorActions) | null>(null);
 
 interface CalculatorProviderProps {
   children: ReactNode;
+  initialForm?: Partial<CalculatorForm>;
 }
 
-export function CalculatorProvider({ children }: CalculatorProviderProps) {
-  const calculator = useCalculator();
+export function CalculatorProvider({ children, initialForm }: CalculatorProviderProps) {
+  const calculator = useCalculator(initialForm);
   return (
     <CalculatorContext.Provider value={calculator}>
       {children}

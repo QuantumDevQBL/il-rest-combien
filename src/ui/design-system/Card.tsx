@@ -4,13 +4,13 @@ import { colors, radius, shadows, spacing } from './tokens';
 
 interface CardProps {
   children: React.ReactNode;
-  variant?: 'default' | 'filled' | 'accent' | 'secondary';
+  variant?: 'default' | 'filled' | 'accent' | 'glass';
   style?: StyleProp<ViewStyle>;
 }
 
 export function Card({ children, variant = 'default', style }: CardProps) {
   return (
-    <View style={[styles.base, styles[variant], variant === 'default' && shadows.sm, style]}>
+    <View style={[styles.base, styles[variant], variant === 'default' && shadows.md, style]}>
       {children}
     </View>
   );
@@ -18,12 +18,13 @@ export function Card({ children, variant = 'default', style }: CardProps) {
 
 const styles = StyleSheet.create({
   base: {
-    backgroundColor: colors.surface,
     borderRadius: radius.lg,
-    padding: spacing.md,
+    padding: spacing.lg,
   },
   default: {
-    borderWidth: 0,
+    backgroundColor: colors.surfaceSolid,
+    borderWidth: 1,
+    borderColor: colors.border,
   },
   filled: {
     backgroundColor: colors.surfaceSecondary,
@@ -33,8 +34,9 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary,
     borderWidth: 0,
   },
-  secondary: {
-    backgroundColor: colors.secondaryLight,
-    borderWidth: 0,
+  glass: {
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
   },
 });

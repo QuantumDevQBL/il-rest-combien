@@ -1,41 +1,64 @@
 import React from 'react';
-import { render, fireEvent, screen, waitFor } from './test-utils';
 import { AppNavigator } from '../navigation/AppNavigator';
+import { render, fireEvent, screen, waitFor } from './test-utils';
+import { resetAsyncStorage } from './__mocks__/async-storage';
 
-jest.mock('@react-native-async-storage/async-storage', () => ({
-  setItem: jest.fn(() => Promise.resolve()),
-  getItem: jest.fn(() => Promise.resolve(null)),
-  removeItem: jest.fn(() => Promise.resolve()),
-}));
+beforeEach(() => {
+  resetAsyncStorage();
+});
+
+async function waitForOnboarding() {
+  await waitFor(() => {
+    expect(screen.getByText('Combien il te reste vraiment ?')).toBeTruthy();
+  });
+}
 
 describe('AppNavigator', () => {
-  it('affiche l\'écran Simulateur par défaut', async () => {
+  it('shows onboarding on first launch', async () => {
     render(<AppNavigator />);
+    await waitForOnboarding();
+  });
+
+  it('navigates from onboarding to home to result', async () => {
+    render(<AppNavigator />);
+    await waitForOnboarding();
+
+    fireEvent.press(screen.getByText('Passer'));
 
     await waitFor(() => {
-      expect(screen.getByText('Il reste combien ?')).toBeTruthy();
+      expect(screen.getByText('Quelle est ton activité ?')).toBeTruthy();
+    });
+
+    fireEvent.press(screen.getByText('Profession libérale non réglementée'));
+    fireEvent.changeText(screen.getByPlaceholderText('0'), '50000');
+    fireEvent.press(screen.getByText('Calculer'));
+
+    await waitFor(() => {
+      expect(screen.getByText('Il te reste')).toBeTruthy();
     });
   });
 
-  it('navigue vers l\'onglet Paramètres', async () => {
+  it('opens settings modal from result screen', async () => {
     render(<AppNavigator />);
+    await waitForOnboarding();
 
-    const parametresTab = screen.getByLabelText('Parametres, tab, 3 of 3');
-    fireEvent.press(parametresTab);
-
+    fireEvent.press(screen.getByText('Passer'));
     await waitFor(() => {
-      expect(screen.getByText('Données N-2 (avis d\'imposition)')).toBeTruthy();
+      expect(screen.getByText('Quelle est ton activité ?')).toBeTruthy();
     });
-  });
 
-  it('navigue vers l\'onglet Historique', async () => {
-    render(<AppNavigator />);
-
-    const historiqueTab = screen.getByLabelText('Historique, tab, 2 of 3');
-    fireEvent.press(historiqueTab);
+    fireEvent.press(screen.getByText('Profession libérale non réglementée'));
+    fireEvent.changeText(screen.getByPlaceholderText('0'), '50000');
+    fireEvent.press(screen.getByText('Calculer'));
 
     await waitFor(() => {
-      expect(screen.getByText('Aucune simulation')).toBeTruthy();
+      expect(screen.getByText('Il te reste')).toBeTruthy();
+    });
+
+    fireEvent.press(screen.getByLabelText('Paramètres fiscaux'));
+
+    await waitFor(() => {
+      expect(screen.getByText('Paramètres fiscaux')).toBeTruthy();
     });
   });
 });

@@ -8,9 +8,9 @@ interface BadgeProps {
 }
 
 const VARIANTS = {
-  primary: { bg: colors.primaryLight, text: colors.background },
+  primary: { bg: colors.primaryLight, text: colors.primary },
   success: { bg: colors.successLight, text: colors.success },
-  info: { bg: colors.infoLight, text: colors.info },
+  info: { bg: colors.secondaryLight, text: colors.secondary },
   danger: { bg: colors.negativeLight, text: colors.negative },
   alert: { bg: colors.alertLight, text: colors.alert },
 };
@@ -27,8 +27,8 @@ export function Badge({ label, variant = 'info' }: BadgeProps) {
 const styles = StyleSheet.create({
   container: {
     alignSelf: 'flex-start',
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.xs,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xxs,
     borderRadius: radius.full,
   },
   text: {

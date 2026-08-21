@@ -9,25 +9,21 @@ interface CardProps {
 }
 
 export function Card({ children, variant = 'default', style }: CardProps) {
-  return (
-    <View style={[styles.base, styles[variant], variant === 'default' && shadows.md, style]}>
-      {children}
-    </View>
-  );
+  return <View style={[styles.base, styles[variant], variant === 'default' && shadows.sm, style]}>{children}</View>;
 }
 
 const styles = StyleSheet.create({
   base: {
     borderRadius: radius.lg,
-    padding: spacing.lg,
+    padding: spacing.md,
   },
   default: {
-    backgroundColor: colors.surfaceSolid,
+    backgroundColor: colors.surfaceElevated,
     borderWidth: 1,
     borderColor: colors.border,
   },
   filled: {
-    backgroundColor: colors.surfaceSecondary,
+    backgroundColor: colors.surface,
     borderWidth: 0,
   },
   accent: {
@@ -35,7 +31,7 @@ const styles = StyleSheet.create({
     borderWidth: 0,
   },
   glass: {
-    backgroundColor: colors.surface,
+    backgroundColor: colors.surfaceElevated,
     borderWidth: 1,
     borderColor: colors.border,
   },

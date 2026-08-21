@@ -101,7 +101,7 @@ const styles = StyleSheet.create({
     color: colors.primary,
   },
   amountPonction: {
-    color: colors.negative,
+    color: colors.secondary,
   },
   separator: {
     height: 1,

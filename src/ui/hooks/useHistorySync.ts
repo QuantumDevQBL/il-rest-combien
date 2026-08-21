@@ -21,6 +21,7 @@ export function useHistorySync(): void {
     lastCaRef.current = ca;
 
     void addItem({
+      label: form.label,
       activity: form.activity,
       caAnnuelHT: ca,
       revenuNetDisponible: result.revenuNetDisponible,

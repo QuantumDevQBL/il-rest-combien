@@ -13,7 +13,7 @@ describe('HomeScreen', () => {
   it('selects an activity and moves to revenue step', () => {
     render(<HomeScreen onCalculate={jest.fn()} />);
     fireEvent.press(screen.getByText('Profession libérale non réglementée'));
-    expect(screen.getByText('Ton chiffre d\'affaires annuel')).toBeTruthy();
+    expect(screen.getByText('Ton chiffre d\'affaires')).toBeTruthy();
   });
 
   it('allows entering a revenue amount', () => {

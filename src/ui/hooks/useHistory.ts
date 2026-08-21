@@ -8,6 +8,7 @@ const MAX_HISTORY_ITEMS = 50;
 export interface HistoryItem {
   id: string;
   date: string;
+  label: string;
   activity: ActivityChoice;
   caAnnuelHT: number;
   revenuNetDisponible: number;

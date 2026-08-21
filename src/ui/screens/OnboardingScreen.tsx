@@ -8,11 +8,10 @@ import {
   StyleSheet,
   Text,
   View,
-  ViewToken,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Button } from '../design-system';
-import { colors, spacing, typography } from '../theme';
+import { Button, Icon, IconName } from '../design-system';
+import { colors, shadows, spacing, typography } from '../theme';
 import { PressableScale } from '../components/PressableScale';
 
 const { width } = Dimensions.get('window');
@@ -21,7 +20,7 @@ interface Slide {
   id: string;
   title: string;
   description: string;
-  emoji: string;
+  icon: IconName;
 }
 
 const SLIDES: Slide[] = [
@@ -29,22 +28,29 @@ const SLIDES: Slide[] = [
     id: '1',
     title: 'Combien il te reste vraiment ?',
     description:
-      'Saisis ton chiffre d\'affaires et découvre instantanément ce qu\'il te reste après cotisations et impôt.',
-    emoji: '💰',
+      'Saisis ton chiffre d\'affaires et découvre instantanément ce qu\'il te reste après cotisations et impôt sur le revenu.',
+    icon: 'cash',
   },
   {
     id: '2',
     title: 'Barème ou versement libératoire ?',
     description:
-      'On compare les deux options d\'impôt pour te dire laquelle est la plus avantageuse cette année.',
-    emoji: '⚖️',
+      'On calcule les deux options d\'impôt et on te dit laquelle est la plus avantageuse pour ta situation.',
+    icon: 'swapHorizontal',
   },
   {
     id: '3',
     title: 'Tes données restent chez toi',
     description:
-      'Aucune connexion internet, aucun tracking. Tout est calculé directement sur ton téléphone.',
-    emoji: '🔒',
+      'Aucune connexion internet, aucun tracking, aucun compte. Tout est calculé directement sur ton téléphone.',
+    icon: 'lockClosed',
+  },
+  {
+    id: '4',
+    title: 'Périmètre de la V1',
+    description:
+      'Micro-entrepreneurs en France métropolitaine, barèmes 2026. Professions réglementées (Cipav) non couvertes pour l\'instant.',
+    icon: 'shieldCheckmark',
   },
 ];
 
@@ -55,12 +61,6 @@ interface OnboardingScreenProps {
 export function OnboardingScreen({ onComplete }: OnboardingScreenProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const flatListRef = useRef<FlatList<Slide>>(null);
-  const scrollX = useRef(new Animated.Value(0)).current;
-
-  const handleScroll = Animated.event(
-    [{ nativeEvent: { contentOffset: { x: scrollX } } }],
-    { useNativeDriver: true }
-  );
 
   const handleMomentumScrollEnd = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
     const newIndex = Math.round(event.nativeEvent.contentOffset.x / width);
@@ -79,8 +79,8 @@ export function OnboardingScreen({ onComplete }: OnboardingScreenProps) {
 
   const renderItem = ({ item }: { item: Slide }) => (
     <View style={styles.slide}>
-      <View style={styles.emojiCircle}>
-        <Text style={styles.emoji}>{item.emoji}</Text>
+      <View style={styles.iconCircle}>
+        <Icon name={item.icon} size={40} color={colors.background} />
       </View>
       <Text style={styles.title}>{item.title}</Text>
       <Text style={styles.description}>{item.description}</Text>
@@ -104,7 +104,6 @@ export function OnboardingScreen({ onComplete }: OnboardingScreenProps) {
         pagingEnabled
         showsHorizontalScrollIndicator={false}
         bounces={false}
-        onScroll={handleScroll}
         onMomentumScrollEnd={handleMomentumScrollEnd}
         onScrollToIndexFailed={() => {
           // Fallback for environments where layout metrics are unavailable (tests).
@@ -113,29 +112,15 @@ export function OnboardingScreen({ onComplete }: OnboardingScreenProps) {
       />
 
       <View style={styles.footer}>
-        <View style={styles.dotsContainer}>
+        <View style={styles.progressContainer}>
           {SLIDES.map((_, index) => {
-            const inputRange = [
-              (index - 1) * width,
-              index * width,
-              (index + 1) * width,
-            ];
-            const scale = scrollX.interpolate({
-              inputRange,
-              outputRange: [0.8, 1.4, 0.8],
-              extrapolate: 'clamp',
-            });
-            const opacity = scrollX.interpolate({
-              inputRange,
-              outputRange: [0.4, 1, 0.4],
-              extrapolate: 'clamp',
-            });
+            const isActive = index === currentIndex;
             return (
               <Animated.View
                 key={index}
                 style={[
                   styles.dot,
-                  { transform: [{ scale }], opacity },
+                  isActive && styles.dotActive,
                 ]}
               />
             );
@@ -173,19 +158,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  emojiCircle: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    backgroundColor: colors.surfaceSolid,
+  iconCircle: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: spacing.xxl,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  emoji: {
-    fontSize: 56,
+    ...shadows.md,
   },
   title: {
     ...typography.h1,
@@ -197,13 +178,13 @@ const styles = StyleSheet.create({
     ...typography.body,
     color: colors.inkSecondary,
     textAlign: 'center',
-    lineHeight: 28,
+    lineHeight: 26,
   },
   footer: {
     paddingHorizontal: spacing.lg,
     paddingBottom: spacing.xxl,
   },
-  dotsContainer: {
+  progressContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
@@ -211,9 +192,16 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
   },
   dot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: colors.inkTertiary,
+    opacity: 0.4,
+    transform: [{ scale: 0.8 }],
+  },
+  dotActive: {
     backgroundColor: colors.primary,
+    opacity: 1,
+    transform: [{ scale: 1 }],
   },
 });

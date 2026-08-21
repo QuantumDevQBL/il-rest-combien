@@ -1,16 +1,20 @@
-import React from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import React, { useEffect } from 'react';
+import { StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useCalculatorContext } from '../context/CalculatorContext';
-import { AnimatedNumber } from '../components/AnimatedNumber';
+import { AnimatedCounter } from '../components/AnimatedCounter';
 import { FadeInView } from '../components/FadeInView';
 import { PressableScale } from '../components/PressableScale';
-import { ProgressBar, Badge, Card, Icon } from '../design-system';
+import { BottomSheet } from '../components/BottomSheet';
+import { MetricPill } from '../components/MetricPill';
+import { ProgressBar, Card, Icon } from '../design-system';
 import { Comparaison } from '../components/Comparaison';
 import { Alertes } from '../components/Alertes';
 import { MentionLegale } from '../components/MentionLegale';
+import { getActivityLabel } from '../mapping';
 import { colors, radius, shadows, spacing, typography } from '../theme';
 import { formatMontant } from '../utils/format';
+import { hapticImpact } from '../utils/haptics';
 
 interface ResultScreenProps {
   onReset: () => void;
@@ -27,16 +31,27 @@ export function ResultScreen({
   onOpenInverse,
   onOpenDetail,
 }: ResultScreenProps) {
-  const { result } = useCalculatorContext();
+  const { result, form } = useCalculatorContext();
+
+  useEffect(() => {
+    if (result) {
+      void hapticImpact();
+    }
+  }, [result]);
 
   if (!result) return null;
 
   const netMensuel = result.revenuNetDisponible / 12;
+  const tauxPrelevement = result.tauxPrelevementGlobal * 100;
+  const estimationLabel = form.label.trim() || getActivityLabel(form.activity);
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <View>
+        <View style={styles.logoRow}>
+          <View style={styles.logoIcon}>
+            <Icon name="cash" size={18} color={colors.background} />
+          </View>
           <Text style={styles.logo}>Il reste combien ?</Text>
         </View>
         <View style={styles.headerActions}>
@@ -47,7 +62,7 @@ export function ResultScreen({
             accessibilityLabel="Historique"
           >
             <View style={styles.iconButton}>
-              <Icon name="time" size={24} color={colors.ink} />
+              <Icon name="time" size={22} color={colors.ink} />
             </View>
           </PressableScale>
           <PressableScale
@@ -57,28 +72,25 @@ export function ResultScreen({
             accessibilityLabel="Paramètres fiscaux"
           >
             <View style={styles.iconButton}>
-              <Icon name="settings" size={24} color={colors.ink} />
+              <Icon name="settings" size={22} color={colors.ink} />
             </View>
           </PressableScale>
         </View>
       </View>
 
-      <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.content}
-        showsVerticalScrollIndicator={false}
-      >
+      <View style={styles.main} pointerEvents="box-none">
         <FadeInView delay={0}>
           <Card variant="glass" style={styles.heroCard}>
-            <Text style={styles.heroLabel}>Il te reste</Text>
+            <View style={styles.heroHeader}>
+              <Text style={styles.heroLabel}>{estimationLabel}</Text>
+              <Text style={styles.heroCa}>CA {formatMontant(result.caAnnuelHT)}</Text>
+            </View>
             <View style={styles.heroAmountRow}>
               <Text style={styles.heroCurrency}>€</Text>
-              <AnimatedNumber
+              <AnimatedCounter
                 value={result.revenuNetDisponible}
                 style={styles.heroAmount}
-                formatter={(v) =>
-                  Math.round(v).toLocaleString('fr-FR')
-                }
+                formatter={(v) => Math.round(v).toLocaleString('fr-FR')}
               />
             </View>
             <Text style={styles.heroMonthly}>soit {formatMontant(netMensuel)} / mois</Text>
@@ -86,11 +98,11 @@ export function ResultScreen({
             <View style={styles.progressContainer}>
               <ProgressBar
                 segments={[
-                  { ratio: result.totalPrelevementsSociaux / result.caAnnuelHT, color: colors.info },
+                  { ratio: result.totalPrelevementsSociaux / result.caAnnuelHT, color: colors.secondary },
                   { ratio: result.impotRetenu / result.caAnnuelHT, color: colors.alert },
                   { ratio: result.revenuNetDisponible / result.caAnnuelHT, color: colors.success },
                 ]}
-                height={12}
+                height={10}
               />
             </View>
 
@@ -99,54 +111,88 @@ export function ResultScreen({
                 Sur 100 € : {formatMontant(result.resteSurCent)}
               </Text>
               <Text style={styles.heroFooterText}>
-                Prélèvements : {(result.tauxPrelevementGlobal * 100).toFixed(1)} %
+                Prélèvements : {tauxPrelevement.toFixed(1)} %
               </Text>
             </View>
           </Card>
         </FadeInView>
 
         <FadeInView delay={100}>
+          <View style={styles.pillsRow}>
+            <MetricPill
+              label="Cotisations"
+              value={formatMontant(result.totalPrelevementsSociaux)}
+              variant="secondary"
+            />
+            <MetricPill
+              label="Impôt"
+              value={formatMontant(result.impotRetenu)}
+              variant="alert"
+            />
+            <MetricPill
+              label="Sur 100 €"
+              value={formatMontant(result.resteSurCent)}
+              variant="success"
+            />
+          </View>
+        </FadeInView>
+      </View>
+
+      <BottomSheet collapsedHeight={220} expandedHeight={620}>
+        <FadeInView delay={150}>
           <Comparaison result={result} />
         </FadeInView>
 
-        <FadeInView delay={200}>
+        <FadeInView delay={250}>
           <Alertes result={result} />
         </FadeInView>
 
         <FadeInView delay={300}>
+          <Card style={styles.hypothesesCard}>
+            <View style={styles.hypothesesHeader}>
+              <Icon name="informationCircle" size={18} color={colors.inkTertiary} />
+              <Text style={styles.hypothesesTitle}>Hypothèses</Text>
+            </View>
+            <Text style={styles.hypothesesText}>
+              Micro-entreprise · France métropolitaine · barèmes 2026. Professions réglementées (Cipav) non couvertes. CFE non incluse.
+            </Text>
+          </Card>
+        </FadeInView>
+
+        <FadeInView delay={400}>
           <View style={styles.actionsContainer}>
             <PressableScale onPress={onOpenDetail} scale={0.97} style={styles.actionCard}>
               <View style={styles.actionIcon}>
-                <Icon name="statsChart" size={24} color={colors.primary} />
+                <Icon name="statsChart" size={22} color={colors.primary} />
               </View>
               <View style={styles.actionText}>
                 <Text style={styles.actionTitle}>Voir le détail</Text>
                 <Text style={styles.actionDescription}>Décompte complet poste par poste</Text>
               </View>
-              <Icon name="arrowForward" size={20} color={colors.inkTertiary} />
+              <Icon name="arrowForward" size={18} color={colors.inkTertiary} />
             </PressableScale>
 
             <PressableScale onPress={onOpenInverse} scale={0.97} style={styles.actionCard}>
               <View style={styles.actionIcon}>
-                <Icon name="swapHorizontal" size={24} color={colors.primary} />
+                <Icon name="swapHorizontal" size={22} color={colors.primary} />
               </View>
               <View style={styles.actionText}>
                 <Text style={styles.actionTitle}>Objectif de revenu</Text>
                 <Text style={styles.actionDescription}>Combien facturer pour gagner X € ?</Text>
               </View>
-              <Icon name="arrowForward" size={20} color={colors.inkTertiary} />
+              <Icon name="arrowForward" size={18} color={colors.inkTertiary} />
             </PressableScale>
           </View>
         </FadeInView>
 
-        <FadeInView delay={400}>
+        <FadeInView delay={450}>
           <PressableScale onPress={onReset} scale={0.97}>
             <Text style={styles.resetText}>Nouvelle simulation</Text>
           </PressableScale>
         </FadeInView>
 
         <MentionLegale />
-      </ScrollView>
+      </BottomSheet>
     </SafeAreaView>
   );
 }
@@ -164,6 +210,19 @@ const styles = StyleSheet.create({
     paddingTop: spacing.md,
     paddingBottom: spacing.md,
   },
+  logoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  logoIcon: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: colors.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: spacing.sm,
+  },
   logo: {
     ...typography.h3,
     color: colors.ink,
@@ -173,30 +232,38 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
   },
   iconButton: {
-    width: 44,
-    height: 44,
+    width: 42,
+    height: 42,
     borderRadius: radius.full,
-    backgroundColor: colors.surfaceSolid,
+    backgroundColor: colors.surfaceElevated,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
     borderColor: colors.border,
   },
-  scrollView: {
-    flex: 1,
-  },
-  content: {
+  main: {
     paddingHorizontal: spacing.lg,
-    paddingBottom: spacing.xxxl,
+    paddingBottom: spacing.md,
   },
   heroCard: {
-    marginBottom: spacing.lg,
     ...shadows.lg,
   },
-  heroLabel: {
-    ...typography.overline,
-    color: colors.inkTertiary,
+  heroHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     marginBottom: spacing.sm,
+  },
+  heroLabel: {
+    ...typography.bodySmall,
+    color: colors.ink,
+    fontWeight: '700',
+    flex: 1,
+    marginRight: spacing.sm,
+  },
+  heroCa: {
+    ...typography.caption,
+    color: colors.inkTertiary,
   },
   heroAmountRow: {
     flexDirection: 'row',
@@ -220,7 +287,7 @@ const styles = StyleSheet.create({
     marginTop: spacing.sm,
   },
   progressContainer: {
-    marginTop: spacing.xl,
+    marginTop: spacing.lg,
     marginBottom: spacing.md,
   },
   heroFooter: {
@@ -231,6 +298,30 @@ const styles = StyleSheet.create({
     ...typography.caption,
     color: colors.inkTertiary,
   },
+  pillsRow: {
+    flexDirection: 'row',
+    gap: spacing.sm,
+    marginTop: spacing.md,
+  },
+  hypothesesCard: {
+    marginBottom: spacing.lg,
+    backgroundColor: colors.surfaceElevated,
+  },
+  hypothesesHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: spacing.xs,
+  },
+  hypothesesTitle: {
+    ...typography.caption,
+    color: colors.inkTertiary,
+    marginLeft: spacing.xs,
+  },
+  hypothesesText: {
+    ...typography.bodySmall,
+    color: colors.inkSecondary,
+    lineHeight: 20,
+  },
   actionsContainer: {
     gap: spacing.md,
     marginBottom: spacing.lg,
@@ -238,17 +329,17 @@ const styles = StyleSheet.create({
   actionCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.surfaceSolid,
+    backgroundColor: colors.surfaceElevated,
     borderRadius: radius.lg,
     padding: spacing.md,
     borderWidth: 1,
     borderColor: colors.border,
   },
   actionIcon: {
-    width: 48,
-    height: 48,
+    width: 44,
+    height: 44,
     borderRadius: radius.md,
-    backgroundColor: 'rgba(245, 183, 0, 0.12)',
+    backgroundColor: colors.primaryLight,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: spacing.md,

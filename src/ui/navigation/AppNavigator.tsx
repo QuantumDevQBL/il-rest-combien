@@ -86,9 +86,11 @@ export function AppNavigator() {
         <Stack.Group
           screenOptions={{
             ...TransitionPresets.ModalSlideFromBottomIOS,
-            presentation: 'modal',
+            presentation: 'transparentModal',
             gestureEnabled: true,
             gestureDirection: 'vertical',
+            cardStyle: { backgroundColor: 'transparent' },
+            cardOverlayEnabled: true,
           }}
         >
           <Stack.Screen name="SettingsModal">

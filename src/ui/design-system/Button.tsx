@@ -27,7 +27,7 @@ export function Button({
         styles.base,
         styles[size],
         styles[variant],
-        variant === 'primary' && !pressed && !disabled && shadows.glow,
+        variant === 'primary' && !pressed && !disabled && shadows.md,
         (pressed || disabled) && styles.disabled,
       ]}
     >
@@ -44,25 +44,25 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: radius.full,
-    minHeight: 56,
+    borderRadius: radius.xl,
+    minHeight: 52,
     gap: spacing.sm,
   },
   md: {
     paddingVertical: spacing.sm,
     paddingHorizontal: spacing.lg,
-    minHeight: 48,
+    minHeight: 44,
   },
   lg: {
     paddingVertical: spacing.md,
     paddingHorizontal: spacing.xl,
-    minHeight: 60,
+    minHeight: 56,
   },
   primary: {
     backgroundColor: colors.primary,
   },
   secondary: {
-    backgroundColor: colors.surface,
+    backgroundColor: colors.surfaceElevated,
     borderWidth: 1,
     borderColor: colors.border,
   },
@@ -73,17 +73,17 @@ const styles = StyleSheet.create({
     backgroundColor: colors.negativeLight,
   },
   disabled: {
-    opacity: 0.45,
+    opacity: 0.4,
   },
   text: {
     ...typography.body,
     fontWeight: '800',
   },
   mdText: {
-    fontSize: 15,
+    fontSize: 14,
   },
   lgText: {
-    fontSize: 17,
+    fontSize: 16,
   },
   primaryText: {
     color: colors.background,

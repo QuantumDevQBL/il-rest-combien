@@ -30,11 +30,15 @@ describe('AppNavigator', () => {
     });
 
     fireEvent.press(screen.getByText('Profession libérale non réglementée'));
-    fireEvent.changeText(screen.getByPlaceholderText('0'), '50000');
+    const input = await waitFor(() => screen.getByPlaceholderText('0'));
+    fireEvent.changeText(input, '50000');
+    await waitFor(() => {
+      expect(screen.getByDisplayValue('50000')).toBeTruthy();
+    });
     fireEvent.press(screen.getByText('Calculer'));
 
     await waitFor(() => {
-      expect(screen.getByText('Il te reste')).toBeTruthy();
+      expect(screen.getByText('Objectif de revenu')).toBeTruthy();
     });
   });
 
@@ -48,11 +52,15 @@ describe('AppNavigator', () => {
     });
 
     fireEvent.press(screen.getByText('Profession libérale non réglementée'));
-    fireEvent.changeText(screen.getByPlaceholderText('0'), '50000');
+    const input = await waitFor(() => screen.getByPlaceholderText('0'));
+    fireEvent.changeText(input, '50000');
+    await waitFor(() => {
+      expect(screen.getByDisplayValue('50000')).toBeTruthy();
+    });
     fireEvent.press(screen.getByText('Calculer'));
 
     await waitFor(() => {
-      expect(screen.getByText('Il te reste')).toBeTruthy();
+      expect(screen.getByText('Objectif de revenu')).toBeTruthy();
     });
 
     fireEvent.press(screen.getByLabelText('Paramètres fiscaux'));

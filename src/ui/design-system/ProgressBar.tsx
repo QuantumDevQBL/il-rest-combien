@@ -10,9 +10,10 @@ interface Segment {
 interface ProgressBarProps {
   segments: Segment[];
   height?: number;
+  animated?: boolean;
 }
 
-export function ProgressBar({ segments, height = 12 }: ProgressBarProps) {
+export function ProgressBar({ segments, height = 8, animated = true }: ProgressBarProps) {
   const total = segments.reduce((sum, s) => sum + s.ratio, 0);
   const safeTotal = total > 0 ? total : 1;
 
@@ -40,7 +41,7 @@ const styles = StyleSheet.create({
   track: {
     flexDirection: 'row',
     width: '100%',
-    backgroundColor: colors.surfaceSecondary,
+    backgroundColor: colors.surface,
     borderRadius: radius.full,
     overflow: 'hidden',
   },

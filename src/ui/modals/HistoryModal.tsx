@@ -1,13 +1,7 @@
 import React from 'react';
-import {
-  Alert,
-  FlatList,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { Alert, FlatList, StyleSheet, Text, View } from 'react-native';
 import { useCalculatorContext } from '../context/CalculatorContext';
+import { ModalContainer } from '../components/ModalContainer';
 import { useHistory, HistoryItem } from '../hooks/useHistory';
 import { EmptyState, Button, Icon } from '../design-system';
 import { PressableScale } from '../components/PressableScale';
@@ -35,6 +29,7 @@ export function HistoryModal({ onClose }: HistoryModalProps) {
   const { setFormField } = useCalculatorContext();
 
   const handleReuse = (item: HistoryItem) => {
+    setFormField('label', item.label);
     setFormField('activity', item.activity);
     setFormField('caAnnuelHT', String(item.caAnnuelHT));
     onClose();
@@ -56,16 +51,7 @@ export function HistoryModal({ onClose }: HistoryModalProps) {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Historique</Text>
-        <PressableScale onPress={onClose} scale={0.9}>
-          <View style={styles.closeButton}>
-            <Icon name="close" size={24} color={colors.ink} />
-          </View>
-        </PressableScale>
-      </View>
-
+    <ModalContainer title="Historique" onClose={onClose} scrollable={false}>
       {!isLoading && items.length === 0 ? (
         <View style={styles.emptyContainer}>
           <EmptyState
@@ -79,6 +65,7 @@ export function HistoryModal({ onClose }: HistoryModalProps) {
           data={items}
           keyExtractor={(item) => item.id}
           contentContainerStyle={styles.listContent}
+          showsVerticalScrollIndicator={false}
           renderItem={({ item }) => (
             <PressableScale
               onPress={() => handleReuse(item)}
@@ -86,7 +73,12 @@ export function HistoryModal({ onClose }: HistoryModalProps) {
               style={styles.item}
             >
               <View style={styles.itemHeader}>
-                <Text style={styles.itemDate}>{formatDate(item.date)}</Text>
+                <View style={styles.itemTitleBlock}>
+                  <Text style={styles.itemLabel} numberOfLines={1}>
+                    {item.label || getActivityLabel(item.activity)}
+                  </Text>
+                  <Text style={styles.itemDate}>{formatDate(item.date)}</Text>
+                </View>
                 <PressableScale
                   onPress={() => handleRemove(item.id)}
                   scale={0.85}
@@ -95,11 +87,10 @@ export function HistoryModal({ onClose }: HistoryModalProps) {
                   accessibilityLabel="Supprimer cette simulation"
                 >
                   <View style={styles.deleteButton}>
-                    <Icon name="closeCircle" size={24} color={colors.inkTertiary} />
+                    <Icon name="closeCircle" size={22} color={colors.inkTertiary} />
                   </View>
                 </PressableScale>
               </View>
-              <Text style={styles.itemActivity}>{getActivityLabel(item.activity)}</Text>
               <View style={styles.itemFooter}>
                 <Text style={styles.itemCa}>CA {formatMontant(item.caAnnuelHT)}</Text>
                 <Text style={styles.itemNet}>{formatMontant(item.revenuNetDisponible)} net</Text>
@@ -119,47 +110,21 @@ export function HistoryModal({ onClose }: HistoryModalProps) {
           <Button label="Vider l'historique" onPress={handleClear} variant="ghost" size="md" />
         </View>
       )}
-    </SafeAreaView>
+    </ModalContainer>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.md,
-    paddingBottom: spacing.md,
-  },
-  title: {
-    ...typography.h2,
-    color: colors.ink,
-  },
-  closeButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: colors.surfaceSolid,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
   emptyContainer: {
     flex: 1,
     justifyContent: 'center',
+    minHeight: 240,
   },
   listContent: {
-    paddingHorizontal: spacing.lg,
     paddingBottom: spacing.xl,
   },
   item: {
-    backgroundColor: colors.surfaceSolid,
+    backgroundColor: colors.surfaceElevated,
     borderRadius: radius.lg,
     padding: spacing.md,
     marginBottom: spacing.md,
@@ -169,8 +134,18 @@ const styles = StyleSheet.create({
   itemHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: spacing.xs,
+    alignItems: 'flex-start',
+    marginBottom: spacing.sm,
+  },
+  itemTitleBlock: {
+    flex: 1,
+    paddingRight: spacing.sm,
+  },
+  itemLabel: {
+    ...typography.body,
+    fontWeight: '700',
+    color: colors.ink,
+    marginBottom: spacing.xxs,
   },
   itemDate: {
     ...typography.caption,
@@ -181,12 +156,6 @@ const styles = StyleSheet.create({
     height: 32,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  itemActivity: {
-    ...typography.body,
-    fontWeight: '700',
-    color: colors.ink,
-    marginBottom: spacing.sm,
   },
   itemFooter: {
     flexDirection: 'row',
@@ -215,10 +184,7 @@ const styles = StyleSheet.create({
     fontWeight: '800',
   },
   footer: {
-    paddingHorizontal: spacing.lg,
-    paddingBottom: spacing.xl,
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
-    paddingTop: spacing.md,
+    marginTop: spacing.sm,
+    marginBottom: spacing.xl,
   },
 });

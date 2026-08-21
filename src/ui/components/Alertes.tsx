@@ -93,7 +93,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'flex-start',
     marginBottom: spacing.sm,
-    backgroundColor: colors.infoLight,
+    backgroundColor: colors.secondaryLight,
   },
   alerteWarning: {
     backgroundColor: colors.alertLight,

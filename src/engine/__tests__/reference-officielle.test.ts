@@ -151,10 +151,6 @@ function makeTest(
   valeurAttendue: number | boolean | null,
   valeurCalculee: number | boolean | null
 ) {
-  if (valeurAttendue === null) {
-    test.skip(label, () => {});
-    return;
-  }
   test(label, () => {
     expect(valeurCalculee).toBe(valeurAttendue);
   });

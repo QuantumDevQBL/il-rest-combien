@@ -22,7 +22,7 @@ function renderWithResult(initialForm = {}, handlers = {}) {
 describe('ResultScreen', () => {
   it('renders nothing when no result is available', () => {
     const { queryByText } = renderWithResult();
-    expect(queryByText('Il te reste')).toBeNull();
+    expect(queryByText('soit 0 € / mois')).toBeNull();
   });
 
   it('displays the main net amount and monthly equivalent', () => {
@@ -32,7 +32,7 @@ describe('ResultScreen', () => {
       rfrN2: '25000',
       partsFiscalesN2: '1',
     });
-    expect(screen.getByText('Il te reste')).toBeTruthy();
+    expect(screen.getByText('Profession libérale non réglementée')).toBeTruthy();
     expect(screen.getByText('36 000')).toBeTruthy();
     expect(screen.getByText('soit 3 000 € / mois')).toBeTruthy();
   });

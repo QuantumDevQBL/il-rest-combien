@@ -15,10 +15,19 @@ describe('OnboardingScreen', () => {
     expect(screen.getByText('Barème ou versement libératoire ?')).toBeTruthy();
   });
 
+  it('renders the scope slide as the last one', () => {
+    render(<OnboardingScreen onComplete={jest.fn()} />);
+    fireEvent.press(screen.getByText('Suivant'));
+    fireEvent.press(screen.getByText('Suivant'));
+    fireEvent.press(screen.getByText('Suivant'));
+    expect(screen.getByText('Périmètre de la V1')).toBeTruthy();
+  });
+
   it('calls onComplete when reaching the last slide and pressing Commencer', () => {
     const onComplete = jest.fn();
     render(<OnboardingScreen onComplete={onComplete} />);
 
+    fireEvent.press(screen.getByText('Suivant'));
     fireEvent.press(screen.getByText('Suivant'));
     fireEvent.press(screen.getByText('Suivant'));
 

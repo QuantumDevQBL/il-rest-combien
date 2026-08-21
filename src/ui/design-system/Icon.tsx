@@ -35,7 +35,14 @@ export type IconName =
   | 'medical'
   | 'school'
   | 'business'
-  | 'download';
+  | 'download'
+  | 'cart'
+  | 'construct'
+  | 'documentText'
+  | 'trophy'
+  | 'lockClosed'
+  | 'flash'
+  | 'call';
 
 const ICON_MAP: Record<IconName, keyof typeof Ionicons.glyphMap> = {
   wallet: 'wallet-outline',
@@ -71,6 +78,13 @@ const ICON_MAP: Record<IconName, keyof typeof Ionicons.glyphMap> = {
   school: 'school-outline',
   business: 'business-outline',
   download: 'download-outline',
+  cart: 'cart-outline',
+  construct: 'construct-outline',
+  documentText: 'document-text-outline',
+  trophy: 'trophy-outline',
+  lockClosed: 'lock-closed-outline',
+  flash: 'flash-outline',
+  call: 'call-outline',
 };
 
 interface IconProps {
@@ -79,10 +93,6 @@ interface IconProps {
   color?: string;
 }
 
-export function Icon({
-  name,
-  size = 24,
-  color = colors.ink,
-}: IconProps) {
+export function Icon({ name, size = 24, color = colors.ink }: IconProps) {
   return <Ionicons name={ICON_MAP[name]} size={size} color={color} />;
 }

@@ -3,7 +3,7 @@ import { StyleSheet, Text, TextInput, View } from 'react-native';
 import { colors, radius, spacing, typography } from '../theme';
 
 interface InputProps {
-  label: string;
+  label?: string;
   value: string;
   onChangeText: (value: string) => void;
   placeholder?: string;
@@ -26,12 +26,15 @@ export function Input({
   suffix,
 }: InputProps) {
   const [isFocused, setIsFocused] = useState(false);
+  const labelId = label ? `${label}-label` : undefined;
 
   return (
     <View style={styles.container}>
-      <Text style={styles.label} nativeID={`${label}-label`}>
-        {label}
-      </Text>
+      {label && (
+        <Text style={styles.label} nativeID={labelId}>
+          {label}
+        </Text>
+      )}
       <View
         style={[
           styles.inputContainer,
@@ -48,8 +51,8 @@ export function Input({
           placeholder={placeholder}
           placeholderTextColor={colors.inkTertiary}
           keyboardType={keyboardType}
-          accessibilityLabel={accessibilityLabel ?? label}
-          accessibilityLabelledBy={`${label}-label`}
+          accessibilityLabel={accessibilityLabel ?? label ?? 'Champ de saisie'}
+          accessibilityLabelledBy={labelId}
         />
         {suffix && <Text style={styles.suffix}>{suffix}</Text>}
       </View>
@@ -71,16 +74,16 @@ const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.surfaceSecondary,
-    borderRadius: radius.md,
+    backgroundColor: colors.surface,
+    borderRadius: radius.lg,
     paddingHorizontal: spacing.md,
     minHeight: 52,
     borderWidth: 1,
-    borderColor: 'transparent',
+    borderColor: colors.border,
   },
   inputContainerFocused: {
-    borderColor: colors.ink,
-    backgroundColor: colors.surface,
+    borderColor: colors.borderFocused,
+    backgroundColor: colors.surfaceElevated,
   },
   inputContainerError: {
     borderColor: colors.negative,

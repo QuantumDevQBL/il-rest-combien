@@ -45,15 +45,15 @@ export function RepartitionChart({ result }: RepartitionChartProps) {
       <Text style={styles.title}>Répartition du chiffre d'affaires</Text>
       <ProgressBar
         segments={[
-          { ratio: ratioSociaux, color: colors.negative },
+          { ratio: ratioSociaux, color: colors.secondary },
           { ratio: ratioImpot, color: colors.alert },
-          { ratio: ratioNet, color: colors.primary },
+          { ratio: ratioNet, color: colors.success },
         ]}
         height={16}
       />
       <View style={styles.legend}>
         <LegendItem
-          color={colors.negative}
+          color={colors.secondary}
           label="Cotisations et CFP"
           amount={totalPrelevementsSociaux}
           ratio={ratioSociaux}

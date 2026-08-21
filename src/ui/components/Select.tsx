@@ -1,10 +1,5 @@
 import React from 'react';
-import {
-  Platform,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import { Platform, StyleSheet, Text, View } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { colors, radius, spacing, typography } from '../theme';
 
@@ -44,11 +39,7 @@ export function Select<T extends string>({
           itemStyle={Platform.OS === 'ios' ? styles.pickerItem : undefined}
         >
           {options.map((option) => (
-            <Picker.Item
-              key={option.value}
-              label={option.label}
-              value={option.value}
-            />
+            <Picker.Item key={option.value} label={option.label} value={option.value} />
           ))}
         </Picker>
       </View>
@@ -66,10 +57,12 @@ const styles = StyleSheet.create({
     marginBottom: spacing.xxs,
   },
   pickerContainer: {
-    backgroundColor: colors.surfaceSecondary,
-    borderRadius: radius.md,
+    backgroundColor: colors.surface,
+    borderRadius: radius.lg,
     minHeight: 52,
     justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: colors.border,
   },
   picker: {
     ...typography.body,

@@ -20,7 +20,7 @@ describe('SettingsModal', () => {
     );
     expect(screen.getByText('Paramètres fiscaux')).toBeTruthy();
     expect(screen.getAllByText('Situation familiale').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getByText('Données N-2 (avis d\'imposition)')).toBeTruthy();
+    expect(screen.getByText('Données N-2')).toBeTruthy();
   });
 
   it('allows changing the number of children', () => {

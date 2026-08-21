@@ -28,7 +28,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
   },
   title: {
-    ...typography.h3,
+    ...typography.h2,
     color: colors.ink,
     marginTop: spacing.lg,
     textAlign: 'center',

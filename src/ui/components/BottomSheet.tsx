@@ -82,8 +82,9 @@ export function BottomSheet({
       onPanResponderRelease: (_, gestureState) => {
         const minY = SCREEN_HEIGHT - expandedHeight;
         const maxY = SCREEN_HEIGHT - collapsedHeight;
-        const threshold = (minY + maxY) / 2;
-        const shouldExpand = currentY.current + gestureState.dy < threshold;
+        const midY = (minY + maxY) / 2;
+        const projectedY = currentY.current + gestureState.dy + gestureState.vy * 80;
+        const shouldExpand = projectedY < midY;
         setExpanded(shouldExpand);
       },
     })
@@ -104,16 +105,16 @@ export function BottomSheet({
         style,
       ]}
     >
-      <PressableScale onPress={handlePress} scale={0.98} style={styles.header}>
+      <View style={styles.header} {...panResponder.panHandlers}>
         {showHandle && (
-          <View style={styles.handleContainer} {...panResponder.panHandlers}>
+          <View style={styles.handleContainer}>
             <View style={styles.handle} />
           </View>
         )}
-        <View style={styles.expandHint}>
+        <PressableScale onPress={handlePress} scale={0.98} style={styles.expandHint}>
           <Icon name={expandedState ? 'chevronDown' : 'chevronUp'} size={20} color={colors.inkTertiary} />
-        </View>
-      </PressableScale>
+        </PressableScale>
+      </View>
       <ScrollView
         style={styles.scroll}
         contentContainerStyle={styles.scrollContent}
@@ -148,12 +149,12 @@ const styles = StyleSheet.create({
   handleContainer: {
     width: '100%',
     alignItems: 'center',
-    paddingVertical: spacing.xs,
+    paddingVertical: spacing.sm,
   },
   handle: {
     width: 40,
-    height: 4,
-    borderRadius: 2,
+    height: 5,
+    borderRadius: 3,
     backgroundColor: colors.inkTertiary,
   },
   expandHint: {

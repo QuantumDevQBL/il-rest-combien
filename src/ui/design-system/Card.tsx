@@ -31,7 +31,7 @@ const styles = StyleSheet.create({
     borderWidth: 0,
   },
   glass: {
-    backgroundColor: colors.surfaceElevated,
+    backgroundColor: colors.surfaceGlass,
     borderWidth: 1,
     borderColor: colors.border,
   },

@@ -27,7 +27,7 @@ export function Button({
         styles.base,
         styles[size],
         styles[variant],
-        variant === 'primary' && !pressed && !disabled && shadows.md,
+        variant === 'primary' && !pressed && !disabled && styles.primaryShadow,
         (pressed || disabled) && styles.disabled,
       ]}
     >
@@ -61,6 +61,13 @@ const styles = StyleSheet.create({
   primary: {
     backgroundColor: colors.primary,
   },
+  primaryShadow: {
+    shadowColor: colors.primary,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.35,
+    shadowRadius: 18,
+    elevation: 8,
+  },
   secondary: {
     backgroundColor: colors.surfaceElevated,
     borderWidth: 1,
@@ -73,7 +80,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.negativeLight,
   },
   disabled: {
-    opacity: 0.4,
+    opacity: 0.45,
   },
   text: {
     ...typography.body,

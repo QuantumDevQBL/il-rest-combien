@@ -1,74 +1,75 @@
 /**
  * Design tokens — Il reste combien.
  *
- * Direction premium mobile : fond quasi-noir, accents or et bleu électrique,
- * surfaces étagées, ombres subtiles, chiffres tabulaires.
+ * Direction "Midnight Fintech" : fond profond bleu-noir, accents cyan et violet,
+ * surfaces étagées, glassmorphism subtil, ombres colorées diffuses, chiffres tabulaires.
  */
 
 import { TextStyle } from 'react-native';
 
 export const colors = {
   // Fonds
-  background: '#050505',
-  surface: '#121212',
-  surfaceElevated: '#1E1E1E',
+  background: '#0B0F19',
+  surface: '#151B2B',
+  surfaceElevated: '#1E2738',
+  surfaceGlass: 'rgba(21, 27, 43, 0.85)',
 
   // Encre
-  ink: '#FFFFFF',
-  inkSecondary: '#B0B0B0',
-  inkTertiary: '#6E6E6E',
+  ink: '#F8FAFC',
+  inkSecondary: '#94A3B8',
+  inkTertiary: '#64748B',
 
   // Bordures
-  border: 'rgba(255, 255, 255, 0.08)',
-  borderFocused: 'rgba(255, 215, 0, 0.6)',
+  border: 'rgba(148, 163, 184, 0.12)',
+  borderFocused: 'rgba(0, 212, 255, 0.5)',
 
   // Accents
-  primary: '#FFD700',
-  primaryLight: 'rgba(255, 215, 0, 0.14)',
-  secondary: '#00D4FF',
-  secondaryLight: 'rgba(0, 212, 255, 0.14)',
-  success: '#00E676',
-  successLight: 'rgba(0, 230, 118, 0.14)',
-  alert: '#FFB300',
-  alertLight: 'rgba(255, 179, 0, 0.14)',
+  primary: '#00D4FF',
+  primaryLight: 'rgba(0, 212, 255, 0.15)',
+  secondary: '#8B5CF6',
+  secondaryLight: 'rgba(139, 92, 246, 0.15)',
+  success: '#22C55E',
+  successLight: 'rgba(34, 197, 94, 0.15)',
+  alert: '#F97316',
+  alertLight: 'rgba(249, 115, 22, 0.15)',
   negative: '#EF4444',
-  negativeLight: 'rgba(239, 68, 68, 0.14)',
+  negativeLight: 'rgba(239, 68, 68, 0.15)',
   info: '#00D4FF',
 
   // État
   disabled: '#3A3A3A',
-  overlay: 'rgba(0, 0, 0, 0.65)',
+  overlay: 'rgba(0, 0, 0, 0.75)',
 } as const;
 
 export const typography = {
   display: {
-    fontSize: 64,
+    fontSize: 56,
     fontWeight: '800' as const,
-    lineHeight: 70,
+    lineHeight: 60,
     fontFamily: 'System',
     fontVariant: ['tabular-nums'] as TextStyle['fontVariant'],
   },
   hero: {
-    fontSize: 48,
+    fontSize: 42,
     fontWeight: '800' as const,
-    lineHeight: 54,
+    lineHeight: 48,
     fontFamily: 'System',
     fontVariant: ['tabular-nums'] as TextStyle['fontVariant'],
   },
   h1: {
-    fontSize: 28,
+    fontSize: 26,
     fontWeight: '800' as const,
-    lineHeight: 34,
+    lineHeight: 32,
     fontFamily: 'System',
   },
   h2: {
-    fontSize: 22,
+    fontSize: 20,
     fontWeight: '700' as const,
-    lineHeight: 28,
+    lineHeight: 26,
     fontFamily: 'System',
   },
   h3: {
-    fontSize: 17,
+    fontSize: 16,
     fontWeight: '700' as const,
     lineHeight: 22,
     fontFamily: 'System',
@@ -86,18 +87,20 @@ export const typography = {
     fontFamily: 'System',
   },
   caption: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '700' as const,
-    lineHeight: 16,
+    lineHeight: 14,
     fontFamily: 'System',
-    letterSpacing: 0.3,
+    letterSpacing: 0.8,
+    textTransform: 'uppercase' as const,
   },
   overline: {
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: '800' as const,
-    letterSpacing: 1.2,
-    textTransform: 'uppercase' as const,
+    lineHeight: 12,
     fontFamily: 'System',
+    letterSpacing: 1,
+    textTransform: 'uppercase' as const,
   },
   amount: {
     fontSize: 16,
@@ -129,29 +132,44 @@ export const radius = {
   md: 12,
   lg: 16,
   xl: 20,
+  xxl: 24,
   full: 9999,
 } as const;
 
 export const shadows = {
   sm: {
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.25,
-    shadowRadius: 6,
-    elevation: 3,
+    shadowColor: colors.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 12,
+    elevation: 4,
   },
   md: {
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.3,
-    shadowRadius: 12,
-    elevation: 6,
+    shadowColor: colors.primary,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.25,
+    shadowRadius: 20,
+    elevation: 8,
   },
   lg: {
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.35,
-    shadowRadius: 20,
-    elevation: 10,
+    shadowColor: colors.primary,
+    shadowOffset: { width: 0, height: 12 },
+    shadowOpacity: 0.3,
+    shadowRadius: 32,
+    elevation: 12,
+  },
+  primaryGlow: {
+    shadowColor: colors.primary,
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.45,
+    shadowRadius: 24,
+    elevation: 12,
+  },
+  secondaryGlow: {
+    shadowColor: colors.secondary,
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.4,
+    shadowRadius: 24,
+    elevation: 12,
   },
 } as const;

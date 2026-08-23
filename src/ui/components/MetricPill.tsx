@@ -1,11 +1,11 @@
 import React from 'react';
 import { StyleProp, StyleSheet, Text, View, ViewStyle } from 'react-native';
-import { colors, radius, spacing, typography } from '../theme';
+import { colors, radius, shadows, spacing, typography } from '../theme';
 
 interface MetricPillProps {
   label: string;
   value: string;
-  variant?: 'default' | 'alert' | 'success' | 'secondary';
+  variant?: 'default' | 'alert' | 'success' | 'secondary' | 'primary';
   style?: StyleProp<ViewStyle>;
 }
 
@@ -14,6 +14,7 @@ const VARIANTS = {
   alert: { valueColor: colors.alert },
   success: { valueColor: colors.success },
   secondary: { valueColor: colors.secondary },
+  primary: { valueColor: colors.primary },
 };
 
 export function MetricPill({ label, value, variant = 'default', style }: MetricPillProps) {
@@ -29,18 +30,17 @@ export function MetricPill({ label, value, variant = 'default', style }: MetricP
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    aspectRatio: 1,
     backgroundColor: colors.surface,
     borderRadius: radius.lg,
-    paddingVertical: spacing.md,
-    paddingHorizontal: spacing.sm,
-    alignItems: 'center',
+    padding: spacing.md,
+    justifyContent: 'space-between',
     borderWidth: 1,
     borderColor: colors.border,
   },
   label: {
     ...typography.caption,
     color: colors.inkTertiary,
-    marginBottom: spacing.xxs,
   },
   value: {
     ...typography.amountLarge,

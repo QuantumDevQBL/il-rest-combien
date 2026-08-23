@@ -39,30 +39,26 @@ export function ActivityGrid({ selected, onSelect }: ActivityGridProps) {
           <PressableScale
             key={option.value}
             onPress={() => onSelect(option.value)}
-            scale={0.97}
+            scale={0.96}
             style={styles.item}
             accessibilityRole="radio"
             accessibilityState={{ checked: isSelected }}
             accessibilityLabel={option.label}
           >
             <View style={[styles.card, isSelected && styles.cardSelected]}>
-              <View style={styles.cardContent}>
-                <View style={[styles.iconCircle, isSelected && styles.iconCircleSelected]}>
-                  <Icon
-                    name={ACTIVITY_ICONS[option.value]}
-                    size={26}
-                    color={isSelected ? colors.background : colors.primary}
-                  />
-                </View>
-                <View style={styles.textContainer}>
-                  <Text style={[styles.label, isSelected && styles.labelSelected]} numberOfLines={2}>
-                    {option.label}
-                  </Text>
-                  <Text style={styles.description} numberOfLines={1}>
-                    {getActivityDescription(option.value)}
-                  </Text>
-                </View>
+              <View style={[styles.iconCircle, isSelected && styles.iconCircleSelected]}>
+                <Icon
+                  name={ACTIVITY_ICONS[option.value]}
+                  size={28}
+                  color={isSelected ? colors.background : colors.inkTertiary}
+                />
               </View>
+              <Text style={[styles.label, isSelected && styles.labelSelected]} numberOfLines={2}>
+                {option.label}
+              </Text>
+              <Text style={styles.description} numberOfLines={1}>
+                {getActivityDescription(option.value)}
+              </Text>
               {isSelected && (
                 <View style={styles.checkmark}>
                   <Icon name="checkmarkCircle" size={18} color={colors.primary} />
@@ -94,36 +90,34 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border,
     padding: spacing.md,
-    justifyContent: 'space-between',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   cardSelected: {
     borderColor: colors.primary,
     backgroundColor: colors.surfaceElevated,
-    ...shadows.sm,
-  },
-  cardContent: {
-    flex: 1,
-    justifyContent: 'space-between',
+    ...shadows.primaryGlow,
   },
   iconCircle: {
-    width: 52,
-    height: 52,
+    width: 56,
+    height: 56,
     borderRadius: radius.md,
-    backgroundColor: colors.primaryLight,
+    backgroundColor: colors.surfaceElevated,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: spacing.sm,
+    borderWidth: 1,
+    borderColor: colors.border,
   },
   iconCircleSelected: {
     backgroundColor: colors.primary,
-  },
-  textContainer: {
-    justifyContent: 'flex-end',
+    borderColor: colors.primary,
   },
   label: {
     ...typography.body,
     color: colors.ink,
     fontWeight: '700',
+    textAlign: 'center',
     marginBottom: spacing.xxs,
   },
   labelSelected: {
@@ -132,6 +126,7 @@ const styles = StyleSheet.create({
   description: {
     ...typography.caption,
     color: colors.inkTertiary,
+    textAlign: 'center',
   },
   checkmark: {
     position: 'absolute',

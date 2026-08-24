@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   Keyboard,
   KeyboardAvoidingView,
@@ -10,42 +10,36 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useCalculatorContext } from '../context/CalculatorContext';
-import { ActivityGrid } from '../components/ActivityGrid';
 import { LogoHeader } from '../components/LogoHeader';
 import { MoneyInput } from '../components/MoneyInput';
 import { Input } from '../components/Input';
 import { PressableScale } from '../components/PressableScale';
-import { FadeInView } from '../components/FadeInView';
-import { Button, Icon } from '../design-system';
+import { Button, Icon, IconName } from '../design-system';
 import { hapticSelection } from '../utils/haptics';
-import { ActivityChoice, getActivityLabel } from '../mapping';
+import { ACTIVITY_OPTIONS, ActivityChoice } from '../mapping';
 import { colors, radius, shadows, spacing, typography } from '../theme';
-import { formatMontant, parseMontantSaisi } from '../utils/format';
+import { parseMontantSaisi } from '../utils/format';
 
 interface HomeScreenProps {
   onCalculate: () => void;
   onOpenHistory?: () => void;
 }
 
+const ACTIVITY_ICONS: Record<ActivityChoice, IconName> = {
+  VENTE_MARCHANDISES: 'cart',
+  PRESTATION_COMMERCIALE: 'business',
+  PRESTATION_ARTISANALE: 'construct',
+  PROFESSION_LIBERALE: 'briefcase',
+};
+
 export function HomeScreen({ onCalculate, onOpenHistory }: HomeScreenProps) {
   const { form, setFormField } = useCalculatorContext();
-  const [step, setStep] = useState<'activity' | 'revenue'>('activity');
-  const { height } = useWindowDimensions();
-  const isCompact = height < 760;
+  const { width, height } = useWindowDimensions();
+  const isCompact = width < 380 || height < 760;
 
   const handleActivitySelect = (activity: ActivityChoice) => {
     void hapticSelection();
     setFormField('activity', activity);
-    setStep('revenue');
-  };
-
-  const handleAmountChange = (value: string) => {
-    setFormField('caAnnuelHT', value);
-  };
-
-  const handleBack = () => {
-    Keyboard.dismiss();
-    setStep('activity');
   };
 
   const handleCalculate = () => {
@@ -55,8 +49,6 @@ export function HomeScreen({ onCalculate, onOpenHistory }: HomeScreenProps) {
 
   const parsedAmount = parseMontantSaisi(form.caAnnuelHT);
   const canCalculate = parsedAmount !== null && parsedAmount > 0;
-  const selectedActivityLabel = getActivityLabel(form.activity);
-  const previewAmount = parsedAmount && parsedAmount > 0 ? formatMontant(parsedAmount) : null;
 
   return (
     <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
@@ -67,114 +59,82 @@ export function HomeScreen({ onCalculate, onOpenHistory }: HomeScreenProps) {
         <LogoHeader onHistory={onOpenHistory} showTagline />
 
         <View style={styles.content}>
-          {step === 'activity' ? (
-            <FadeInView key="activity" duration={350} style={styles.stepContainer}>
-              <View style={styles.heroBlock}>
-                <Text style={styles.eyebrow}>Simulation micro-entreprise</Text>
-                <Text style={styles.stepTitle}>Quelle est ton activité ?</Text>
-                <Text style={styles.stepSubtitle}>
-                  En moins d&apos;une minute, tu vois ce qu&apos;il te reste vraiment
-                  après charges et impôt.
-                </Text>
-              </View>
+          <View style={styles.heroBlock}>
+            <Text style={styles.stepTitle}>Quelle est ton activité ?</Text>
+            <Text style={styles.stepSubtitle}>
+              Choisis ton métier, saisis ton chiffre d&apos;affaires HT, puis calcule.
+            </Text>
+          </View>
 
-              <View style={styles.progressCard}>
-                <View style={styles.progressRow}>
-                  <Text style={styles.progressLabel}>Étape 1 sur 2</Text>
-                  <Text style={styles.progressMeta}>Choix du métier</Text>
-                </View>
-                <View style={styles.progressTrack}>
-                  <View style={[styles.progressFill, styles.progressFillHalf]} />
-                </View>
-              </View>
-
-              <View style={styles.gridWrapper}>
-                <ActivityGrid selected={form.activity} onSelect={handleActivitySelect} />
-              </View>
-
-              <View style={[styles.tipCard, isCompact && styles.tipCardCompact]}>
-                <View style={styles.tipIcon}>
-                  <Icon name="flash" size={18} color={colors.primary} />
-                </View>
-                <View style={styles.tipContent}>
-                  <Text style={styles.tipTitle}>Pensé pour aller vite</Text>
-                  <Text style={styles.tip}>
-                    Base 2026 fiable, calcul local, et aucun compte à créer.
-                  </Text>
-                </View>
-              </View>
-            </FadeInView>
-          ) : (
-            <FadeInView key="revenue" duration={350} style={styles.stepContainer}>
-              <View style={styles.headerText}>
+          <View style={styles.grid}>
+            {ACTIVITY_OPTIONS.map((option) => {
+              const isSelected = form.activity === option.value;
+              return (
                 <PressableScale
-                  onPress={handleBack}
-                  scale={0.95}
-                  style={styles.backButton}
-                  accessibilityRole="button"
-                  accessibilityLabel="Retour à la sélection d'activité"
+                  key={option.value}
+                  onPress={() => handleActivitySelect(option.value)}
+                  scale={0.97}
+                  style={[styles.activityItem, isCompact && styles.activityItemCompact]}
+                  accessibilityRole="radio"
+                  accessibilityState={{ checked: isSelected }}
+                  accessibilityLabel={option.label}
                 >
-                  <Icon name="arrowBack" size={16} color={colors.primary} />
-                  <Text style={styles.backText}>Retour</Text>
+                  <View
+                    style={[
+                      styles.activityCard,
+                      isSelected && styles.activityCardSelected,
+                    ]}
+                  >
+                    <View
+                      style={[
+                        styles.iconCircle,
+                        isSelected && styles.iconCircleSelected,
+                      ]}
+                    >
+                      <Icon
+                        name={ACTIVITY_ICONS[option.value]}
+                        size={isCompact ? 24 : 28}
+                        color={isSelected ? colors.surface : colors.primary}
+                      />
+                    </View>
+                    <Text style={[styles.activityLabel, isSelected && styles.activityLabelSelected]}>
+                      {option.label}
+                    </Text>
+                    <Text style={styles.activityDescription}>{option.description}</Text>
+                  </View>
                 </PressableScale>
+              );
+            })}
+          </View>
 
-                <Text style={styles.eyebrow}>Étape 2 sur 2</Text>
-                <Text style={styles.stepTitle}>Ton chiffre d&apos;affaires</Text>
-                <Text style={styles.stepSubtitle}>
-                  Indique ton CA annuel HT prévu. L&apos;estimation se mettra sur le
-                  bon régime pour {selectedActivityLabel.toLowerCase()}.
-                </Text>
-              </View>
+          <View style={styles.inputSection}>
+            <MoneyInput
+              value={form.caAnnuelHT}
+              onChangeText={(value) => setFormField('caAnnuelHT', value)}
+              placeholder="0"
+              size="hero"
+            />
+            <Text style={styles.amountHint}>Chiffre d&apos;affaires annuel HT</Text>
 
-              <View style={styles.summaryCard}>
-                <View style={styles.summaryItem}>
-                  <Text style={styles.summaryLabel}>Activité</Text>
-                  <Text style={styles.summaryValue}>{selectedActivityLabel}</Text>
-                </View>
-                <View style={styles.summaryDivider} />
-                <View style={styles.summaryItem}>
-                  <Text style={styles.summaryLabel}>Simulation</Text>
-                  <Text style={styles.summaryValue}>
-                    {previewAmount ?? 'Prête à saisir'}
-                  </Text>
-                </View>
-              </View>
+            <Input
+              label="Nom de l'estimation"
+              value={form.label}
+              onChangeText={(value) => setFormField('label', value)}
+              placeholder="Ex : Client A"
+              keyboardType="default"
+              helper="Facultatif. Sert seulement à retrouver la simulation."
+            />
+          </View>
 
-              <View style={styles.inputWrapper}>
-                <MoneyInput
-                  value={form.caAnnuelHT}
-                  onChangeText={handleAmountChange}
-                  placeholder="0"
-                  autoFocus
-                  size="hero"
-                />
-                <Text style={styles.amountHint}>
-                  Hors taxes, charges non déduites
-                </Text>
-
-                <View style={styles.labelInput}>
-                  <Input
-                    label="Nom de l'estimation"
-                    value={form.label}
-                    onChangeText={(value) => setFormField('label', value)}
-                    placeholder="Ex : Projet client A"
-                    keyboardType="default"
-                    helper="Pour retrouver cette simulation dans l'historique."
-                  />
-                </View>
-              </View>
-
-              <View style={styles.footer}>
-                <Button
-                  label="Calculer"
-                  onPress={handleCalculate}
-                  disabled={!canCalculate}
-                  variant="primary"
-                  size="lg"
-                />
-              </View>
-            </FadeInView>
-          )}
+          <View style={styles.footer}>
+            <Button
+              label="Calculer"
+              onPress={handleCalculate}
+              disabled={!canCalculate}
+              variant="primary"
+              size="lg"
+            />
+          </View>
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -193,21 +153,10 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: spacing.lg,
     paddingTop: spacing.xs,
-    paddingBottom: spacing.md,
-  },
-  stepContainer: {
-    flex: 1,
+    paddingBottom: spacing.lg,
   },
   heroBlock: {
     marginBottom: spacing.md,
-  },
-  headerText: {
-    marginBottom: spacing.md,
-  },
-  eyebrow: {
-    ...typography.overline,
-    color: colors.primary,
-    marginBottom: spacing.xs,
   },
   stepTitle: {
     ...typography.h1,
@@ -218,141 +167,75 @@ const styles = StyleSheet.create({
     ...typography.body,
     color: colors.inkSecondary,
   },
-  progressCard: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.lg,
-    padding: spacing.md,
-    borderWidth: 1,
-    borderColor: colors.border,
-    marginBottom: spacing.md,
-    ...shadows.sm,
-  },
-  progressRow: {
+  grid: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     justifyContent: 'space-between',
-    alignItems: 'center',
+    marginBottom: spacing.lg,
+  },
+  activityItem: {
+    width: '48%',
+    marginBottom: spacing.md,
+  },
+  activityItemCompact: {
     marginBottom: spacing.sm,
   },
-  progressLabel: {
-    ...typography.caption,
-    color: colors.primary,
+  activityCard: {
+    minHeight: 152,
+    backgroundColor: colors.surface,
+    borderRadius: radius.xl,
+    borderWidth: 1,
+    borderColor: colors.border,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.md,
+    alignItems: 'center',
+    justifyContent: 'center',
+    ...shadows.sm,
   },
-  progressMeta: {
-    ...typography.bodySmall,
-    color: colors.inkSecondary,
+  activityCardSelected: {
+    borderColor: colors.primary,
+    backgroundColor: colors.primaryLight,
+    ...shadows.md,
   },
-  progressTrack: {
-    height: 8,
+  iconCircle: {
+    width: 52,
+    height: 52,
     borderRadius: radius.full,
     backgroundColor: colors.primaryLight,
-    overflow: 'hidden',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: spacing.sm,
   },
-  progressFill: {
-    height: '100%',
-    borderRadius: radius.full,
+  iconCircleSelected: {
     backgroundColor: colors.primary,
   },
-  progressFillHalf: {
-    width: '50%',
-  },
-  gridWrapper: {
-    flex: 1,
-    alignSelf: 'stretch',
-  },
-  tipCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.surface,
-    borderRadius: radius.lg,
-    padding: spacing.md,
-    borderWidth: 1,
-    borderColor: colors.border,
-    marginTop: spacing.sm,
-    ...shadows.sm,
-  },
-  tipCardCompact: {
-    marginTop: spacing.xs,
-  },
-  tipIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: radius.md,
-    backgroundColor: colors.primaryLight,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: spacing.sm,
-  },
-  tipContent: {
-    flex: 1,
-  },
-  tipTitle: {
+  activityLabel: {
     ...typography.body,
     color: colors.ink,
     fontWeight: '800',
+    textAlign: 'center',
     marginBottom: spacing.xxs,
   },
-  tip: {
+  activityLabelSelected: {
+    color: colors.primaryDark,
+  },
+  activityDescription: {
     ...typography.bodySmall,
-    color: colors.inkSecondary,
-  },
-  backButton: {
-    alignSelf: 'flex-start',
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: spacing.sm,
-  },
-  backText: {
-    ...typography.body,
-    color: colors.primary,
-    fontWeight: '700',
-    marginLeft: spacing.xxs,
-  },
-  summaryCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.surface,
-    borderRadius: radius.lg,
-    borderWidth: 1,
-    borderColor: colors.border,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    marginBottom: spacing.md,
-    ...shadows.sm,
-  },
-  summaryItem: {
-    flex: 1,
-  },
-  summaryLabel: {
-    ...typography.caption,
     color: colors.inkTertiary,
-    marginBottom: spacing.xxs,
+    textAlign: 'center',
+    minHeight: 32,
   },
-  summaryValue: {
-    ...typography.body,
-    color: colors.ink,
-    fontWeight: '800',
-  },
-  summaryDivider: {
-    width: 1,
-    alignSelf: 'stretch',
-    backgroundColor: colors.border,
-    marginHorizontal: spacing.md,
-  },
-  inputWrapper: {
-    flex: 1,
-    justifyContent: 'center',
+  inputSection: {
+    marginTop: 'auto',
   },
   amountHint: {
     ...typography.caption,
     color: colors.inkTertiary,
     textAlign: 'center',
     marginTop: spacing.sm,
-    marginBottom: spacing.lg,
-  },
-  labelInput: {
-    marginTop: spacing.xs,
+    marginBottom: spacing.md,
   },
   footer: {
-    paddingTop: spacing.sm,
+    paddingTop: spacing.md,
   },
 });

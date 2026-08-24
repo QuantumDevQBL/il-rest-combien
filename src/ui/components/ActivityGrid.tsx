@@ -17,89 +17,98 @@ const ACTIVITY_ICONS: Record<ActivityChoice, IconName> = {
   PROFESSION_LIBERALE: 'briefcase',
 };
 
+const ACTIVITY_ROWS = [
+  [ACTIVITY_OPTIONS[0], ACTIVITY_OPTIONS[1]],
+  [ACTIVITY_OPTIONS[2], ACTIVITY_OPTIONS[3]],
+] as const;
+
 export function ActivityGrid({ selected, onSelect }: ActivityGridProps) {
   const { width, height } = useWindowDimensions();
   const isCompact = width < 360 || height < 700;
   const iconSize = isCompact ? 26 : 30;
   const circleSize = isCompact ? 48 : 56;
-  const columnPadding = isCompact ? spacing.xs : spacing.sm;
-  const cardMinHeight = isCompact ? 152 : 168;
+  const cardMinHeight = isCompact ? 148 : 164;
 
   return (
     <View style={styles.grid}>
-      {ACTIVITY_OPTIONS.map((option) => {
-        const isSelected = selected === option.value;
-        return (
-          <PressableScale
-            key={option.value}
-            onPress={() => onSelect(option.value)}
-            scale={0.96}
-            style={[
-              styles.item,
-              {
-                paddingHorizontal: columnPadding,
-                marginBottom: isCompact ? spacing.sm : spacing.md,
-              },
-            ]}
-            accessibilityRole="radio"
-            accessibilityState={{ checked: isSelected }}
-            accessibilityLabel={option.label}
-          >
-            <View
-              style={[
-                styles.card,
-                isSelected && styles.cardSelected,
-                { minHeight: cardMinHeight },
-              ]}
-            >
-              <View
-                style={[
-                  styles.iconCircle,
-                  isSelected && styles.iconCircleSelected,
-                  { width: circleSize, height: circleSize },
-                ]}
+      {ACTIVITY_ROWS.map((row, rowIndex) => (
+        <View
+          key={`row-${rowIndex}`}
+          style={[styles.row, rowIndex > 0 && styles.rowSpacing]}
+        >
+          {row.map((option) => {
+            const isSelected = selected === option.value;
+            return (
+              <PressableScale
+                key={option.value}
+                onPress={() => onSelect(option.value)}
+                scale={0.96}
+                style={styles.item}
+                accessibilityRole="radio"
+                accessibilityState={{ checked: isSelected }}
+                accessibilityLabel={option.label}
               >
-                <Icon
-                  name={ACTIVITY_ICONS[option.value]}
-                  size={iconSize}
-                  color={isSelected ? colors.surface : colors.primary}
-                />
-              </View>
-              <View style={styles.textBlock}>
-                <Text
-                  style={[styles.label, isSelected && styles.labelSelected]}
-                  numberOfLines={1}
-                  adjustsFontSizeToFit
-                  minimumFontScale={0.85}
+                <View
+                  style={[
+                    styles.card,
+                    isSelected && styles.cardSelected,
+                    { minHeight: cardMinHeight },
+                  ]}
                 >
-                  {option.label}
-                </Text>
-                <Text style={styles.description} numberOfLines={1} adjustsFontSizeToFit>
-                  {option.description}
-                </Text>
-              </View>
-              {isSelected && (
-                <View style={styles.checkmark}>
-                  <Icon name="checkmarkCircle" size={18} color={colors.primary} />
+                  <View
+                    style={[
+                      styles.iconCircle,
+                      isSelected && styles.iconCircleSelected,
+                      { width: circleSize, height: circleSize },
+                    ]}
+                  >
+                    <Icon
+                      name={ACTIVITY_ICONS[option.value]}
+                      size={iconSize}
+                      color={isSelected ? colors.surface : colors.primary}
+                    />
+                  </View>
+                  <View style={styles.textBlock}>
+                    <Text
+                      style={[styles.label, isSelected && styles.labelSelected]}
+                      numberOfLines={1}
+                      adjustsFontSizeToFit
+                      minimumFontScale={0.9}
+                    >
+                      {option.label}
+                    </Text>
+                    <Text style={styles.description} numberOfLines={2}>
+                      {option.description}
+                    </Text>
+                  </View>
+                  {isSelected && (
+                    <View style={styles.checkmark}>
+                      <Icon name="checkmarkCircle" size={18} color={colors.primary} />
+                    </View>
+                  )}
                 </View>
-              )}
-            </View>
-          </PressableScale>
-        );
-      })}
+              </PressableScale>
+            );
+          })}
+        </View>
+      ))}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   grid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
     width: '100%',
-    marginHorizontal: -spacing.xs,
+  },
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  rowSpacing: {
+    marginTop: spacing.md,
   },
   item: {
-    width: '50%',
+    width: '48.25%',
   },
   card: {
     flex: 1,
@@ -107,7 +116,8 @@ const styles = StyleSheet.create({
     borderRadius: radius.xl,
     borderWidth: 1,
     borderColor: colors.border,
-    padding: spacing.md,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.md,
     justifyContent: 'center',
     alignItems: 'center',
     ...shadows.sm,
@@ -146,7 +156,7 @@ const styles = StyleSheet.create({
     ...typography.bodySmall,
     color: colors.inkTertiary,
     textAlign: 'center',
-    minHeight: 17,
+    minHeight: 32,
   },
   checkmark: {
     position: 'absolute',

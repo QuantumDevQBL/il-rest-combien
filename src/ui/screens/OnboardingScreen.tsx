@@ -22,35 +22,32 @@ interface Slide {
   title: string;
   description: string;
   icon: IconName;
+  kicker: string;
 }
 
 const SLIDES: Slide[] = [
   {
     id: '1',
-    title: 'Combien il te reste vraiment ?',
+    kicker: 'Le besoin',
+    title: 'Tu saisis ton CA, tu vois ton vrai net',
     description:
-      'Saisis ton chiffre d\'affaires et découvre instantanément ce qu\'il te reste après cotisations et impôt sur le revenu.',
+      "Pas un simulateur administratif de plus. L'app répond vite à la vraie question d'un freelance : combien il me reste réellement ?",
     icon: 'cash',
   },
   {
     id: '2',
-    title: 'Barème ou versement libératoire ?',
+    kicker: 'La valeur',
+    title: 'Cotisations, impôt, reste sur 100 €',
     description:
-      'On calcule les deux options d\'impôt et on te dit laquelle est la plus avantageuse pour ta situation.',
-    icon: 'swapHorizontal',
+      "Le résultat met d'abord l'essentiel en avant : ton net mensuel, ton net annuel et la part absorbée par les prélèvements.",
+    icon: 'statsChart',
   },
   {
     id: '3',
-    title: 'Tes données restent chez toi',
+    kicker: 'Le cadre',
+    title: 'Simple, local, pensé pour la micro',
     description:
-      'Aucune connexion internet, aucun tracking, aucun compte. Tout est calculé directement sur ton téléphone.',
-    icon: 'lockClosed',
-  },
-  {
-    id: '4',
-    title: 'Périmètre de la V1',
-    description:
-      'Micro-entrepreneurs en France métropolitaine, barèmes 2026. Professions réglementées (Cipav) non couvertes pour l\'instant.',
+      "Barèmes 2026, calcul local sur le téléphone, paramètres avancés seulement si tu veux affiner. Tu peux commencer sans tout renseigner.",
     icon: 'shieldCheckmark',
   },
 ];
@@ -103,6 +100,7 @@ export function OnboardingScreen({ onComplete }: OnboardingScreenProps) {
         <View style={styles.iconCircle}>
           <Icon name={item.icon} size={44} color={colors.background} />
         </View>
+        <Text style={styles.kicker}>{item.kicker}</Text>
         <Text style={styles.title}>{item.title}</Text>
         <Text style={styles.description}>{item.description}</Text>
       </Animated.View>
@@ -143,10 +141,7 @@ export function OnboardingScreen({ onComplete }: OnboardingScreenProps) {
             return (
               <Animated.View
                 key={index}
-                style={[
-                  styles.dot,
-                  isActive && styles.dotActive,
-                ]}
+                style={[styles.dot, isActive && styles.dotActive]}
               />
             );
           })}
@@ -191,8 +186,13 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: spacing.xxl,
+    marginBottom: spacing.xl,
     ...shadows.md,
+  },
+  kicker: {
+    ...typography.overline,
+    color: colors.primary,
+    marginBottom: spacing.sm,
   },
   title: {
     ...typography.h1,
@@ -205,6 +205,7 @@ const styles = StyleSheet.create({
     color: colors.inkSecondary,
     textAlign: 'center',
     lineHeight: 24,
+    maxWidth: 320,
   },
   footer: {
     paddingHorizontal: spacing.lg,

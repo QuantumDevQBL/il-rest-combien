@@ -5,33 +5,31 @@ import { render, fireEvent, screen } from './test-utils';
 describe('OnboardingScreen', () => {
   it('renders the first slide', () => {
     render(<OnboardingScreen onComplete={jest.fn()} />);
-    expect(screen.getByText('Combien il te reste vraiment ?')).toBeTruthy();
+    expect(screen.getByText('Tu saisis ton CA, tu vois ton vrai net')).toBeTruthy();
     expect(screen.getByText('Suivant')).toBeTruthy();
   });
 
   it('navigates to the next slide on next press', () => {
     render(<OnboardingScreen onComplete={jest.fn()} />);
     fireEvent.press(screen.getByText('Suivant'));
-    expect(screen.getByText('Barème ou versement libératoire ?')).toBeTruthy();
+    expect(screen.getByText('Cotisations, impôt, reste sur 100 €')).toBeTruthy();
   });
 
-  it('renders the scope slide as the last one', () => {
+  it('renders the last slide after two next presses', () => {
     render(<OnboardingScreen onComplete={jest.fn()} />);
     fireEvent.press(screen.getByText('Suivant'));
     fireEvent.press(screen.getByText('Suivant'));
-    fireEvent.press(screen.getByText('Suivant'));
-    expect(screen.getByText('Périmètre de la V1')).toBeTruthy();
+    expect(screen.getByText('Simple, local, pensé pour la micro')).toBeTruthy();
+    expect(screen.getByText('Commencer')).toBeTruthy();
   });
 
-  it('calls onComplete when reaching the last slide and pressing Commencer', () => {
+  it('calls onComplete when pressing Commencer on the last slide', () => {
     const onComplete = jest.fn();
     render(<OnboardingScreen onComplete={onComplete} />);
 
     fireEvent.press(screen.getByText('Suivant'));
     fireEvent.press(screen.getByText('Suivant'));
-    fireEvent.press(screen.getByText('Suivant'));
 
-    expect(screen.getByText('Commencer')).toBeTruthy();
     fireEvent.press(screen.getByText('Commencer'));
     expect(onComplete).toHaveBeenCalled();
   });

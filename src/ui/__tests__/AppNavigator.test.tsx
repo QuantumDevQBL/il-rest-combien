@@ -7,23 +7,16 @@ beforeEach(() => {
   resetAsyncStorage();
 });
 
-async function waitForOnboarding() {
-  await waitFor(() => {
-    expect(screen.getByText('Combien il te reste vraiment ?')).toBeTruthy();
-  });
-}
-
 describe('AppNavigator', () => {
-  it('shows onboarding on first launch', async () => {
+  it('shows home on launch', async () => {
     render(<AppNavigator />);
-    await waitForOnboarding();
+    await waitFor(() => {
+      expect(screen.getByText('Quelle est ton activité ?')).toBeTruthy();
+    });
   });
 
-  it('navigates from onboarding to home to result', async () => {
+  it('navigates from home to result', async () => {
     render(<AppNavigator />);
-    await waitForOnboarding();
-
-    fireEvent.press(screen.getByText('Passer'));
 
     await waitFor(() => {
       expect(screen.getByText('Quelle est ton activité ?')).toBeTruthy();
@@ -44,9 +37,7 @@ describe('AppNavigator', () => {
 
   it('opens settings modal from result screen', async () => {
     render(<AppNavigator />);
-    await waitForOnboarding();
 
-    fireEvent.press(screen.getByText('Passer'));
     await waitFor(() => {
       expect(screen.getByText('Quelle est ton activité ?')).toBeTruthy();
     });

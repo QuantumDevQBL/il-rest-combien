@@ -67,7 +67,10 @@ export function AppNavigator() {
 
         <Stack.Screen name="Home">
           {({ navigation }) => (
-            <HomeScreen onCalculate={() => navigation.navigate('Result')} />
+            <HomeScreen
+              onCalculate={() => navigation.navigate('Result')}
+              onOpenHistory={() => navigation.navigate('HistoryModal')}
+            />
           )}
         </Stack.Screen>
 

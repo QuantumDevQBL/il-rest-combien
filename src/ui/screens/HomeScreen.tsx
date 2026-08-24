@@ -18,21 +18,15 @@ import { FadeInView } from '../components/FadeInView';
 import { Button } from '../design-system';
 import { hapticSelection } from '../utils/haptics';
 import { ActivityChoice } from '../mapping';
-import { colors, radius, spacing, typography } from '../theme';
+import { colors, spacing, typography } from '../theme';
 import { parseMontantSaisi } from '../utils/format';
 
 interface HomeScreenProps {
   onCalculate: () => void;
+  onOpenHistory?: () => void;
 }
 
-function getCurrentMonthLabel(): string {
-  const date = new Date();
-  const month = date.toLocaleDateString('fr-FR', { month: 'long' });
-  const year = date.getFullYear();
-  return `${month.charAt(0).toUpperCase() + month.slice(1)} ${year}`;
-}
-
-export function HomeScreen({ onCalculate }: HomeScreenProps) {
+export function HomeScreen({ onCalculate, onOpenHistory }: HomeScreenProps) {
   const { form, setFormField } = useCalculatorContext();
   const [step, setStep] = useState<'activity' | 'revenue'>('activity');
 
@@ -65,25 +59,15 @@ export function HomeScreen({ onCalculate }: HomeScreenProps) {
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.keyboardView}
       >
-        <LogoHeader />
+        <LogoHeader onHistory={onOpenHistory} />
 
         <View style={styles.content}>
           {step === 'activity' ? (
             <FadeInView key="activity" duration={300} style={styles.stepContainer}>
-              <View style={styles.greetingRow}>
-                <View>
-                  <Text style={styles.greeting}>Bonjour 👋</Text>
-                  <Text style={styles.month}>{getCurrentMonthLabel()}</Text>
-                </View>
-                <View style={styles.avatar}>
-                  <Text style={styles.avatarText}>RC</Text>
-                </View>
-              </View>
-
               <View style={styles.headerText}>
                 <Text style={styles.stepTitle}>Quelle est ton activité ?</Text>
                 <Text style={styles.stepSubtitle}>
-                  Choisis la catégorie qui correspond le mieux à ton métier.
+                  Choisis la catégorie qui correspond à ton métier.
                 </Text>
               </View>
 
@@ -113,7 +97,7 @@ export function HomeScreen({ onCalculate }: HomeScreenProps) {
 
                 <Text style={styles.stepTitle}>Ton chiffre d'affaires</Text>
                 <Text style={styles.stepSubtitle}>
-                  Saisis le montant HT prévu pour cette année.
+                  Montant HT prévu cette année.
                 </Text>
               </View>
 
@@ -131,7 +115,7 @@ export function HomeScreen({ onCalculate }: HomeScreenProps) {
 
                 <View style={styles.labelInput}>
                   <Input
-                    label="Nom de l'estimation (optionnel)"
+                    label="Nom de l'estimation"
                     value={form.label}
                     onChangeText={(value) => setFormField('label', value)}
                     placeholder="Ex : Projet client A"
@@ -169,36 +153,10 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     paddingHorizontal: spacing.lg,
+    paddingTop: spacing.sm,
   },
   stepContainer: {
     flex: 1,
-  },
-  greetingRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: spacing.lg,
-  },
-  greeting: {
-    ...typography.bodySmall,
-    color: colors.inkTertiary,
-  },
-  month: {
-    ...typography.h3,
-    color: colors.ink,
-  },
-  avatar: {
-    width: 44,
-    height: 44,
-    borderRadius: radius.full,
-    backgroundColor: colors.primaryLight,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  avatarText: {
-    ...typography.body,
-    color: colors.primary,
-    fontWeight: '800',
   },
   headerText: {
     marginBottom: spacing.lg,
@@ -230,7 +188,6 @@ const styles = StyleSheet.create({
   backButton: {
     alignSelf: 'flex-start',
     marginBottom: spacing.md,
-    marginTop: spacing.xs,
   },
   backText: {
     ...typography.body,

@@ -21,6 +21,8 @@ export function ActivityGrid({ selected, onSelect }: ActivityGridProps) {
   const { width } = useWindowDimensions();
   const isSmallScreen = width < 360;
   const gap = isSmallScreen ? spacing.sm : spacing.md;
+  const iconSize = isSmallScreen ? 28 : 34;
+  const circleSize = isSmallScreen ? 54 : 64;
 
   return (
     <View style={[styles.grid, { marginHorizontal: -gap / 2 }]}>
@@ -37,33 +39,32 @@ export function ActivityGrid({ selected, onSelect }: ActivityGridProps) {
             accessibilityLabel={option.label}
           >
             <View style={[styles.card, isSelected && styles.cardSelected]}>
-              <View style={styles.row}>
-                <View style={[styles.iconCircle, isSelected && styles.iconCircleSelected]}>
-                  <Icon
-                    name={ACTIVITY_ICONS[option.value]}
-                    size={isSmallScreen ? 22 : 26}
-                    color={isSelected ? colors.surface : colors.primary}
-                  />
+              <View
+                style={[
+                  styles.iconCircle,
+                  isSelected && styles.iconCircleSelected,
+                  { width: circleSize, height: circleSize },
+                ]}
+              >
+                <Icon
+                  name={ACTIVITY_ICONS[option.value]}
+                  size={iconSize}
+                  color={isSelected ? colors.surface : colors.primary}
+                />
+              </View>
+              <Text
+                style={[styles.label, isSelected && styles.labelSelected]}
+                numberOfLines={1}
+                adjustsFontSizeToFit
+                minimumFontScale={0.8}
+              >
+                {option.label}
+              </Text>
+              {isSelected && (
+                <View style={styles.checkmark}>
+                  <Icon name="checkmarkCircle" size={20} color={colors.primary} />
                 </View>
-                {isSelected && (
-                  <View style={styles.checkmark}>
-                    <Icon name="checkmarkCircle" size={18} color={colors.primary} />
-                  </View>
-                )}
-              </View>
-
-              <View style={styles.textBlock}>
-                <Text
-                  style={[styles.label, isSelected && styles.labelSelected]}
-                  numberOfLines={1}
-                  adjustsFontSizeToFit
-                >
-                  {option.label}
-                </Text>
-                <Text style={styles.description} numberOfLines={1}>
-                  {option.description}
-                </Text>
-              </View>
+              )}
             </View>
           </PressableScale>
         );
@@ -79,7 +80,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   item: {
-    minHeight: 110,
+    aspectRatio: 1,
   },
   card: {
     flex: 1,
@@ -88,7 +89,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border,
     padding: spacing.md,
-    justifyContent: 'space-between',
+    justifyContent: 'center',
+    alignItems: 'center',
     ...shadows.sm,
   },
   cardSelected: {
@@ -96,41 +98,29 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primaryLight,
     ...shadows.md,
   },
-  row: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: spacing.sm,
-  },
   iconCircle: {
-    width: 46,
-    height: 46,
     borderRadius: radius.full,
     backgroundColor: colors.primaryLight,
     alignItems: 'center',
     justifyContent: 'center',
+    marginBottom: spacing.sm,
   },
   iconCircleSelected: {
     backgroundColor: colors.primary,
-  },
-  textBlock: {
-    width: '100%',
   },
   label: {
     ...typography.body,
     color: colors.ink,
     fontWeight: '700',
-    marginBottom: spacing.xxs,
+    textAlign: 'center',
+    maxWidth: '100%',
   },
   labelSelected: {
     color: colors.ink,
   },
-  description: {
-    ...typography.bodySmall,
-    color: colors.inkTertiary,
-    fontWeight: '500',
-  },
   checkmark: {
-    marginLeft: spacing.sm,
+    position: 'absolute',
+    top: spacing.sm,
+    right: spacing.sm,
   },
 });

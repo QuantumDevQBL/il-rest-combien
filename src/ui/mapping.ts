@@ -16,6 +16,7 @@ export type ActivityChoice =
 export interface ActivityOption {
   value: ActivityChoice;
   label: string;
+  description: string;
   activite: ActiviteMicro;
   natureActivite: NatureActivite;
 }
@@ -23,25 +24,29 @@ export interface ActivityOption {
 export const ACTIVITY_OPTIONS: readonly ActivityOption[] = [
   {
     value: 'VENTE_MARCHANDISES',
-    label: 'Vente de marchandises',
+    label: 'Vente',
+    description: 'Commerce, revente',
     activite: 'BIC_VENTE',
     natureActivite: 'commerciale',
   },
   {
     value: 'PRESTATION_COMMERCIALE',
-    label: 'Prestations de services commerciales',
+    label: 'Services',
+    description: 'Conseil, B2B',
     activite: 'BIC_PRESTATION',
     natureActivite: 'commerciale',
   },
   {
     value: 'PRESTATION_ARTISANALE',
-    label: 'Prestations artisanales',
+    label: 'Artisanat',
+    description: 'Travaux, main-d’œuvre',
     activite: 'BIC_PRESTATION',
     natureActivite: 'artisanale',
   },
   {
     value: 'PROFESSION_LIBERALE',
-    label: 'Profession libérale non réglementée',
+    label: 'Libéral',
+    description: 'Non réglementé',
     activite: 'BNC',
     natureActivite: 'liberale',
   },

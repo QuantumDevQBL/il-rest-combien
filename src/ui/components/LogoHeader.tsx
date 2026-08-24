@@ -21,7 +21,7 @@ export function LogoHeader({
         <View style={styles.iconCircle}>
           <Icon name="cash" size={18} color={colors.surface} />
         </View>
-        <Text style={styles.title}>ResteClair</Text>
+        <Text style={styles.title}>Il reste</Text>
       </View>
 
       {(showTagline || onSettings || onHistory) && (

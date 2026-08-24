@@ -29,7 +29,7 @@ describe('AppNavigator', () => {
       expect(screen.getByText('Quelle est ton activité ?')).toBeTruthy();
     });
 
-    fireEvent.press(screen.getByText('Profession libérale non réglementée'));
+    fireEvent.press(screen.getByText('Libéral'));
     const input = await waitFor(() => screen.getByPlaceholderText('0'));
     fireEvent.changeText(input, '50000');
     await waitFor(() => {
@@ -51,7 +51,7 @@ describe('AppNavigator', () => {
       expect(screen.getByText('Quelle est ton activité ?')).toBeTruthy();
     });
 
-    fireEvent.press(screen.getByText('Profession libérale non réglementée'));
+    fireEvent.press(screen.getByText('Libéral'));
     const input = await waitFor(() => screen.getByPlaceholderText('0'));
     fireEvent.changeText(input, '50000');
     await waitFor(() => {

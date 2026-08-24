@@ -22,6 +22,7 @@ export type RootStackParamList = {
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
+const IS_TEST_ENV = process.env.NODE_ENV === 'test';
 
 function HistorySync() {
   useHistorySync();
@@ -52,6 +53,7 @@ export function AppNavigator() {
         screenOptions={{
           headerShown: false,
           cardStyle: { backgroundColor: colors.background },
+          animationEnabled: !IS_TEST_ENV,
         }}
       >
         <Stack.Screen name="Onboarding">
@@ -94,6 +96,7 @@ export function AppNavigator() {
             gestureDirection: 'vertical',
             cardStyle: { backgroundColor: 'transparent' },
             cardOverlayEnabled: true,
+            animationEnabled: !IS_TEST_ENV,
           }}
         >
           <Stack.Screen name="SettingsModal">

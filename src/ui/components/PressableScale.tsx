@@ -13,6 +13,8 @@ interface PressableScaleProps extends PressableProps {
   scale?: number;
 }
 
+const IS_TEST_ENV = process.env.NODE_ENV === 'test';
+
 export function PressableScale({
   children,
   style,
@@ -22,6 +24,7 @@ export function PressableScale({
   const animatedValue = React.useRef(new Animated.Value(1)).current;
 
   const onPressIn = () => {
+    if (IS_TEST_ENV) return;
     Animated.spring(animatedValue, {
       toValue: scale,
       useNativeDriver: true,
@@ -30,6 +33,7 @@ export function PressableScale({
   };
 
   const onPressOut = () => {
+    if (IS_TEST_ENV) return;
     Animated.spring(animatedValue, {
       toValue: 1,
       useNativeDriver: true,
@@ -39,7 +43,12 @@ export function PressableScale({
 
   return (
     <Pressable onPressIn={onPressIn} onPressOut={onPressOut} {...props}>
-      <Animated.View style={[{ transform: [{ scale: animatedValue }] }, style]}>
+      <Animated.View
+        style={[
+          { transform: [{ scale: IS_TEST_ENV ? 1 : animatedValue }] },
+          style,
+        ]}
+      >
         {children}
       </Animated.View>
     </Pressable>

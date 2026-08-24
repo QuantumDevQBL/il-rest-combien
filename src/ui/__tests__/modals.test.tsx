@@ -19,7 +19,8 @@ describe('SettingsModal', () => {
       </CalculatorProvider>
     );
     expect(screen.getByText('Paramètres fiscaux')).toBeTruthy();
-    expect(screen.getAllByText('Situation familiale').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getByText('Options avancées')).toBeTruthy();
+    expect(screen.getByText('Ce qui change ton net')).toBeTruthy();
     expect(screen.getByText('Données N-2')).toBeTruthy();
   });
 

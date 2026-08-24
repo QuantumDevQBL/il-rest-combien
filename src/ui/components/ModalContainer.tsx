@@ -39,7 +39,7 @@ export function ModalContainer({
   );
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.keyboardView}
@@ -52,7 +52,7 @@ export function ModalContainer({
 
             <View style={styles.header}>
               <Text style={styles.title}>{title}</Text>
-              <PressableScale onPress={onClose} scale={0.9}>
+              <PressableScale onPress={onClose} scale={0.88} accessibilityRole="button" accessibilityLabel="Fermer">
                 <View style={styles.closeButton}>
                   <Icon name="close" size={22} color={colors.ink} />
                 </View>
@@ -123,6 +123,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderWidth: 1,
     borderColor: colors.border,
+    ...shadows.sm,
   },
   scroll: {
     maxHeight: '100%',

@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useCalculatorContext } from '../context/CalculatorContext';
 import { AnimatedCounter } from '../components/AnimatedCounter';
@@ -40,7 +40,12 @@ function ProgressRow({ label, value, ratio, color }: ProgressRowProps) {
         <Text style={styles.progressRowValue}>{value}</Text>
       </View>
       <View style={styles.progressRowTrack}>
-        <View style={[styles.progressRowFill, { width: `${safeRatio * 100}%`, backgroundColor: color }]} />
+        <View
+          style={[
+            styles.progressRowFill,
+            { width: `${safeRatio * 100}%`, backgroundColor: color },
+          ]}
+        />
       </View>
     </View>
   );
@@ -54,6 +59,8 @@ export function ResultScreen({
   onOpenDetail,
 }: ResultScreenProps) {
   const { result, form } = useCalculatorContext();
+  const { height } = useWindowDimensions();
+  const isCompact = height < 700;
 
   useEffect(() => {
     if (result) {
@@ -66,10 +73,11 @@ export function ResultScreen({
   const netMensuel = result.revenuNetDisponible / 12;
   const tauxPrelevement = result.tauxPrelevementGlobal * 100;
   const estimationLabel = form.label.trim() || getActivityLabel(form.activity);
+  const displayVariant = isCompact ? styles.heroAmountCompact : styles.heroAmount;
 
   const rows: ProgressRowProps[] = [
     {
-      label: 'Chiffre d\'affaires',
+      label: "Chiffre d'affaires",
       value: formatMontant(result.caAnnuelHT),
       ratio: 1,
       color: colors.ink,
@@ -101,7 +109,7 @@ export function ResultScreen({
   ];
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
       <View style={styles.header}>
         <View style={styles.activityBlock}>
           <Text style={styles.activityLabel}>{estimationLabel}</Text>
@@ -110,22 +118,22 @@ export function ResultScreen({
         <View style={styles.headerActions}>
           <PressableScale
             onPress={onOpenHistory}
-            scale={0.9}
+            scale={0.88}
             accessibilityRole="button"
             accessibilityLabel="Historique"
           >
             <View style={styles.iconButton}>
-              <Icon name="time" size={22} color={colors.inkSecondary} />
+              <Icon name="time" size={20} color={colors.inkSecondary} />
             </View>
           </PressableScale>
           <PressableScale
             onPress={onOpenSettings}
-            scale={0.9}
+            scale={0.88}
             accessibilityRole="button"
             accessibilityLabel="Paramètres fiscaux"
           >
             <View style={styles.iconButton}>
-              <Icon name="settings" size={22} color={colors.inkSecondary} />
+              <Icon name="settings" size={20} color={colors.inkSecondary} />
             </View>
           </PressableScale>
         </View>
@@ -139,7 +147,7 @@ export function ResultScreen({
               <Text style={styles.heroCurrency}>€</Text>
               <AnimatedCounter
                 value={netMensuel}
-                style={styles.heroAmount}
+                style={displayVariant}
                 formatter={(v) => Math.round(v).toLocaleString('fr-FR')}
               />
             </View>
@@ -153,11 +161,17 @@ export function ResultScreen({
             <View style={styles.progressContainer}>
               <ProgressBar
                 segments={[
-                  { ratio: result.totalPrelevementsSociaux / result.caAnnuelHT, color: '#F43F5E' },
+                  {
+                    ratio: result.totalPrelevementsSociaux / result.caAnnuelHT,
+                    color: '#F43F5E',
+                  },
                   { ratio: result.impotRetenu / result.caAnnuelHT, color: '#8B5CF6' },
-                  { ratio: result.revenuNetDisponible / result.caAnnuelHT, color: colors.primary },
+                  {
+                    ratio: result.revenuNetDisponible / result.caAnnuelHT,
+                    color: colors.primary,
+                  },
                 ]}
-                height={10}
+                height={isCompact ? 8 : 10}
               />
             </View>
 
@@ -201,7 +215,7 @@ export function ResultScreen({
         </FadeInView>
       </View>
 
-      <BottomSheet collapsedHeight={220} expandedHeight={620}>
+      <BottomSheet collapsedHeight={isCompact ? 180 : 220} expandedHeight={height * 0.85}>
         <FadeInView delay={150}>
           <Comparaison result={result} />
         </FadeInView>
@@ -217,7 +231,8 @@ export function ResultScreen({
               <Text style={styles.hypothesesTitle}>Hypothèses</Text>
             </View>
             <Text style={styles.hypothesesText}>
-              Micro-entreprise · France métropolitaine · barèmes 2026. Professions réglementées (Cipav) non couvertes. CFE non incluse.
+              Micro-entreprise · France métropolitaine · barèmes 2026. Professions
+              réglementées (Cipav) non couvertes. CFE non incluse.
             </Text>
           </Card>
         </FadeInView>
@@ -271,7 +286,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     paddingHorizontal: spacing.lg,
     paddingTop: spacing.md,
-    paddingBottom: spacing.md,
+    paddingBottom: spacing.sm,
   },
   activityBlock: {
     flex: 1,
@@ -292,42 +307,49 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
   },
   iconButton: {
-    width: 42,
-    height: 42,
+    width: 40,
+    height: 40,
     borderRadius: radius.full,
     backgroundColor: colors.surface,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
     borderColor: colors.border,
+    ...shadows.sm,
   },
   main: {
     paddingHorizontal: spacing.lg,
-    paddingBottom: spacing.md,
+    paddingBottom: spacing.sm,
   },
   heroCard: {
     ...shadows.primaryGlow,
+    paddingVertical: spacing.md,
   },
   heroLabel: {
     ...typography.caption,
     color: colors.surface,
     opacity: 0.9,
+    textAlign: 'center',
   },
   heroAmountRow: {
     flexDirection: 'row',
     alignItems: 'flex-start',
     justifyContent: 'center',
-    marginTop: spacing.sm,
+    marginTop: spacing.xs,
   },
   heroCurrency: {
     ...typography.h2,
     color: colors.surface,
     marginRight: spacing.xs,
-    marginTop: spacing.sm,
+    marginTop: spacing.xs,
     opacity: 0.9,
   },
   heroAmount: {
     ...typography.display,
+    color: colors.surface,
+  },
+  heroAmountCompact: {
+    ...typography.displaySmall,
     color: colors.surface,
   },
   heroTrend: {
@@ -335,7 +357,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: spacing.xs,
-    marginTop: spacing.sm,
+    marginTop: spacing.xs,
   },
   heroTrendText: {
     ...typography.bodySmall,
@@ -343,8 +365,8 @@ const styles = StyleSheet.create({
     opacity: 0.9,
   },
   progressContainer: {
-    marginTop: spacing.lg,
-    marginBottom: spacing.md,
+    marginTop: spacing.md,
+    marginBottom: spacing.sm,
   },
   heroFooter: {
     flexDirection: 'row',
@@ -361,11 +383,11 @@ const styles = StyleSheet.create({
     padding: spacing.md,
     borderWidth: 1,
     borderColor: colors.border,
-    marginTop: spacing.md,
+    marginTop: spacing.sm,
     ...shadows.sm,
   },
   progressRow: {
-    marginBottom: spacing.sm,
+    marginBottom: spacing.xs,
   },
   progressRowHeader: {
     flexDirection: 'row',
@@ -383,7 +405,7 @@ const styles = StyleSheet.create({
     fontWeight: '800',
   },
   progressRowTrack: {
-    height: 6,
+    height: 5,
     borderRadius: radius.full,
     backgroundColor: 'rgba(15, 23, 42, 0.06)',
     overflow: 'hidden',
@@ -395,7 +417,7 @@ const styles = StyleSheet.create({
   pillsRow: {
     flexDirection: 'row',
     gap: spacing.sm,
-    marginTop: spacing.md,
+    marginTop: spacing.sm,
   },
   hypothesesCard: {
     marginBottom: spacing.lg,
@@ -414,7 +436,7 @@ const styles = StyleSheet.create({
   hypothesesText: {
     ...typography.bodySmall,
     color: colors.inkSecondary,
-    lineHeight: 20,
+    lineHeight: 18,
   },
   actionsContainer: {
     gap: spacing.md,
@@ -457,5 +479,6 @@ const styles = StyleSheet.create({
     color: colors.primary,
     textAlign: 'center',
     marginBottom: spacing.lg,
+    fontWeight: '700',
   },
 });

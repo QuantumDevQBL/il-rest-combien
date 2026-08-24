@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { PressableScale } from './PressableScale';
 import { Icon } from '../design-system';
-import { colors, radius, spacing, typography } from '../theme';
+import { colors, radius, shadows, spacing, typography } from '../theme';
 
 interface LogoHeaderProps {
   showTagline?: boolean;
@@ -19,20 +19,22 @@ export function LogoHeader({
     <View style={styles.container}>
       <View style={styles.logoRow}>
         <View style={styles.iconCircle}>
-          <Icon name="cash" size={18} color={colors.surface} />
+          <Icon name="cash" size={20} color={colors.surface} />
         </View>
-        <Text style={styles.title}>Il reste</Text>
+        <View>
+          <Text style={styles.title}>Il reste</Text>
+          {showTagline && (
+            <Text style={styles.tagline}>Micro-entreprise 2026</Text>
+          )}
+        </View>
       </View>
 
-      {(showTagline || onSettings || onHistory) && (
+      {(onSettings || onHistory) && (
         <View style={styles.rightRow}>
-          {showTagline && (
-            <Text style={styles.tagline}>Calculateur micro-entreprise 2026</Text>
-          )}
           {onHistory && (
             <PressableScale
               onPress={onHistory}
-              scale={0.9}
+              scale={0.88}
               accessibilityRole="button"
               accessibilityLabel="Historique"
             >
@@ -44,7 +46,7 @@ export function LogoHeader({
           {onSettings && (
             <PressableScale
               onPress={onSettings}
-              scale={0.9}
+              scale={0.88}
               accessibilityRole="button"
               accessibilityLabel="Paramètres fiscaux"
             >
@@ -66,34 +68,34 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: spacing.lg,
     paddingTop: spacing.md,
-    paddingBottom: spacing.md,
+    paddingBottom: spacing.sm,
   },
   logoRow: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   iconCircle: {
-    width: 34,
-    height: 34,
+    width: 38,
+    height: 38,
     borderRadius: radius.full,
     backgroundColor: colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: spacing.sm,
+    ...shadows.sm,
   },
   title: {
     ...typography.h3,
     color: colors.ink,
   },
+  tagline: {
+    ...typography.caption,
+    color: colors.inkTertiary,
+  },
   rightRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.sm,
-  },
-  tagline: {
-    ...typography.bodySmall,
-    color: colors.inkTertiary,
-    marginRight: spacing.sm,
   },
   iconButton: {
     width: 40,
@@ -104,5 +106,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderWidth: 1,
     borderColor: colors.border,
+    ...shadows.sm,
   },
 });

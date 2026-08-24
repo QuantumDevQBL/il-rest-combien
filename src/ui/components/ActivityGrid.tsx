@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View, useWindowDimensions } from 'react-native';
+import { StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import { PressableScale } from './PressableScale';
 import { Icon, IconName } from '../design-system';
 import { ActivityChoice, ACTIVITY_OPTIONS } from '../mapping';
@@ -18,22 +18,22 @@ const ACTIVITY_ICONS: Record<ActivityChoice, IconName> = {
 };
 
 export function ActivityGrid({ selected, onSelect }: ActivityGridProps) {
-  const { width } = useWindowDimensions();
-  const isSmallScreen = width < 360;
-  const gap = isSmallScreen ? spacing.sm : spacing.md;
-  const iconSize = isSmallScreen ? 28 : 34;
-  const circleSize = isSmallScreen ? 54 : 64;
+  const { width, height } = useWindowDimensions();
+  const isCompact = width < 360 || height < 700;
+  const gap = isCompact ? spacing.sm : spacing.md;
+  const iconSize = isCompact ? 26 : 30;
+  const circleSize = isCompact ? 48 : 56;
 
   return (
-    <View style={[styles.grid, { marginHorizontal: -gap / 2 }]}>
+    <View style={[styles.grid, { gap }]}>
       {ACTIVITY_OPTIONS.map((option) => {
         const isSelected = selected === option.value;
         return (
           <PressableScale
             key={option.value}
             onPress={() => onSelect(option.value)}
-            scale={0.97}
-            style={[styles.item, { width: '50%', padding: gap / 2 }]}
+            scale={0.96}
+            style={[styles.item, { width: '50%' }]}
             accessibilityRole="radio"
             accessibilityState={{ checked: isSelected }}
             accessibilityLabel={option.label}
@@ -52,17 +52,22 @@ export function ActivityGrid({ selected, onSelect }: ActivityGridProps) {
                   color={isSelected ? colors.surface : colors.primary}
                 />
               </View>
-              <Text
-                style={[styles.label, isSelected && styles.labelSelected]}
-                numberOfLines={1}
-                adjustsFontSizeToFit
-                minimumFontScale={0.8}
-              >
-                {option.label}
-              </Text>
+              <View style={styles.textBlock}>
+                <Text
+                  style={[styles.label, isSelected && styles.labelSelected]}
+                  numberOfLines={1}
+                  adjustsFontSizeToFit
+                  minimumFontScale={0.85}
+                >
+                  {option.label}
+                </Text>
+                <Text style={styles.description} numberOfLines={1} adjustsFontSizeToFit>
+                  {option.description}
+                </Text>
+              </View>
               {isSelected && (
                 <View style={styles.checkmark}>
-                  <Icon name="checkmarkCircle" size={20} color={colors.primary} />
+                  <Icon name="checkmarkCircle" size={18} color={colors.primary} />
                 </View>
               )}
             </View>
@@ -80,12 +85,12 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   item: {
-    aspectRatio: 1,
+    aspectRatio: 1.12,
   },
   card: {
     flex: 1,
     backgroundColor: colors.surface,
-    borderRadius: radius.lg,
+    borderRadius: radius.xl,
     borderWidth: 1,
     borderColor: colors.border,
     padding: spacing.md,
@@ -108,15 +113,24 @@ const styles = StyleSheet.create({
   iconCircleSelected: {
     backgroundColor: colors.primary,
   },
+  textBlock: {
+    alignItems: 'center',
+    width: '100%',
+  },
   label: {
     ...typography.body,
     color: colors.ink,
     fontWeight: '700',
     textAlign: 'center',
-    maxWidth: '100%',
+    marginBottom: spacing.xxs,
   },
   labelSelected: {
-    color: colors.ink,
+    color: colors.primaryDark,
+  },
+  description: {
+    ...typography.bodySmall,
+    color: colors.inkTertiary,
+    textAlign: 'center',
   },
   checkmark: {
     position: 'absolute',

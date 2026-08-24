@@ -9,6 +9,7 @@ export type IconName =
   | 'people'
   | 'person'
   | 'briefcase'
+  | 'briefcaseFilled'
   | 'warning'
   | 'informationCircle'
   | 'checkmarkCircle'
@@ -31,12 +32,16 @@ export type IconName =
   | 'shieldCheckmark'
   | 'swapHorizontal'
   | 'bag'
+  | 'bagFilled'
   | 'hammer'
+  | 'hammerFilled'
   | 'medical'
   | 'school'
   | 'business'
+  | 'businessFilled'
   | 'download'
   | 'cart'
+  | 'cartFilled'
   | 'construct'
   | 'documentText'
   | 'trophy'
@@ -51,6 +56,7 @@ const ICON_MAP: Record<IconName, keyof typeof Ionicons.glyphMap> = {
   people: 'people-outline',
   person: 'person-outline',
   briefcase: 'briefcase-outline',
+  briefcaseFilled: 'briefcase',
   warning: 'warning-outline',
   informationCircle: 'information-circle-outline',
   checkmarkCircle: 'checkmark-circle-outline',
@@ -73,12 +79,16 @@ const ICON_MAP: Record<IconName, keyof typeof Ionicons.glyphMap> = {
   shieldCheckmark: 'shield-checkmark-outline',
   swapHorizontal: 'swap-horizontal-outline',
   bag: 'bag-outline',
+  bagFilled: 'bag',
   hammer: 'hammer-outline',
+  hammerFilled: 'hammer',
   medical: 'medical-outline',
   school: 'school-outline',
   business: 'business-outline',
+  businessFilled: 'business',
   download: 'download-outline',
   cart: 'cart-outline',
+  cartFilled: 'cart',
   construct: 'construct-outline',
   documentText: 'document-text-outline',
   trophy: 'trophy-outline',

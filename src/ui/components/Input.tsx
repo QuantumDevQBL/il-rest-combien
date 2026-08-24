@@ -77,14 +77,15 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surface,
     borderRadius: radius.xl,
     paddingHorizontal: spacing.md,
-    minHeight: 52,
-    borderWidth: 1,
+    minHeight: 50,
+    borderWidth: 1.5,
     borderColor: colors.border,
     ...shadows.sm,
   },
   inputContainerFocused: {
     borderColor: colors.borderFocused,
     backgroundColor: colors.surface,
+    ...shadows.md,
   },
   inputContainerError: {
     borderColor: colors.negative,

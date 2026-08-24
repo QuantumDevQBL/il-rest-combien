@@ -13,6 +13,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Button, Icon, IconName } from '../design-system';
 import { colors, shadows, spacing, typography } from '../theme';
 import { PressableScale } from '../components/PressableScale';
+import { hapticSelection } from '../utils/haptics';
 
 const { width } = Dimensions.get('window');
 
@@ -61,10 +62,12 @@ interface OnboardingScreenProps {
 export function OnboardingScreen({ onComplete }: OnboardingScreenProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const flatListRef = useRef<FlatList<Slide>>(null);
+  const scrollX = useRef(new Animated.Value(0)).current;
 
   const handleMomentumScrollEnd = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
     const newIndex = Math.round(event.nativeEvent.contentOffset.x / width);
     setCurrentIndex(newIndex);
+    void hapticSelection();
   };
 
   const goToNext = () => {
@@ -77,25 +80,44 @@ export function OnboardingScreen({ onComplete }: OnboardingScreenProps) {
     }
   };
 
-  const renderItem = ({ item }: { item: Slide }) => (
-    <View style={styles.slide}>
-      <View style={styles.iconCircle}>
-        <Icon name={item.icon} size={40} color={colors.background} />
-      </View>
-      <Text style={styles.title}>{item.title}</Text>
-      <Text style={styles.description}>{item.description}</Text>
-    </View>
-  );
+  const renderItem = ({ item, index }: { item: Slide; index: number }) => {
+    const inputRange = [(index - 1) * width, index * width, (index + 1) * width];
+    const opacity = scrollX.interpolate({
+      inputRange,
+      outputRange: [0.2, 1, 0.2],
+      extrapolate: 'clamp',
+    });
+    const translateY = scrollX.interpolate({
+      inputRange,
+      outputRange: [24, 0, 24],
+      extrapolate: 'clamp',
+    });
+    const scale = scrollX.interpolate({
+      inputRange,
+      outputRange: [0.92, 1, 0.92],
+      extrapolate: 'clamp',
+    });
+
+    return (
+      <Animated.View style={[styles.slide, { opacity, transform: [{ translateY }, { scale }] }]}>
+        <View style={styles.iconCircle}>
+          <Icon name={item.icon} size={44} color={colors.background} />
+        </View>
+        <Text style={styles.title}>{item.title}</Text>
+        <Text style={styles.description}>{item.description}</Text>
+      </Animated.View>
+    );
+  };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
       <View style={styles.skipContainer}>
-        <PressableScale onPress={onComplete}>
+        <PressableScale onPress={onComplete} scale={0.95}>
           <Text style={styles.skipText}>Passer</Text>
         </PressableScale>
       </View>
 
-      <FlatList
+      <Animated.FlatList
         ref={flatListRef}
         data={SLIDES}
         renderItem={renderItem}
@@ -105,6 +127,9 @@ export function OnboardingScreen({ onComplete }: OnboardingScreenProps) {
         showsHorizontalScrollIndicator={false}
         bounces={false}
         onMomentumScrollEnd={handleMomentumScrollEnd}
+        onScroll={Animated.event([{ nativeEvent: { contentOffset: { x: scrollX } } }], {
+          useNativeDriver: false,
+        })}
         onScrollToIndexFailed={() => {
           // Fallback for environments where layout metrics are unavailable (tests).
         }}
@@ -151,6 +176,7 @@ const styles = StyleSheet.create({
   skipText: {
     ...typography.bodySmall,
     color: colors.inkTertiary,
+    fontWeight: '600',
   },
   slide: {
     width,
@@ -159,9 +185,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   iconCircle: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
+    width: 108,
+    height: 108,
+    borderRadius: 54,
     backgroundColor: colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
@@ -178,7 +204,7 @@ const styles = StyleSheet.create({
     ...typography.body,
     color: colors.inkSecondary,
     textAlign: 'center',
-    lineHeight: 26,
+    lineHeight: 24,
   },
   footer: {
     paddingHorizontal: spacing.lg,
@@ -196,10 +222,12 @@ const styles = StyleSheet.create({
     height: 8,
     borderRadius: 4,
     backgroundColor: colors.inkTertiary,
-    opacity: 0.4,
-    transform: [{ scale: 0.8 }],
+    opacity: 0.3,
+    transform: [{ scale: 0.85 }],
   },
   dotActive: {
+    width: 22,
+    borderRadius: 4,
     backgroundColor: colors.primary,
     opacity: 1,
     transform: [{ scale: 1 }],

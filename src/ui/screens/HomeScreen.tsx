@@ -15,7 +15,7 @@ import { MoneyInput } from '../components/MoneyInput';
 import { Input } from '../components/Input';
 import { PressableScale } from '../components/PressableScale';
 import { FadeInView } from '../components/FadeInView';
-import { Button } from '../design-system';
+import { Button, Icon } from '../design-system';
 import { hapticSelection } from '../utils/haptics';
 import { ActivityChoice } from '../mapping';
 import { colors, spacing, typography } from '../theme';
@@ -54,16 +54,16 @@ export function HomeScreen({ onCalculate, onOpenHistory }: HomeScreenProps) {
   const canCalculate = parsedAmount !== null && parsedAmount > 0;
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.keyboardView}
       >
-        <LogoHeader onHistory={onOpenHistory} />
+        <LogoHeader onHistory={onOpenHistory} showTagline />
 
         <View style={styles.content}>
           {step === 'activity' ? (
-            <FadeInView key="activity" duration={300} style={styles.stepContainer}>
+            <FadeInView key="activity" duration={350} style={styles.stepContainer}>
               <View style={styles.headerText}>
                 <Text style={styles.stepTitle}>Quelle est ton activité ?</Text>
                 <Text style={styles.stepSubtitle}>
@@ -85,14 +85,17 @@ export function HomeScreen({ onCalculate, onOpenHistory }: HomeScreenProps) {
               </View>
             </FadeInView>
           ) : (
-            <FadeInView key="revenue" duration={300} style={styles.stepContainer}>
+            <FadeInView key="revenue" duration={350} style={styles.stepContainer}>
               <View style={styles.headerText}>
                 <PressableScale
                   onPress={handleBack}
                   scale={0.95}
                   style={styles.backButton}
+                  accessibilityRole="button"
+                  accessibilityLabel="Retour à la sélection d'activité"
                 >
-                  <Text style={styles.backText}>← Retour</Text>
+                  <Icon name="arrowBack" size={16} color={colors.primary} />
+                  <Text style={styles.backText}>Retour</Text>
                 </PressableScale>
 
                 <Text style={styles.stepTitle}>Ton chiffre d'affaires</Text>
@@ -153,18 +156,18 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     paddingHorizontal: spacing.lg,
-    paddingTop: spacing.sm,
+    paddingTop: spacing.xs,
   },
   stepContainer: {
     flex: 1,
   },
   headerText: {
-    marginBottom: spacing.lg,
+    marginBottom: spacing.md,
   },
   stepTitle: {
     ...typography.h1,
     color: colors.ink,
-    marginBottom: spacing.sm,
+    marginBottom: spacing.xs,
   },
   stepSubtitle: {
     ...typography.body,
@@ -176,8 +179,8 @@ const styles = StyleSheet.create({
     alignSelf: 'stretch',
   },
   tipWrapper: {
-    marginTop: spacing.lg,
-    marginBottom: spacing.xl,
+    marginTop: spacing.md,
+    marginBottom: spacing.lg,
     alignItems: 'center',
   },
   tip: {
@@ -187,27 +190,30 @@ const styles = StyleSheet.create({
   },
   backButton: {
     alignSelf: 'flex-start',
-    marginBottom: spacing.md,
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: spacing.sm,
   },
   backText: {
     ...typography.body,
     color: colors.primary,
-    fontWeight: '600',
+    fontWeight: '700',
+    marginLeft: spacing.xxs,
   },
   inputWrapper: {
     flex: 1,
     justifyContent: 'center',
-    paddingBottom: spacing.lg,
+    paddingBottom: spacing.md,
   },
   amountHint: {
     ...typography.caption,
     color: colors.inkTertiary,
     textAlign: 'center',
-    marginTop: spacing.md,
-    marginBottom: spacing.xl,
+    marginTop: spacing.sm,
+    marginBottom: spacing.lg,
   },
   labelInput: {
-    marginTop: spacing.sm,
+    marginTop: spacing.xs,
   },
   footer: {
     paddingBottom: spacing.lg,

@@ -9,7 +9,11 @@ interface CardProps {
 }
 
 export function Card({ children, variant = 'default', style }: CardProps) {
-  return <View style={[styles.base, styles[variant], variant === 'default' && shadows.sm, style]}>{children}</View>;
+  return (
+    <View style={[styles.base, styles[variant], variant === 'default' && shadows.sm, style]}>
+      {children}
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({

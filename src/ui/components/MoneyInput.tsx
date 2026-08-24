@@ -88,13 +88,14 @@ const styles = StyleSheet.create({
     borderRadius: radius.xxl,
     paddingHorizontal: spacing.xl,
     paddingVertical: spacing.lg,
-    borderWidth: 1,
+    borderWidth: 1.5,
     borderColor: colors.border,
     ...shadows.sm,
   },
   containerFocused: {
     borderColor: colors.borderFocused,
     backgroundColor: colors.surface,
+    ...shadows.md,
   },
   currency: {
     ...typography.hero,

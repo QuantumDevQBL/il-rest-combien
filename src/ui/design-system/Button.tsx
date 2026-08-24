@@ -1,5 +1,6 @@
 import React from 'react';
-import { Pressable, StyleSheet, Text } from 'react-native';
+import { StyleSheet, Text } from 'react-native';
+import { PressableScale } from '../components/PressableScale';
 import { colors, radius, shadows, spacing, typography } from './tokens';
 
 interface ButtonProps {
@@ -20,22 +21,25 @@ export function Button({
   icon,
 }: ButtonProps) {
   return (
-    <Pressable
+    <PressableScale
       onPress={onPress}
       disabled={disabled}
-      style={({ pressed }) => [
+      scale={0.97}
+      style={[
         styles.base,
         styles[size],
         styles[variant],
-        variant === 'primary' && !pressed && !disabled && styles.primaryShadow,
-        (pressed || disabled) && styles.disabled,
+        variant === 'primary' && !disabled && styles.primaryShadow,
+        disabled && styles.disabled,
       ]}
+      accessibilityRole="button"
+      accessibilityLabel={label}
     >
       {icon}
       <Text style={[styles.text, styles[`${variant}Text` as const], styles[`${size}Text` as const]]}>
         {label}
       </Text>
-    </Pressable>
+    </PressableScale>
   );
 }
 
@@ -64,9 +68,9 @@ const styles = StyleSheet.create({
   primaryShadow: {
     shadowColor: colors.primary,
     shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.25,
-    shadowRadius: 18,
-    elevation: 6,
+    shadowOpacity: 0.28,
+    shadowRadius: 20,
+    elevation: 7,
   },
   secondary: {
     backgroundColor: colors.surface,
@@ -80,7 +84,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.negativeLight,
   },
   disabled: {
-    opacity: 0.45,
+    opacity: 0.4,
   },
   text: {
     ...typography.body,

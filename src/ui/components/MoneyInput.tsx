@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, TextInput, View } from 'react-native';
-import { colors, radius, spacing, typography } from '../theme';
+import { colors, radius, shadows, spacing, typography } from '../theme';
 import { parseMontantSaisi } from '../utils/format';
 
 interface MoneyInputProps {
@@ -85,19 +85,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: colors.surface,
-    borderRadius: radius.xl,
+    borderRadius: radius.xxl,
     paddingHorizontal: spacing.xl,
     paddingVertical: spacing.lg,
     borderWidth: 1,
     borderColor: colors.border,
+    ...shadows.sm,
   },
   containerFocused: {
     borderColor: colors.borderFocused,
-    backgroundColor: colors.surfaceElevated,
+    backgroundColor: colors.surface,
   },
   currency: {
     ...typography.hero,
-    color: colors.inkTertiary,
+    color: colors.primary,
     marginRight: spacing.sm,
   },
   input: {

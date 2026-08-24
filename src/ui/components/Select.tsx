@@ -1,7 +1,7 @@
 import React from 'react';
 import { Platform, StyleSheet, Text, View } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
-import { colors, radius, spacing, typography } from '../theme';
+import { colors, radius, shadows, spacing, typography } from '../theme';
 
 interface SelectOption<T extends string> {
   value: T;
@@ -58,11 +58,12 @@ const styles = StyleSheet.create({
   },
   pickerContainer: {
     backgroundColor: colors.surface,
-    borderRadius: radius.lg,
+    borderRadius: radius.xl,
     minHeight: 52,
     justifyContent: 'center',
     borderWidth: 1,
     borderColor: colors.border,
+    ...shadows.sm,
   },
   picker: {
     ...typography.body,

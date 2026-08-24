@@ -39,7 +39,7 @@ export function ActivityGrid({ selected, onSelect }: ActivityGridProps) {
           <PressableScale
             key={option.value}
             onPress={() => onSelect(option.value)}
-            scale={0.96}
+            scale={0.97}
             style={styles.item}
             accessibilityRole="radio"
             accessibilityState={{ checked: isSelected }}
@@ -49,8 +49,8 @@ export function ActivityGrid({ selected, onSelect }: ActivityGridProps) {
               <View style={[styles.iconCircle, isSelected && styles.iconCircleSelected]}>
                 <Icon
                   name={ACTIVITY_ICONS[option.value]}
-                  size={28}
-                  color={isSelected ? colors.background : colors.inkTertiary}
+                  size={26}
+                  color={isSelected ? colors.surface : colors.primary}
                 />
               </View>
               <Text style={[styles.label, isSelected && styles.labelSelected]} numberOfLines={2}>
@@ -86,32 +86,30 @@ const styles = StyleSheet.create({
   card: {
     flex: 1,
     backgroundColor: colors.surface,
-    borderRadius: radius.lg,
+    borderRadius: radius.xl,
     borderWidth: 1,
     borderColor: colors.border,
     padding: spacing.md,
     justifyContent: 'center',
     alignItems: 'center',
+    ...shadows.sm,
   },
   cardSelected: {
     borderColor: colors.primary,
-    backgroundColor: colors.surfaceElevated,
-    ...shadows.primaryGlow,
+    backgroundColor: colors.primaryLight,
+    ...shadows.md,
   },
   iconCircle: {
-    width: 56,
-    height: 56,
-    borderRadius: radius.md,
-    backgroundColor: colors.surfaceElevated,
+    width: 54,
+    height: 54,
+    borderRadius: radius.full,
+    backgroundColor: colors.primaryLight,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: spacing.sm,
-    borderWidth: 1,
-    borderColor: colors.border,
   },
   iconCircleSelected: {
     backgroundColor: colors.primary,
-    borderColor: colors.primary,
   },
   label: {
     ...typography.body,

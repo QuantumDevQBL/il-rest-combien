@@ -24,6 +24,28 @@ interface ResultScreenProps {
   onOpenDetail: () => void;
 }
 
+interface ProgressRowProps {
+  label: string;
+  value: string;
+  ratio: number;
+  color: string;
+}
+
+function ProgressRow({ label, value, ratio, color }: ProgressRowProps) {
+  const safeRatio = Math.max(0, Math.min(1, ratio));
+  return (
+    <View style={styles.progressRow}>
+      <View style={styles.progressRowHeader}>
+        <Text style={styles.progressRowLabel}>{label}</Text>
+        <Text style={styles.progressRowValue}>{value}</Text>
+      </View>
+      <View style={styles.progressRowTrack}>
+        <View style={[styles.progressRowFill, { width: `${safeRatio * 100}%`, backgroundColor: color }]} />
+      </View>
+    </View>
+  );
+}
+
 export function ResultScreen({
   onReset,
   onOpenSettings,
@@ -45,14 +67,45 @@ export function ResultScreen({
   const tauxPrelevement = result.tauxPrelevementGlobal * 100;
   const estimationLabel = form.label.trim() || getActivityLabel(form.activity);
 
+  const rows: ProgressRowProps[] = [
+    {
+      label: 'Chiffre d\'affaires',
+      value: formatMontant(result.caAnnuelHT),
+      ratio: 1,
+      color: colors.ink,
+    },
+    {
+      label: 'Cotisations sociales',
+      value: `−${formatMontant(result.cotisationsSociales)}`,
+      ratio: result.cotisationsSociales / result.caAnnuelHT,
+      color: '#F43F5E',
+    },
+    {
+      label: 'Formation professionnelle',
+      value: `−${formatMontant(result.cfp)}`,
+      ratio: result.cfp / result.caAnnuelHT,
+      color: '#F59E0B',
+    },
+    {
+      label: 'Impôt provisionné',
+      value: `−${formatMontant(result.impotRetenu)}`,
+      ratio: result.impotRetenu / result.caAnnuelHT,
+      color: '#8B5CF6',
+    },
+    {
+      label: 'Reste à vivre',
+      value: formatMontant(result.revenuNetDisponible),
+      ratio: result.revenuNetDisponible / result.caAnnuelHT,
+      color: colors.primary,
+    },
+  ];
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <View style={styles.logoRow}>
-          <View style={styles.logoIcon}>
-            <Icon name="cash" size={18} color={colors.background} />
-          </View>
-          <Text style={styles.logo}>Il reste combien ?</Text>
+        <View style={styles.activityBlock}>
+          <Text style={styles.activityLabel}>{estimationLabel}</Text>
+          <Text style={styles.activityCa}>CA {formatMontant(result.caAnnuelHT)}</Text>
         </View>
         <View style={styles.headerActions}>
           <PressableScale
@@ -62,7 +115,7 @@ export function ResultScreen({
             accessibilityLabel="Historique"
           >
             <View style={styles.iconButton}>
-              <Icon name="time" size={22} color={colors.ink} />
+              <Icon name="time" size={22} color={colors.inkSecondary} />
             </View>
           </PressableScale>
           <PressableScale
@@ -72,7 +125,7 @@ export function ResultScreen({
             accessibilityLabel="Paramètres fiscaux"
           >
             <View style={styles.iconButton}>
-              <Icon name="settings" size={22} color={colors.ink} />
+              <Icon name="settings" size={22} color={colors.inkSecondary} />
             </View>
           </PressableScale>
         </View>
@@ -80,27 +133,29 @@ export function ResultScreen({
 
       <View style={styles.main} pointerEvents="box-none">
         <FadeInView delay={0}>
-          <Card variant="glass" style={styles.heroCard}>
-            <View style={styles.heroHeader}>
-              <Text style={styles.heroLabel}>{estimationLabel}</Text>
-              <Text style={styles.heroCa}>CA {formatMontant(result.caAnnuelHT)}</Text>
-            </View>
+          <Card variant="accent" style={styles.heroCard}>
+            <Text style={styles.heroLabel}>Reste à vivre ce mois-ci</Text>
             <View style={styles.heroAmountRow}>
               <Text style={styles.heroCurrency}>€</Text>
               <AnimatedCounter
-                value={result.revenuNetDisponible}
+                value={netMensuel}
                 style={styles.heroAmount}
                 formatter={(v) => Math.round(v).toLocaleString('fr-FR')}
               />
             </View>
-            <Text style={styles.heroMonthly}>soit {formatMontant(netMensuel)} / mois</Text>
+            <View style={styles.heroTrend}>
+              <Icon name="trendingUp" size={14} color={colors.surface} />
+              <Text style={styles.heroTrendText}>
+                soit {formatMontant(result.revenuNetDisponible)} / an
+              </Text>
+            </View>
 
             <View style={styles.progressContainer}>
               <ProgressBar
                 segments={[
-                  { ratio: result.totalPrelevementsSociaux / result.caAnnuelHT, color: colors.secondary },
-                  { ratio: result.impotRetenu / result.caAnnuelHT, color: colors.alert },
-                  { ratio: result.revenuNetDisponible / result.caAnnuelHT, color: colors.success },
+                  { ratio: result.totalPrelevementsSociaux / result.caAnnuelHT, color: '#F43F5E' },
+                  { ratio: result.impotRetenu / result.caAnnuelHT, color: '#8B5CF6' },
+                  { ratio: result.revenuNetDisponible / result.caAnnuelHT, color: colors.primary },
                 ]}
                 height={10}
               />
@@ -118,6 +173,14 @@ export function ResultScreen({
         </FadeInView>
 
         <FadeInView delay={100}>
+          <View style={styles.rowsCard}>
+            {rows.map((row) => (
+              <ProgressRow key={row.label} {...row} />
+            ))}
+          </View>
+        </FadeInView>
+
+        <FadeInView delay={150}>
           <View style={styles.pillsRow}>
             <MetricPill
               label="Cotisations"
@@ -205,27 +268,24 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     paddingHorizontal: spacing.lg,
     paddingTop: spacing.md,
     paddingBottom: spacing.md,
   },
-  logoRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  logoIcon: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: colors.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
+  activityBlock: {
+    flex: 1,
     marginRight: spacing.sm,
   },
-  logo: {
-    ...typography.h3,
+  activityLabel: {
+    ...typography.body,
     color: colors.ink,
+    fontWeight: '800',
+  },
+  activityCa: {
+    ...typography.caption,
+    color: colors.inkTertiary,
+    marginTop: spacing.xxs,
   },
   headerActions: {
     flexDirection: 'row',
@@ -235,7 +295,7 @@ const styles = StyleSheet.create({
     width: 42,
     height: 42,
     borderRadius: radius.full,
-    backgroundColor: colors.surfaceElevated,
+    backgroundColor: colors.surface,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
@@ -246,45 +306,41 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.md,
   },
   heroCard: {
-    ...shadows.lg,
-  },
-  heroHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: spacing.sm,
+    ...shadows.primaryGlow,
   },
   heroLabel: {
-    ...typography.bodySmall,
-    color: colors.ink,
-    fontWeight: '700',
-    flex: 1,
-    marginRight: spacing.sm,
-  },
-  heroCa: {
     ...typography.caption,
-    color: colors.inkTertiary,
+    color: colors.surface,
+    opacity: 0.9,
   },
   heroAmountRow: {
     flexDirection: 'row',
     alignItems: 'flex-start',
     justifyContent: 'center',
+    marginTop: spacing.sm,
   },
   heroCurrency: {
     ...typography.h2,
-    color: colors.primary,
+    color: colors.surface,
     marginRight: spacing.xs,
     marginTop: spacing.sm,
+    opacity: 0.9,
   },
   heroAmount: {
     ...typography.display,
-    color: colors.ink,
+    color: colors.surface,
   },
-  heroMonthly: {
-    ...typography.body,
-    color: colors.inkSecondary,
-    textAlign: 'center',
+  heroTrend: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing.xs,
     marginTop: spacing.sm,
+  },
+  heroTrendText: {
+    ...typography.bodySmall,
+    color: colors.surface,
+    opacity: 0.9,
   },
   progressContainer: {
     marginTop: spacing.lg,
@@ -296,7 +352,45 @@ const styles = StyleSheet.create({
   },
   heroFooterText: {
     ...typography.caption,
-    color: colors.inkTertiary,
+    color: colors.surface,
+    opacity: 0.8,
+  },
+  rowsCard: {
+    backgroundColor: colors.surface,
+    borderRadius: radius.xl,
+    padding: spacing.md,
+    borderWidth: 1,
+    borderColor: colors.border,
+    marginTop: spacing.md,
+    ...shadows.sm,
+  },
+  progressRow: {
+    marginBottom: spacing.sm,
+  },
+  progressRowHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: spacing.xxs,
+  },
+  progressRowLabel: {
+    ...typography.bodySmall,
+    color: colors.inkSecondary,
+  },
+  progressRowValue: {
+    ...typography.bodySmall,
+    color: colors.ink,
+    fontWeight: '800',
+  },
+  progressRowTrack: {
+    height: 6,
+    borderRadius: radius.full,
+    backgroundColor: 'rgba(15, 23, 42, 0.06)',
+    overflow: 'hidden',
+  },
+  progressRowFill: {
+    height: '100%',
+    borderRadius: radius.full,
   },
   pillsRow: {
     flexDirection: 'row',
@@ -305,7 +399,7 @@ const styles = StyleSheet.create({
   },
   hypothesesCard: {
     marginBottom: spacing.lg,
-    backgroundColor: colors.surfaceElevated,
+    backgroundColor: colors.surface,
   },
   hypothesesHeader: {
     flexDirection: 'row',
@@ -329,11 +423,12 @@ const styles = StyleSheet.create({
   actionCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.surfaceElevated,
-    borderRadius: radius.lg,
+    backgroundColor: colors.surface,
+    borderRadius: radius.xl,
     padding: spacing.md,
     borderWidth: 1,
     borderColor: colors.border,
+    ...shadows.sm,
   },
   actionIcon: {
     width: 44,

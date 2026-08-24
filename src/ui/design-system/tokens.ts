@@ -1,44 +1,44 @@
 /**
- * Design tokens — Il reste combien.
+ * Design tokens — ResteClair.
  *
- * Direction "Midnight Fintech" : fond profond bleu-noir, accents cyan et violet,
- * surfaces étagées, glassmorphism subtil, ombres colorées diffuses, chiffres tabulaires.
+ * Direction "Clair & Vert" : fond clair slate-50, surfaces blanches,
+ * accents emerald/teal, ombres douces neutres, typographie bold et aérée.
  */
 
 import { TextStyle } from 'react-native';
 
 export const colors = {
   // Fonds
-  background: '#0B0F19',
-  surface: '#151B2B',
-  surfaceElevated: '#1E2738',
-  surfaceGlass: 'rgba(21, 27, 43, 0.85)',
+  background: '#F8FAFC',
+  surface: '#FFFFFF',
+  surfaceElevated: '#FFFFFF',
+  surfaceGlass: 'rgba(255, 255, 255, 0.92)',
 
   // Encre
-  ink: '#F8FAFC',
-  inkSecondary: '#94A3B8',
-  inkTertiary: '#64748B',
+  ink: '#0F172A',
+  inkSecondary: '#475569',
+  inkTertiary: '#94A3B8',
 
   // Bordures
-  border: 'rgba(148, 163, 184, 0.12)',
-  borderFocused: 'rgba(0, 212, 255, 0.5)',
+  border: 'rgba(15, 23, 42, 0.08)',
+  borderFocused: 'rgba(16, 185, 129, 0.5)',
 
   // Accents
-  primary: '#00D4FF',
-  primaryLight: 'rgba(0, 212, 255, 0.15)',
-  secondary: '#8B5CF6',
-  secondaryLight: 'rgba(139, 92, 246, 0.15)',
-  success: '#22C55E',
-  successLight: 'rgba(34, 197, 94, 0.15)',
-  alert: '#F97316',
-  alertLight: 'rgba(249, 115, 22, 0.15)',
+  primary: '#10B981',
+  primaryLight: 'rgba(16, 185, 129, 0.12)',
+  secondary: '#0D9488',
+  secondaryLight: 'rgba(13, 148, 136, 0.12)',
+  success: '#10B981',
+  successLight: 'rgba(16, 185, 129, 0.12)',
+  alert: '#F59E0B',
+  alertLight: 'rgba(245, 158, 11, 0.12)',
   negative: '#EF4444',
-  negativeLight: 'rgba(239, 68, 68, 0.15)',
-  info: '#00D4FF',
+  negativeLight: 'rgba(239, 68, 68, 0.12)',
+  info: '#0D9488',
 
   // État
-  disabled: '#3A3A3A',
-  overlay: 'rgba(0, 0, 0, 0.75)',
+  disabled: '#E2E8F0',
+  overlay: 'rgba(15, 23, 42, 0.5)',
 } as const;
 
 export const typography = {
@@ -138,38 +138,31 @@ export const radius = {
 
 export const shadows = {
   sm: {
-    shadowColor: colors.primary,
+    shadowColor: colors.ink,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 6,
+    elevation: 2,
+  },
+  md: {
+    shadowColor: colors.ink,
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
+    shadowOpacity: 0.08,
     shadowRadius: 12,
     elevation: 4,
   },
-  md: {
-    shadowColor: colors.primary,
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.25,
-    shadowRadius: 20,
-    elevation: 8,
-  },
   lg: {
-    shadowColor: colors.primary,
+    shadowColor: colors.ink,
     shadowOffset: { width: 0, height: 12 },
-    shadowOpacity: 0.3,
-    shadowRadius: 32,
-    elevation: 12,
+    shadowOpacity: 0.12,
+    shadowRadius: 28,
+    elevation: 10,
   },
   primaryGlow: {
     shadowColor: colors.primary,
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.45,
-    shadowRadius: 24,
-    elevation: 12,
-  },
-  secondaryGlow: {
-    shadowColor: colors.secondary,
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.4,
-    shadowRadius: 24,
-    elevation: 12,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.25,
+    shadowRadius: 18,
+    elevation: 8,
   },
 } as const;

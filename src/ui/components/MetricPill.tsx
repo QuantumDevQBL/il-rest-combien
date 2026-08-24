@@ -32,11 +32,12 @@ const styles = StyleSheet.create({
     flex: 1,
     aspectRatio: 1,
     backgroundColor: colors.surface,
-    borderRadius: radius.lg,
+    borderRadius: radius.xl,
     padding: spacing.md,
     justifyContent: 'space-between',
     borderWidth: 1,
     borderColor: colors.border,
+    ...shadows.sm,
   },
   label: {
     ...typography.caption,

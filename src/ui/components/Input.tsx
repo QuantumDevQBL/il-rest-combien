@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { StyleSheet, Text, TextInput, View } from 'react-native';
-import { colors, radius, spacing, typography } from '../theme';
+import { colors, radius, shadows, spacing, typography } from '../theme';
 
 interface InputProps {
   label?: string;
@@ -75,15 +75,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: colors.surface,
-    borderRadius: radius.lg,
+    borderRadius: radius.xl,
     paddingHorizontal: spacing.md,
     minHeight: 52,
     borderWidth: 1,
     borderColor: colors.border,
+    ...shadows.sm,
   },
   inputContainerFocused: {
     borderColor: colors.borderFocused,
-    backgroundColor: colors.surfaceElevated,
+    backgroundColor: colors.surface,
   },
   inputContainerError: {
     borderColor: colors.negative,

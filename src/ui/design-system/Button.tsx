@@ -44,7 +44,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: radius.xl,
+    borderRadius: radius.xxl,
     minHeight: 52,
     gap: spacing.sm,
   },
@@ -64,12 +64,12 @@ const styles = StyleSheet.create({
   primaryShadow: {
     shadowColor: colors.primary,
     shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.35,
+    shadowOpacity: 0.25,
     shadowRadius: 18,
-    elevation: 8,
+    elevation: 6,
   },
   secondary: {
-    backgroundColor: colors.surfaceElevated,
+    backgroundColor: colors.surface,
     borderWidth: 1,
     borderColor: colors.border,
   },
@@ -93,7 +93,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   primaryText: {
-    color: colors.background,
+    color: colors.surface,
   },
   secondaryText: {
     color: colors.ink,

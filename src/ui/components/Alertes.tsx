@@ -57,7 +57,7 @@ export function Alertes({ result }: AlertesProps) {
           variant="filled"
           style={[
             styles.alerte,
-            alerte.variant === 'alert' ? styles.alerteWarning : undefined,
+            alerte.variant === 'alert' ? styles.alerteWarning : styles.alerteInfo,
           ]}
         >
           <Icon
@@ -93,6 +93,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'flex-start',
     marginBottom: spacing.sm,
+  },
+  alerteInfo: {
     backgroundColor: colors.secondaryLight,
   },
   alerteWarning: {
@@ -106,6 +108,6 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   alerteTextWarning: {
-    color: colors.alert,
+    color: '#B45309',
   },
 });

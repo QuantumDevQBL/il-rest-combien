@@ -18,11 +18,18 @@ import { FadeInView } from '../components/FadeInView';
 import { Button } from '../design-system';
 import { hapticSelection } from '../utils/haptics';
 import { ActivityChoice } from '../mapping';
-import { colors, spacing, typography } from '../theme';
+import { colors, radius, spacing, typography } from '../theme';
 import { parseMontantSaisi } from '../utils/format';
 
 interface HomeScreenProps {
   onCalculate: () => void;
+}
+
+function getCurrentMonthLabel(): string {
+  const date = new Date();
+  const month = date.toLocaleDateString('fr-FR', { month: 'long' });
+  const year = date.getFullYear();
+  return `${month.charAt(0).toUpperCase() + month.slice(1)} ${year}`;
 }
 
 export function HomeScreen({ onCalculate }: HomeScreenProps) {
@@ -63,6 +70,16 @@ export function HomeScreen({ onCalculate }: HomeScreenProps) {
         <View style={styles.content}>
           {step === 'activity' ? (
             <FadeInView key="activity" duration={300} style={styles.stepContainer}>
+              <View style={styles.greetingRow}>
+                <View>
+                  <Text style={styles.greeting}>Bonjour 👋</Text>
+                  <Text style={styles.month}>{getCurrentMonthLabel()}</Text>
+                </View>
+                <View style={styles.avatar}>
+                  <Text style={styles.avatarText}>RC</Text>
+                </View>
+              </View>
+
               <View style={styles.headerText}>
                 <Text style={styles.stepTitle}>Quelle est ton activité ?</Text>
                 <Text style={styles.stepSubtitle}>
@@ -155,6 +172,33 @@ const styles = StyleSheet.create({
   },
   stepContainer: {
     flex: 1,
+  },
+  greetingRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: spacing.lg,
+  },
+  greeting: {
+    ...typography.bodySmall,
+    color: colors.inkTertiary,
+  },
+  month: {
+    ...typography.h3,
+    color: colors.ink,
+  },
+  avatar: {
+    width: 44,
+    height: 44,
+    borderRadius: radius.full,
+    backgroundColor: colors.primaryLight,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  avatarText: {
+    ...typography.body,
+    color: colors.primary,
+    fontWeight: '800',
   },
   headerText: {
     marginBottom: spacing.lg,

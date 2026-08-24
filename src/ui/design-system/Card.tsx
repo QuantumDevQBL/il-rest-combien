@@ -14,16 +14,16 @@ export function Card({ children, variant = 'default', style }: CardProps) {
 
 const styles = StyleSheet.create({
   base: {
-    borderRadius: radius.lg,
+    borderRadius: radius.xl,
     padding: spacing.md,
   },
   default: {
-    backgroundColor: colors.surfaceElevated,
+    backgroundColor: colors.surface,
     borderWidth: 1,
     borderColor: colors.border,
   },
   filled: {
-    backgroundColor: colors.surface,
+    backgroundColor: colors.background,
     borderWidth: 0,
   },
   accent: {

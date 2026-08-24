@@ -33,8 +33,8 @@ describe('ResultScreen', () => {
       partsFiscalesN2: '1',
     });
     expect(screen.getByText('Profession libérale non réglementée')).toBeTruthy();
-    expect(screen.getByText('36 000')).toBeTruthy();
-    expect(screen.getByText('soit 3 000 € / mois')).toBeTruthy();
+    expect(screen.getByText('3 000')).toBeTruthy();
+    expect(screen.getByText('soit 36 000 € / an')).toBeTruthy();
   });
 
   it('displays the rest per 100 € and global tax rate', () => {

@@ -5,6 +5,7 @@ import {
   Platform,
   StyleSheet,
   Text,
+  useWindowDimensions,
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -17,9 +18,9 @@ import { PressableScale } from '../components/PressableScale';
 import { FadeInView } from '../components/FadeInView';
 import { Button, Icon } from '../design-system';
 import { hapticSelection } from '../utils/haptics';
-import { ActivityChoice } from '../mapping';
-import { colors, spacing, typography } from '../theme';
-import { parseMontantSaisi } from '../utils/format';
+import { ActivityChoice, getActivityLabel } from '../mapping';
+import { colors, radius, shadows, spacing, typography } from '../theme';
+import { formatMontant, parseMontantSaisi } from '../utils/format';
 
 interface HomeScreenProps {
   onCalculate: () => void;
@@ -29,6 +30,8 @@ interface HomeScreenProps {
 export function HomeScreen({ onCalculate, onOpenHistory }: HomeScreenProps) {
   const { form, setFormField } = useCalculatorContext();
   const [step, setStep] = useState<'activity' | 'revenue'>('activity');
+  const { height } = useWindowDimensions();
+  const isCompact = height < 760;
 
   const handleActivitySelect = (activity: ActivityChoice) => {
     void hapticSelection();
@@ -52,6 +55,8 @@ export function HomeScreen({ onCalculate, onOpenHistory }: HomeScreenProps) {
 
   const parsedAmount = parseMontantSaisi(form.caAnnuelHT);
   const canCalculate = parsedAmount !== null && parsedAmount > 0;
+  const selectedActivityLabel = getActivityLabel(form.activity);
+  const previewAmount = parsedAmount && parsedAmount > 0 ? formatMontant(parsedAmount) : null;
 
   return (
     <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
@@ -64,24 +69,39 @@ export function HomeScreen({ onCalculate, onOpenHistory }: HomeScreenProps) {
         <View style={styles.content}>
           {step === 'activity' ? (
             <FadeInView key="activity" duration={350} style={styles.stepContainer}>
-              <View style={styles.headerText}>
+              <View style={styles.heroBlock}>
+                <Text style={styles.eyebrow}>Simulation micro-entreprise</Text>
                 <Text style={styles.stepTitle}>Quelle est ton activité ?</Text>
                 <Text style={styles.stepSubtitle}>
-                  Choisis la catégorie qui correspond à ton métier.
+                  En moins d&apos;une minute, tu vois ce qu&apos;il te reste vraiment
+                  après charges et impôt.
                 </Text>
+              </View>
+
+              <View style={styles.progressCard}>
+                <View style={styles.progressRow}>
+                  <Text style={styles.progressLabel}>Étape 1 sur 2</Text>
+                  <Text style={styles.progressMeta}>Choix du métier</Text>
+                </View>
+                <View style={styles.progressTrack}>
+                  <View style={[styles.progressFill, styles.progressFillHalf]} />
+                </View>
               </View>
 
               <View style={styles.gridWrapper}>
-                <ActivityGrid
-                  selected={form.activity}
-                  onSelect={handleActivitySelect}
-                />
+                <ActivityGrid selected={form.activity} onSelect={handleActivitySelect} />
               </View>
 
-              <View style={styles.tipWrapper}>
-                <Text style={styles.tip}>
-                  Professions réglementées (Cipav) : bientôt disponibles.
-                </Text>
+              <View style={[styles.tipCard, isCompact && styles.tipCardCompact]}>
+                <View style={styles.tipIcon}>
+                  <Icon name="flash" size={18} color={colors.primary} />
+                </View>
+                <View style={styles.tipContent}>
+                  <Text style={styles.tipTitle}>Pensé pour aller vite</Text>
+                  <Text style={styles.tip}>
+                    Base 2026 fiable, calcul local, et aucun compte à créer.
+                  </Text>
+                </View>
               </View>
             </FadeInView>
           ) : (
@@ -98,10 +118,26 @@ export function HomeScreen({ onCalculate, onOpenHistory }: HomeScreenProps) {
                   <Text style={styles.backText}>Retour</Text>
                 </PressableScale>
 
-                <Text style={styles.stepTitle}>Ton chiffre d'affaires</Text>
+                <Text style={styles.eyebrow}>Étape 2 sur 2</Text>
+                <Text style={styles.stepTitle}>Ton chiffre d&apos;affaires</Text>
                 <Text style={styles.stepSubtitle}>
-                  Montant HT prévu cette année.
+                  Indique ton CA annuel HT prévu. L&apos;estimation se mettra sur le
+                  bon régime pour {selectedActivityLabel.toLowerCase()}.
                 </Text>
+              </View>
+
+              <View style={styles.summaryCard}>
+                <View style={styles.summaryItem}>
+                  <Text style={styles.summaryLabel}>Activité</Text>
+                  <Text style={styles.summaryValue}>{selectedActivityLabel}</Text>
+                </View>
+                <View style={styles.summaryDivider} />
+                <View style={styles.summaryItem}>
+                  <Text style={styles.summaryLabel}>Simulation</Text>
+                  <Text style={styles.summaryValue}>
+                    {previewAmount ?? 'Prête à saisir'}
+                  </Text>
+                </View>
               </View>
 
               <View style={styles.inputWrapper}>
@@ -157,12 +193,21 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: spacing.lg,
     paddingTop: spacing.xs,
+    paddingBottom: spacing.md,
   },
   stepContainer: {
     flex: 1,
   },
+  heroBlock: {
+    marginBottom: spacing.md,
+  },
   headerText: {
     marginBottom: spacing.md,
+  },
+  eyebrow: {
+    ...typography.overline,
+    color: colors.primary,
+    marginBottom: spacing.xs,
   },
   stepTitle: {
     ...typography.h1,
@@ -173,20 +218,82 @@ const styles = StyleSheet.create({
     ...typography.body,
     color: colors.inkSecondary,
   },
+  progressCard: {
+    backgroundColor: colors.surface,
+    borderRadius: radius.lg,
+    padding: spacing.md,
+    borderWidth: 1,
+    borderColor: colors.border,
+    marginBottom: spacing.md,
+    ...shadows.sm,
+  },
+  progressRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: spacing.sm,
+  },
+  progressLabel: {
+    ...typography.caption,
+    color: colors.primary,
+  },
+  progressMeta: {
+    ...typography.bodySmall,
+    color: colors.inkSecondary,
+  },
+  progressTrack: {
+    height: 8,
+    borderRadius: radius.full,
+    backgroundColor: colors.primaryLight,
+    overflow: 'hidden',
+  },
+  progressFill: {
+    height: '100%',
+    borderRadius: radius.full,
+    backgroundColor: colors.primary,
+  },
+  progressFillHalf: {
+    width: '50%',
+  },
   gridWrapper: {
     flex: 1,
-    justifyContent: 'center',
     alignSelf: 'stretch',
   },
-  tipWrapper: {
-    marginTop: spacing.md,
-    marginBottom: spacing.lg,
+  tipCard: {
+    flexDirection: 'row',
     alignItems: 'center',
+    backgroundColor: colors.surface,
+    borderRadius: radius.lg,
+    padding: spacing.md,
+    borderWidth: 1,
+    borderColor: colors.border,
+    marginTop: spacing.sm,
+    ...shadows.sm,
+  },
+  tipCardCompact: {
+    marginTop: spacing.xs,
+  },
+  tipIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: radius.md,
+    backgroundColor: colors.primaryLight,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: spacing.sm,
+  },
+  tipContent: {
+    flex: 1,
+  },
+  tipTitle: {
+    ...typography.body,
+    color: colors.ink,
+    fontWeight: '800',
+    marginBottom: spacing.xxs,
   },
   tip: {
-    ...typography.caption,
-    color: colors.inkTertiary,
-    textAlign: 'center',
+    ...typography.bodySmall,
+    color: colors.inkSecondary,
   },
   backButton: {
     alignSelf: 'flex-start',
@@ -200,10 +307,40 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     marginLeft: spacing.xxs,
   },
+  summaryCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.surface,
+    borderRadius: radius.lg,
+    borderWidth: 1,
+    borderColor: colors.border,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    marginBottom: spacing.md,
+    ...shadows.sm,
+  },
+  summaryItem: {
+    flex: 1,
+  },
+  summaryLabel: {
+    ...typography.caption,
+    color: colors.inkTertiary,
+    marginBottom: spacing.xxs,
+  },
+  summaryValue: {
+    ...typography.body,
+    color: colors.ink,
+    fontWeight: '800',
+  },
+  summaryDivider: {
+    width: 1,
+    alignSelf: 'stretch',
+    backgroundColor: colors.border,
+    marginHorizontal: spacing.md,
+  },
   inputWrapper: {
     flex: 1,
     justifyContent: 'center',
-    paddingBottom: spacing.md,
   },
   amountHint: {
     ...typography.caption,
@@ -216,6 +353,6 @@ const styles = StyleSheet.create({
     marginTop: spacing.xs,
   },
   footer: {
-    paddingBottom: spacing.lg,
+    paddingTop: spacing.sm,
   },
 });

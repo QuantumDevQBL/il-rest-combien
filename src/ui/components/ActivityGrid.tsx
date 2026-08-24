@@ -20,12 +20,13 @@ const ACTIVITY_ICONS: Record<ActivityChoice, IconName> = {
 export function ActivityGrid({ selected, onSelect }: ActivityGridProps) {
   const { width, height } = useWindowDimensions();
   const isCompact = width < 360 || height < 700;
-  const gap = isCompact ? spacing.sm : spacing.md;
   const iconSize = isCompact ? 26 : 30;
   const circleSize = isCompact ? 48 : 56;
+  const columnPadding = isCompact ? spacing.xs : spacing.sm;
+  const cardMinHeight = isCompact ? 152 : 168;
 
   return (
-    <View style={[styles.grid, { gap }]}>
+    <View style={styles.grid}>
       {ACTIVITY_OPTIONS.map((option) => {
         const isSelected = selected === option.value;
         return (
@@ -33,12 +34,24 @@ export function ActivityGrid({ selected, onSelect }: ActivityGridProps) {
             key={option.value}
             onPress={() => onSelect(option.value)}
             scale={0.96}
-            style={[styles.item, { width: '50%' }]}
+            style={[
+              styles.item,
+              {
+                paddingHorizontal: columnPadding,
+                marginBottom: isCompact ? spacing.sm : spacing.md,
+              },
+            ]}
             accessibilityRole="radio"
             accessibilityState={{ checked: isSelected }}
             accessibilityLabel={option.label}
           >
-            <View style={[styles.card, isSelected && styles.cardSelected]}>
+            <View
+              style={[
+                styles.card,
+                isSelected && styles.cardSelected,
+                { minHeight: cardMinHeight },
+              ]}
+            >
               <View
                 style={[
                   styles.iconCircle,
@@ -83,9 +96,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     width: '100%',
+    marginHorizontal: -spacing.xs,
   },
   item: {
-    aspectRatio: 1.12,
+    width: '50%',
   },
   card: {
     flex: 1,
@@ -123,6 +137,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     textAlign: 'center',
     marginBottom: spacing.xxs,
+    minHeight: 20,
   },
   labelSelected: {
     color: colors.primaryDark,
@@ -131,6 +146,7 @@ const styles = StyleSheet.create({
     ...typography.bodySmall,
     color: colors.inkTertiary,
     textAlign: 'center',
+    minHeight: 17,
   },
   checkmark: {
     position: 'absolute',

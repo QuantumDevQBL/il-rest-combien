@@ -32,10 +32,10 @@ describe('HomeScreen', () => {
     expect(onCalculate).toHaveBeenCalled();
   });
 
-  it('shows the Cipav helper text', () => {
+  it('shows the quick-value helper text', () => {
     render(<HomeScreen onCalculate={jest.fn()} />);
     expect(
-      screen.getByText('Professions réglementées (Cipav) : bientôt disponibles.')
+      screen.getByText('Pensé pour aller vite')
     ).toBeTruthy();
   });
 });

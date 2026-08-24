@@ -22,10 +22,10 @@ function renderWithResult(initialForm = {}, handlers = {}) {
 describe('ResultScreen', () => {
   it('renders nothing when no result is available', () => {
     const { queryByText } = renderWithResult();
-    expect(queryByText('soit 0 € / mois')).toBeNull();
+    expect(queryByText('Ce qu’il te reste vraiment par mois')).toBeNull();
   });
 
-  it('displays the main net amount and monthly equivalent', () => {
+  it('displays the main net amount and annual summary', () => {
     renderWithResult({
       activity: 'PROFESSION_LIBERALE',
       caAnnuelHT: '50000',
@@ -33,8 +33,9 @@ describe('ResultScreen', () => {
       partsFiscalesN2: '1',
     });
     expect(screen.getByText('Libéral')).toBeTruthy();
+    expect(screen.getByText('Ce qu’il te reste vraiment par mois')).toBeTruthy();
     expect(screen.getByText('3 000')).toBeTruthy();
-    expect(screen.getByText('soit 36 000 € / an')).toBeTruthy();
+    expect(screen.getAllByText('36 000 €').length).toBeGreaterThan(0);
   });
 
   it('displays the rest per 100 € and global tax rate', () => {
@@ -44,8 +45,8 @@ describe('ResultScreen', () => {
       rfrN2: '25000',
       partsFiscalesN2: '1',
     });
-    expect(screen.getByText('Sur 100 € : 72 €')).toBeTruthy();
-    expect(screen.getByText('Prélèvements : 28.0 %')).toBeTruthy();
+    expect(screen.getByText('72 € / 100 €')).toBeTruthy();
+    expect(screen.getByText('28.0 %')).toBeTruthy();
   });
 
   it('calls navigation callbacks', () => {

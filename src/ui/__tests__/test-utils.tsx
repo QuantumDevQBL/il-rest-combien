@@ -3,6 +3,7 @@ import { render as rtlRender, RenderOptions } from '@testing-library/react-nativ
 import { NavigationContainer } from '@react-navigation/native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { CalculatorProvider } from '../context/CalculatorContext';
+import { SubscriptionProvider } from '../context/SubscriptionContext';
 
 function AllTheProviders({ children }: { children: React.ReactNode }): ReactElement {
   return (
@@ -12,9 +13,11 @@ function AllTheProviders({ children }: { children: React.ReactNode }): ReactElem
         insets: { top: 44, left: 0, right: 0, bottom: 34 },
       }}
     >
-      <CalculatorProvider>
-        <NavigationContainer>{children}</NavigationContainer>
-      </CalculatorProvider>
+      <SubscriptionProvider>
+        <CalculatorProvider>
+          <NavigationContainer>{children}</NavigationContainer>
+        </CalculatorProvider>
+      </SubscriptionProvider>
     </SafeAreaProvider>
   );
 }

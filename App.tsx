@@ -5,18 +5,21 @@ import { NavigationContainer } from '@react-navigation/native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { StyleSheet } from 'react-native';
 import { CalculatorProvider } from './src/ui/context/CalculatorContext';
+import { SubscriptionProvider } from './src/ui/context/SubscriptionContext';
 import { AppNavigator } from './src/ui/navigation/AppNavigator';
 
 export default function App() {
   return (
     <GestureHandlerRootView style={styles.container}>
       <SafeAreaProvider>
-        <CalculatorProvider>
-          <NavigationContainer>
-            <StatusBar style="light" />
-            <AppNavigator />
-          </NavigationContainer>
-        </CalculatorProvider>
+        <SubscriptionProvider>
+          <CalculatorProvider>
+            <NavigationContainer>
+              <StatusBar style="light" />
+              <AppNavigator />
+            </NavigationContainer>
+          </CalculatorProvider>
+        </SubscriptionProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>
   );

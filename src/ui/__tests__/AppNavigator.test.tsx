@@ -80,4 +80,45 @@ describe('AppNavigator', () => {
       expect(screen.getByText(homePrompt)).toBeTruthy();
     });
   });
+
+  it('opens the paywall from the result screen when pilotage is locked', async () => {
+    render(<AppNavigator />);
+
+    await waitFor(() => {
+      expect(screen.getByText(homePrompt)).toBeTruthy();
+    });
+
+    fireEvent.changeText(screen.getByPlaceholderText('0'), '50000');
+    fireEvent.press(screen.getByText('Calculer mon net'));
+
+    await waitFor(() => {
+      expect(screen.getByText(/Objectif de revenu/)).toBeTruthy();
+    });
+
+    fireEvent.press(screen.getByText('Ouvrir Pilotage'));
+
+    await waitFor(() => {
+      expect(screen.getByText(/Pilotez ce que vous pouvez réellement garder/)).toBeTruthy();
+    });
+  });
+
+  it('opens the paywall from the Pilotage tab when premium is inactive', async () => {
+    render(<AppNavigator />);
+
+    await waitFor(() => {
+      expect(screen.getByText(homePrompt)).toBeTruthy();
+    });
+
+    fireEvent.press(screen.getByText('Pilotage'));
+
+    await waitFor(() => {
+      expect(screen.getByText(/Débloquez le suivi mois par mois/)).toBeTruthy();
+    });
+
+    fireEvent.press(screen.getByText(/Voir l’offre Pilotage/));
+
+    await waitFor(() => {
+      expect(screen.getByText(/Pilotez ce que vous pouvez réellement garder/)).toBeTruthy();
+    });
+  });
 });

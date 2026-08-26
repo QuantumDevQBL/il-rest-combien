@@ -12,22 +12,23 @@ describe('HomeScreen', () => {
     jest.restoreAllMocks();
   });
 
-  it('renders the compact activity selection flow', () => {
+  it('renders the compact single-screen flow', () => {
     render(<HomeScreen onCalculate={jest.fn()} />);
-    expect(screen.getByText(/Quelle est ton activ/)).toBeTruthy();
+    expect(screen.getByText(/Le vrai net/)).toBeTruthy();
     expect(screen.getByText('Vente')).toBeTruthy();
-    expect(screen.getByText(/Lib/)).toBeTruthy();
+    expect(screen.getAllByText('Libéral').length).toBeGreaterThan(0);
+    expect(screen.getByText('Calculer mon net')).toBeTruthy();
   });
 
-  it('moves to the revenue step after selecting an activity', () => {
+  it('updates the activity summary after selecting an activity', () => {
     render(<HomeScreen onCalculate={jest.fn()} />);
-    fireEvent.press(screen.getByText(/Lib/));
-    expect(screen.getByText(/Ton chiffre d'affaires/)).toBeTruthy();
+    fireEvent.press(screen.getByLabelText('Vente'));
+    expect(screen.getByText('Commerce, revente')).toBeTruthy();
+    expect(screen.getAllByText('Vente').length).toBeGreaterThan(0);
   });
 
-  it('allows entering a revenue amount after selecting an activity', () => {
+  it('allows entering a revenue amount immediately', () => {
     render(<HomeScreen onCalculate={jest.fn()} />);
-    fireEvent.press(screen.getByText(/Lib/));
     fireEvent.changeText(screen.getByPlaceholderText('0'), '50000');
     expect(screen.getByDisplayValue('50000')).toBeTruthy();
   });
@@ -35,15 +36,13 @@ describe('HomeScreen', () => {
   it('calls onCalculate when pressing the calculate button', () => {
     const onCalculate = jest.fn();
     render(<HomeScreen onCalculate={onCalculate} />);
-    fireEvent.press(screen.getByText(/Lib/));
     fireEvent.changeText(screen.getByPlaceholderText('0'), '50000');
-    fireEvent.press(screen.getByText('Calculer'));
+    fireEvent.press(screen.getByText('Calculer mon net'));
     expect(onCalculate).toHaveBeenCalled();
   });
 
-  it('shows the revenue helper text on the revenue step', () => {
+  it('shows the revenue helper text on the main screen', () => {
     render(<HomeScreen onCalculate={jest.fn()} />);
-    fireEvent.press(screen.getByText(/Lib/));
-    expect(screen.getByText(/Hors taxes/)).toBeTruthy();
+    expect(screen.getByText(/CA annuel HT estimé/)).toBeTruthy();
   });
 });

@@ -14,8 +14,7 @@ afterEach(() => {
 });
 
 describe('AppNavigator', () => {
-  const homePrompt = /Quelle est ton activ/;
-  const liberalOption = /Lib/;
+  const homePrompt = /Le vrai net/;
 
   it('shows home on launch', async () => {
     render(<AppNavigator />);
@@ -32,10 +31,8 @@ describe('AppNavigator', () => {
       expect(screen.getByText(homePrompt)).toBeTruthy();
     });
 
-    fireEvent.press(screen.getByText(liberalOption));
-    const input = await waitFor(() => screen.getByPlaceholderText('0'));
-    fireEvent.changeText(input, '50000');
-    fireEvent.press(screen.getByText('Calculer'));
+    fireEvent.changeText(screen.getByPlaceholderText('0'), '50000');
+    fireEvent.press(screen.getByText('Calculer mon net'));
 
     await waitFor(() => {
       expect(screen.getByText(/Objectif de revenu/)).toBeTruthy();
@@ -49,16 +46,14 @@ describe('AppNavigator', () => {
       expect(screen.getByText(homePrompt)).toBeTruthy();
     });
 
-    fireEvent.press(screen.getByText(liberalOption));
-    const input = await waitFor(() => screen.getByPlaceholderText('0'));
-    fireEvent.changeText(input, '50000');
-    fireEvent.press(screen.getByText('Calculer'));
+    fireEvent.changeText(screen.getByPlaceholderText('0'), '50000');
+    fireEvent.press(screen.getByText('Calculer mon net'));
 
     await waitFor(() => {
       expect(screen.getByText(/Objectif de revenu/)).toBeTruthy();
     });
 
-    fireEvent.press(screen.getByLabelText(/Param/));
+    fireEvent.press(screen.getByLabelText(/Paramètres fiscaux/));
 
     await waitFor(() => {
       expect(screen.getAllByText(/Param/).length).toBeGreaterThan(0);
@@ -72,10 +67,8 @@ describe('AppNavigator', () => {
       expect(screen.getByText(homePrompt)).toBeTruthy();
     });
 
-    fireEvent.press(screen.getByText(liberalOption));
-    const input = await waitFor(() => screen.getByPlaceholderText('0'));
-    fireEvent.changeText(input, '50000');
-    fireEvent.press(screen.getByText('Calculer'));
+    fireEvent.changeText(screen.getByPlaceholderText('0'), '50000');
+    fireEvent.press(screen.getByText('Calculer mon net'));
 
     await waitFor(() => {
       expect(screen.getByLabelText('Accueil')).toBeTruthy();

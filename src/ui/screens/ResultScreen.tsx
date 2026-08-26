@@ -1,20 +1,17 @@
 import React, { useEffect, useRef } from 'react';
-import { StyleSheet, Text, useWindowDimensions, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useCalculatorContext } from '../context/CalculatorContext';
 import { AnimatedCounter } from '../components/AnimatedCounter';
 import { FadeInView } from '../components/FadeInView';
 import { PressableScale } from '../components/PressableScale';
-import { BottomSheet } from '../components/BottomSheet';
 import { MetricPill } from '../components/MetricPill';
-import { ProgressBar, Card, Icon } from '../design-system';
+import { Button, Card, Icon, ProgressBar } from '../design-system';
 import { Comparaison } from '../components/Comparaison';
 import { Alertes } from '../components/Alertes';
-import { MentionLegale } from '../components/MentionLegale';
 import { getActivityLabel } from '../mapping';
 import { colors, radius, shadows, spacing, typography } from '../theme';
-import { PremiumIntroSource } from '../utils/analytics';
-import { trackEvent } from '../utils/analytics';
+import { PremiumIntroSource, trackEvent } from '../utils/analytics';
 import { formatMontant } from '../utils/format';
 import { hapticImpact } from '../utils/haptics';
 
@@ -35,12 +32,7 @@ interface SummaryCardProps {
 
 function SummaryCard({ label, value, tone = 'default' }: SummaryCardProps) {
   return (
-    <View
-      style={[
-        styles.summaryCard,
-        tone === 'accent' && styles.summaryCardAccent,
-      ]}
-    >
+    <View style={[styles.summaryCard, tone === 'accent' && styles.summaryCardAccent]}>
       <Text style={[styles.summaryLabel, tone === 'accent' && styles.summaryLabelAccent]}>
         {label}
       </Text>
@@ -57,10 +49,9 @@ export function ResultScreen({
   onOpenHistory,
   onOpenInverse,
   onOpenDetail,
+  onOpenPilotage,
 }: ResultScreenProps) {
   const { result, form } = useCalculatorContext();
-  const { height } = useWindowDimensions();
-  const isCompact = height < 700;
   const trackedResultRef = useRef<string | null>(null);
 
   useEffect(() => {
@@ -94,10 +85,9 @@ export function ResultScreen({
   const netMensuel = result.revenuNetDisponible / 12;
   const tauxPrelevement = result.tauxPrelevementGlobal * 100;
   const estimationLabel = form.label.trim() || getActivityLabel(form.activity);
-  const displayVariant = isCompact ? styles.heroAmountCompact : styles.heroAmount;
   const scenarioLabel =
     result.estEligibleVL === null
-      ? 'Comparaison d’impôt disponible avec ton RFR N-2'
+      ? 'Comparaison d’impôt disponible avec votre RFR N-2'
       : result.scenarioLePlusFavorable === 'VL'
         ? 'Versement libératoire retenu'
         : 'Barème progressif retenu';
@@ -144,16 +134,20 @@ export function ResultScreen({
         </View>
       </View>
 
-      <View style={styles.main} pointerEvents="box-none">
+      <ScrollView
+        style={styles.scroll}
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+      >
         <FadeInView delay={0}>
           <Card variant="accent" style={styles.heroCard}>
-            <Text style={styles.heroLabel}>Ce qu’il te reste vraiment par mois</Text>
+            <Text style={styles.heroLabel}>Ce qu’il vous reste vraiment par mois</Text>
             <View style={styles.heroAmountRow}>
               <Text style={styles.heroCurrency}>€</Text>
               <AnimatedCounter
                 value={netMensuel}
-                style={displayVariant}
-                formatter={(v) => Math.round(v).toLocaleString('fr-FR')}
+                style={styles.heroAmount}
+                formatter={(value) => Math.round(value).toLocaleString('fr-FR')}
               />
             </View>
             <Text style={styles.heroCaption}>
@@ -173,16 +167,14 @@ export function ResultScreen({
                     color: colors.primary,
                   },
                 ]}
-                height={isCompact ? 8 : 10}
+                height={10}
               />
             </View>
 
             <View style={styles.heroFooter}>
               <View style={styles.heroFooterItem}>
-                <Text style={styles.heroFooterLabel}>Tu gardes</Text>
-                <Text style={styles.heroFooterValue}>
-                  {formatMontant(result.resteSurCent)} / 100 €
-                </Text>
+                <Text style={styles.heroFooterLabel}>Vous gardez</Text>
+                <Text style={styles.heroFooterValue}>{formatMontant(result.resteSurCent)} / 100 €</Text>
               </View>
               <View style={styles.heroFooterItem}>
                 <Text style={styles.heroFooterLabel}>Prélèvements</Text>
@@ -195,10 +187,7 @@ export function ResultScreen({
         <FadeInView delay={100}>
           <View style={styles.summaryGrid}>
             <SummaryCard label="Net annuel estimé" value={formatMontant(result.revenuNetDisponible)} />
-            <SummaryCard
-              label="Impôt retenu"
-              value={formatMontant(result.impotRetenu)}
-            />
+            <SummaryCard label="Impôt retenu" value={formatMontant(result.impotRetenu)} />
             <SummaryCard
               label="Cotisations + CFP"
               value={formatMontant(result.totalPrelevementsSociaux)}
@@ -209,45 +198,56 @@ export function ResultScreen({
 
         <FadeInView delay={150}>
           <View style={styles.pillsRow}>
-            <MetricPill
-              label="Mensuel"
-              value={formatMontant(netMensuel)}
-              variant="success"
-            />
-            <MetricPill
-              label="Annuel"
-              value={formatMontant(result.revenuNetDisponible)}
-              variant="secondary"
-            />
-            <MetricPill
-              label="Sur 100 €"
-              value={formatMontant(result.resteSurCent)}
-              variant="alert"
-            />
+            <MetricPill label="Mensuel" value={formatMontant(netMensuel)} variant="success" />
+            <MetricPill label="Annuel" value={formatMontant(result.revenuNetDisponible)} variant="secondary" />
+            <MetricPill label="Sur 100 €" value={formatMontant(result.resteSurCent)} variant="alert" />
           </View>
         </FadeInView>
-      </View>
 
-      <BottomSheet collapsedHeight={isCompact ? 220 : 250} expandedHeight={height * 0.85}>
-        <FadeInView delay={150}>
+        <FadeInView delay={220}>
+          <Card style={styles.pilotageCard}>
+            <View style={styles.pilotageHeader}>
+              <View style={styles.pilotageCopy}>
+                <Text style={styles.pilotageTitle}>Pilotage</Text>
+                <Text style={styles.pilotageText}>
+                  Suivez ce que vous avez encaissé, ce qu’il faut réserver, et ce
+                  que vous pouvez réellement garder.
+                </Text>
+              </View>
+              <View style={styles.pilotageBadge}>
+                <Icon name="statsChart" size={18} color={colors.primary} />
+              </View>
+            </View>
+            {onOpenPilotage ? (
+              <Button
+                label="Ouvrir Pilotage"
+                onPress={() => onOpenPilotage('monthly_tracking')}
+                variant="primary"
+                size="md"
+              />
+            ) : null}
+          </Card>
+        </FadeInView>
+
+        <FadeInView delay={260}>
           <Comparaison result={result} />
         </FadeInView>
 
-        <FadeInView delay={250}>
+        <FadeInView delay={320}>
           <Alertes result={result} />
         </FadeInView>
 
-        <FadeInView delay={300}>
+        <FadeInView delay={360}>
           <Card style={styles.actionsIntroCard}>
             <Text style={styles.actionsIntroTitle}>Approfondir si besoin</Text>
             <Text style={styles.actionsIntroText}>
-              Le résultat principal est ci-dessus. Les options suivantes servent à
-              détailler ou projeter la simulation.
+              Le résultat principal reste au-dessus. Les actions ci-dessous servent
+              seulement à détailler ou préparer la suite.
             </Text>
           </Card>
         </FadeInView>
 
-        <FadeInView delay={400}>
+        <FadeInView delay={420}>
           <View style={styles.actionsContainer}>
             <PressableScale onPress={onOpenDetail} scale={0.97} style={styles.actionCard}>
               <View style={styles.actionIcon}>
@@ -273,7 +273,7 @@ export function ResultScreen({
           </View>
         </FadeInView>
 
-        <FadeInView delay={450}>
+        <FadeInView delay={460}>
           <Card style={styles.hypothesesCard}>
             <View style={styles.hypothesesHeader}>
               <Icon name="informationCircle" size={18} color={colors.inkTertiary} />
@@ -286,14 +286,12 @@ export function ResultScreen({
           </Card>
         </FadeInView>
 
-        <FadeInView delay={500}>
+        <FadeInView delay={520}>
           <PressableScale onPress={onReset} scale={0.97}>
             <Text style={styles.resetText}>Nouvelle simulation</Text>
           </PressableScale>
         </FadeInView>
-
-        <MentionLegale />
-      </BottomSheet>
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -345,9 +343,12 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
     ...shadows.sm,
   },
-  main: {
+  scroll: {
+    flex: 1,
+  },
+  content: {
     paddingHorizontal: spacing.lg,
-    paddingBottom: spacing.sm,
+    paddingBottom: spacing.xxxl,
   },
   heroCard: {
     ...shadows.primaryGlow,
@@ -374,10 +375,6 @@ const styles = StyleSheet.create({
   },
   heroAmount: {
     ...typography.display,
-    color: colors.surface,
-  },
-  heroAmountCompact: {
-    ...typography.displaySmall,
     color: colors.surface,
   },
   heroCaption: {
@@ -455,6 +452,37 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: spacing.sm,
     marginTop: spacing.xs,
+    marginBottom: spacing.lg,
+  },
+  pilotageCard: {
+    marginBottom: spacing.lg,
+  },
+  pilotageHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: spacing.md,
+    marginBottom: spacing.md,
+  },
+  pilotageCopy: {
+    flex: 1,
+  },
+  pilotageTitle: {
+    ...typography.h2,
+    color: colors.ink,
+    marginBottom: spacing.xs,
+  },
+  pilotageText: {
+    ...typography.bodySmall,
+    color: colors.inkSecondary,
+    lineHeight: 18,
+  },
+  pilotageBadge: {
+    width: 40,
+    height: 40,
+    borderRadius: radius.md,
+    backgroundColor: colors.primaryLight,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   actionsIntroCard: {
     marginBottom: spacing.lg,

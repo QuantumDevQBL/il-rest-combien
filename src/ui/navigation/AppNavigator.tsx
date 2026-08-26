@@ -8,23 +8,15 @@ import { SettingsModal } from '../modals/SettingsModal';
 import { HistoryModal } from '../modals/HistoryModal';
 import { InverseModal } from '../modals/InverseModal';
 import { DetailModal } from '../modals/DetailModal';
-import { PremiumIntroModal } from '../modals/PremiumIntroModal';
-import { PilotagePaywallModal } from '../modals/PilotagePaywallModal';
-import { PilotageScreen } from '../screens/PilotageScreen';
-import { useSubscription } from '../context/SubscriptionContext';
 import { colors } from '../theme';
-import { PremiumIntroSource } from '../utils/analytics';
 
 export type RootStackParamList = {
   Home: undefined;
   Result: undefined;
-  Pilotage: { source?: PremiumIntroSource } | undefined;
   SettingsModal: undefined;
   HistoryModal: undefined;
   InverseModal: undefined;
   DetailModal: undefined;
-  PremiumIntroModal: { source: PremiumIntroSource };
-  PilotagePaywallModal: { source: PremiumIntroSource };
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -37,7 +29,6 @@ function HistorySync() {
 
 export function AppNavigator() {
   const { isLoading, markAsSeen } = useOnboarding();
-  const { hasInitialized, isPilotageActive } = useSubscription();
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
@@ -55,18 +46,6 @@ export function AppNavigator() {
   if (!isReady) {
     return null;
   }
-
-  const openPilotageFromIntent = (
-    navigation: { navigate: (screen: keyof RootStackParamList, params?: any) => void },
-    source: PremiumIntroSource
-  ) => {
-    if (hasInitialized && isPilotageActive) {
-      navigation.navigate('Pilotage', { source });
-      return;
-    }
-
-    navigation.navigate('PilotagePaywallModal', { source });
-  };
 
   return (
     <>
@@ -104,21 +83,6 @@ export function AppNavigator() {
               onOpenHistory={() => navigation.navigate('HistoryModal')}
               onOpenInverse={() => navigation.navigate('InverseModal')}
               onOpenDetail={() => navigation.navigate('DetailModal')}
-              onOpenPilotage={(source) => openPilotageFromIntent(navigation, source)}
-            />
-          )}
-        </Stack.Screen>
-
-        <Stack.Screen
-          name="Pilotage"
-          options={{
-            ...TransitionPresets.SlideFromRightIOS,
-          }}
-        >
-          {({ navigation, route }) => (
-            <PilotageScreen
-              source={route.params?.source}
-              onBack={() => navigation.goBack()}
             />
           )}
         </Stack.Screen>
@@ -145,23 +109,6 @@ export function AppNavigator() {
           </Stack.Screen>
           <Stack.Screen name="DetailModal">
             {({ navigation }) => <DetailModal onClose={() => navigation.goBack()} />}
-          </Stack.Screen>
-          <Stack.Screen name="PremiumIntroModal">
-            {({ navigation, route }) => (
-              <PremiumIntroModal
-                source={route.params.source}
-                onClose={() => navigation.goBack()}
-              />
-            )}
-          </Stack.Screen>
-          <Stack.Screen name="PilotagePaywallModal">
-            {({ navigation, route }) => (
-              <PilotagePaywallModal
-                source={route.params.source}
-                onClose={() => navigation.goBack()}
-                onUnlockPilotage={() => navigation.replace('Pilotage', { source: route.params.source })}
-              />
-            )}
           </Stack.Screen>
         </Stack.Group>
       </Stack.Navigator>

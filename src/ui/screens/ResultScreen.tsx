@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useCalculatorContext } from '../context/CalculatorContext';
@@ -13,6 +13,8 @@ import { Alertes } from '../components/Alertes';
 import { MentionLegale } from '../components/MentionLegale';
 import { getActivityLabel } from '../mapping';
 import { colors, radius, shadows, spacing, typography } from '../theme';
+import { PremiumIntroSource } from '../utils/analytics';
+import { trackEvent } from '../utils/analytics';
 import { formatMontant } from '../utils/format';
 import { hapticImpact } from '../utils/haptics';
 
@@ -22,6 +24,7 @@ interface ResultScreenProps {
   onOpenHistory: () => void;
   onOpenInverse: () => void;
   onOpenDetail: () => void;
+  onOpenPilotage?: (source: PremiumIntroSource) => void;
 }
 
 interface SummaryCardProps {
@@ -58,11 +61,32 @@ export function ResultScreen({
   const { result, form } = useCalculatorContext();
   const { height } = useWindowDimensions();
   const isCompact = height < 700;
+  const trackedResultRef = useRef<string | null>(null);
 
   useEffect(() => {
     if (result) {
       void hapticImpact();
     }
+  }, [result]);
+
+  useEffect(() => {
+    if (!result) {
+      return;
+    }
+
+    const nextKey = [
+      result.caAnnuelHT,
+      result.revenuNetDisponible,
+      result.impotRetenu,
+      result.totalPrelevementsSociaux,
+    ].join(':');
+
+    if (trackedResultRef.current === nextKey) {
+      return;
+    }
+
+    trackedResultRef.current = nextKey;
+    void trackEvent('result_viewed');
   }, [result]);
 
   if (!result) return null;
@@ -87,6 +111,16 @@ export function ResultScreen({
           <Text style={styles.activityCa}>CA {formatMontant(result.caAnnuelHT)}</Text>
         </View>
         <View style={styles.headerActions}>
+          <PressableScale
+            onPress={onReset}
+            scale={0.88}
+            accessibilityRole="button"
+            accessibilityLabel="Accueil"
+          >
+            <View style={styles.iconButton}>
+              <Icon name="home" size={20} color={colors.inkSecondary} />
+            </View>
+          </PressableScale>
           <PressableScale
             onPress={onOpenHistory}
             scale={0.88}

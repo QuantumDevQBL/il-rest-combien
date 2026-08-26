@@ -1,17 +1,15 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Badge, Button, Card, Icon } from '../design-system';
 import { ModalContainer } from '../components/ModalContainer';
-import {
-  PremiumSource,
-  SubscriptionPackage,
-  useSubscriptionContext,
-} from '../context/SubscriptionContext';
+import { useSubscriptionContext } from '../context/SubscriptionContext';
+import { PremiumSource, SubscriptionPackage } from '../subscription/types';
 import { colors, radius, spacing, typography } from '../theme';
 
 interface PilotagePaywallModalProps {
   source: PremiumSource;
   onClose: () => void;
+  onSuccess: () => void;
 }
 
 function PackageCard({
@@ -45,14 +43,22 @@ function PackageCard({
 export function PilotagePaywallModal({
   source,
   onClose,
+  onSuccess,
 }: PilotagePaywallModalProps) {
   const {
+    isPremiumActive,
     packages,
     isLoading,
     errorMessage,
     purchasePlan,
     restorePurchases,
   } = useSubscriptionContext();
+
+  useEffect(() => {
+    if (isPremiumActive) {
+      onSuccess();
+    }
+  }, [isPremiumActive, onSuccess]);
 
   return (
     <ModalContainer title="Pilotage Premium" onClose={onClose}>
@@ -112,16 +118,18 @@ export function PilotagePaywallModal({
         </View>
       </View>
 
-      <View style={styles.packages}>
-        {packages.map((item) => (
-          <PackageCard
-            key={item.plan}
-            item={item}
-            active={isLoading}
-            onPress={() => void purchasePlan(item.plan, source)}
-          />
-        ))}
-      </View>
+      {packages.length > 0 ? (
+        <View style={styles.packages}>
+          {packages.map((item) => (
+            <PackageCard
+              key={item.plan}
+              item={item}
+              active={isLoading}
+              onPress={() => void purchasePlan(item.plan, source)}
+            />
+          ))}
+        </View>
+      ) : null}
 
       {errorMessage ? (
         <Card style={styles.errorCard}>

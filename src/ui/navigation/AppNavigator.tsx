@@ -227,6 +227,10 @@ export function AppNavigator() {
                     closePaywall();
                     navigation.goBack();
                   }}
+                  onSuccess={() => {
+                    closePaywall();
+                    navigation.navigate('MainTabs' as never, { screen: 'Pilotage' } as never);
+                  }}
                 />
               ) : null
             }

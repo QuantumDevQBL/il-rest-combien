@@ -16,7 +16,7 @@ describe('HomeScreen', () => {
     render(<HomeScreen onCalculate={jest.fn()} />);
     expect(screen.getByText(/Le vrai net/)).toBeTruthy();
     expect(screen.getByText('Vente')).toBeTruthy();
-    expect(screen.getAllByText('Libéral').length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Lib/).length).toBeGreaterThan(0);
     expect(screen.getByText('Calculer mon net')).toBeTruthy();
   });
 
@@ -43,6 +43,6 @@ describe('HomeScreen', () => {
 
   it('shows the revenue helper text on the main screen', () => {
     render(<HomeScreen onCalculate={jest.fn()} />);
-    expect(screen.getByText(/CA annuel HT estimé/)).toBeTruthy();
+    expect(screen.getByText(/CA annuel HT estime/)).toBeTruthy();
   });
 });

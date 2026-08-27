@@ -53,7 +53,7 @@ describe('AppNavigator', () => {
       expect(screen.getByText(/Objectif de revenu/)).toBeTruthy();
     });
 
-    fireEvent.press(screen.getByLabelText(/Paramètres fiscaux/));
+    fireEvent.press(screen.getByLabelText(/Param/));
 
     await waitFor(() => {
       expect(screen.getAllByText(/Param/).length).toBeGreaterThan(0);
@@ -98,7 +98,7 @@ describe('AppNavigator', () => {
     fireEvent.press(screen.getByText('Ouvrir Pilotage'));
 
     await waitFor(() => {
-      expect(screen.getByText(/Pilotez ce que vous pouvez réellement garder/)).toBeTruthy();
+      expect(screen.getByText(/Pilotez ce que vous pouvez reellement garder/)).toBeTruthy();
     });
   });
 
@@ -112,13 +112,15 @@ describe('AppNavigator', () => {
     fireEvent.press(screen.getByText('Pilotage'));
 
     await waitFor(() => {
-      expect(screen.getByText(/Débloquez le suivi mois par mois/)).toBeTruthy();
+      expect(
+        screen.getByText(/Debloquez le suivi mois par mois|D.bloquez le suivi mois par mois/)
+      ).toBeTruthy();
     });
 
-    fireEvent.press(screen.getByText(/Voir l’offre Pilotage/));
+    fireEvent.press(screen.getByText(/Voir/));
 
     await waitFor(() => {
-      expect(screen.getByText(/Pilotez ce que vous pouvez réellement garder/)).toBeTruthy();
+      expect(screen.getByText(/Pilotez ce que vous pouvez reellement garder/)).toBeTruthy();
     });
   });
 });

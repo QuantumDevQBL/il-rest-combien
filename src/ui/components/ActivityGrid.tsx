@@ -34,12 +34,15 @@ export function ActivityGrid({ selected, onSelect }: ActivityGridProps) {
             accessibilityLabel={option.label}
           >
             <View style={[styles.pill, isSelected && styles.pillSelected]}>
-              <View style={[styles.iconCircle, isSelected && styles.iconCircleSelected]}>
-                <Icon
-                  name={ACTIVITY_ICONS[option.value]}
-                  size={16}
-                  color={isSelected ? colors.surface : colors.primary}
-                />
+              <View style={styles.pillTopRow}>
+                <View style={[styles.iconCircle, isSelected && styles.iconCircleSelected]}>
+                  <Icon
+                    name={ACTIVITY_ICONS[option.value]}
+                    size={15}
+                    color={isSelected ? colors.surface : colors.primary}
+                  />
+                </View>
+                {isSelected ? <View style={styles.selectionDot} /> : null}
               </View>
               <View style={styles.textBlock}>
                 <Text style={[styles.label, isSelected && styles.labelSelected]}>
@@ -67,53 +70,64 @@ const styles = StyleSheet.create({
     width: '100%',
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: spacing.sm,
+    gap: spacing.xs,
   },
   item: {
-    width: '47%',
+    width: '48%',
   },
   pill: {
-    minHeight: 74,
+    minHeight: 64,
     backgroundColor: colors.surface,
     borderRadius: radius.lg,
     borderWidth: 1,
     borderColor: colors.border,
     paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.sm,
-    flexDirection: 'row',
-    alignItems: 'center',
+    paddingVertical: 10,
   },
   pillSelected: {
     borderColor: colors.primary,
     backgroundColor: colors.primaryLight,
   },
+  pillTopRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: spacing.xs,
+  },
   iconCircle: {
-    width: 32,
-    height: 32,
+    width: 28,
+    height: 28,
     borderRadius: radius.md,
     backgroundColor: colors.primaryLight,
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: spacing.sm,
   },
   iconCircleSelected: {
+    backgroundColor: colors.primary,
+  },
+  selectionDot: {
+    width: 8,
+    height: 8,
+    borderRadius: radius.full,
     backgroundColor: colors.primary,
   },
   textBlock: {
     flex: 1,
   },
   label: {
-    ...typography.bodySmall,
+    ...typography.body,
     color: colors.ink,
     fontWeight: '700',
-    marginBottom: spacing.xxs,
   },
   labelSelected: {
     color: colors.primaryDark,
   },
   description: {
-    ...typography.caption,
+    ...typography.bodySmall,
     color: colors.inkTertiary,
+    marginTop: 2,
+    textTransform: 'none',
+    letterSpacing: 0,
   },
   descriptionSelected: {
     color: colors.primaryDark,

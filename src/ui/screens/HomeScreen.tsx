@@ -8,18 +8,18 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useCalculatorContext } from '../context/CalculatorContext';
 import { ActivityGrid } from '../components/ActivityGrid';
+import { FadeInView } from '../components/FadeInView';
+import { Input } from '../components/Input';
 import { LogoHeader } from '../components/LogoHeader';
 import { MoneyInput } from '../components/MoneyInput';
-import { Input } from '../components/Input';
-import { FadeInView } from '../components/FadeInView';
-import { Button, Icon } from '../design-system';
-import { trackEvent } from '../utils/analytics';
-import { hapticSelection } from '../utils/haptics';
+import { useCalculatorContext } from '../context/CalculatorContext';
+import { Button, Card, Icon } from '../design-system';
 import { ActivityChoice, getActivityLabel } from '../mapping';
 import { colors, radius, spacing, typography } from '../theme';
+import { trackEvent } from '../utils/analytics';
 import { formatMontant, parseMontantSaisi } from '../utils/format';
+import { hapticSelection } from '../utils/haptics';
 
 interface HomeScreenProps {
   onCalculate: () => void;
@@ -60,66 +60,67 @@ export function HomeScreen({ onCalculate, onOpenHistory }: HomeScreenProps) {
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          <FadeInView duration={350} style={styles.stepContainer}>
+          <FadeInView duration={350} style={styles.stack}>
             <View style={styles.heroBlock}>
               <Text style={styles.eyebrow}>Calculateur micro-entreprise</Text>
-              <Text style={styles.stepTitle}>Le vrai net, avant de le dépenser.</Text>
+              <Text style={styles.stepTitle}>Le vrai net, avant de le depenser.</Text>
               <Text style={styles.stepSubtitle}>
-                Choisissez votre activité, indiquez votre CA, et obtenez tout de
-                suite ce que vous pouvez réellement garder.
+                Choisissez votre activite, entrez votre CA, et voyez tout de suite ce que
+                vous pouvez reellement garder.
               </Text>
             </View>
 
-            <View style={styles.section}>
-              <Text style={styles.sectionLabel}>Activité</Text>
+            <Card style={styles.heroCard}>
+              <View style={styles.sectionHeader}>
+                <Text style={styles.sectionLabel}>Activite</Text>
+                <Text style={styles.sectionHint}>4 profils, un seul calcul</Text>
+              </View>
               <ActivityGrid selected={form.activity} onSelect={handleActivitySelect} />
-            </View>
+            </Card>
 
-            <View style={styles.summaryCard}>
+            <Card style={styles.summaryCard}>
               <View style={styles.summaryItem}>
-                <Text style={styles.summaryLabel}>Activité</Text>
+                <Text style={styles.summaryLabel}>Activite</Text>
                 <Text style={styles.summaryValue}>{selectedActivityLabel}</Text>
               </View>
               <View style={styles.summaryDivider} />
               <View style={styles.summaryItem}>
                 <Text style={styles.summaryLabel}>CA saisi</Text>
-                <Text style={styles.summaryValue}>{previewAmount ?? 'À renseigner'}</Text>
+                <Text style={styles.summaryValue}>{previewAmount ?? 'A renseigner'}</Text>
               </View>
-            </View>
+            </Card>
 
-            <View style={styles.inputWrapper}>
+            <View style={styles.inputBlock}>
               <MoneyInput
                 value={form.caAnnuelHT}
                 onChangeText={(value) => setFormField('caAnnuelHT', value)}
                 placeholder="0"
                 size="hero"
               />
-              <Text style={styles.amountHint}>CA annuel HT estimé</Text>
+              <Text style={styles.amountHint}>CA annuel HT estime</Text>
             </View>
 
-            <View style={styles.labelInput}>
-              <Input
-                label="Nom de l'estimation"
-                value={form.label}
-                onChangeText={(value) => setFormField('label', value)}
-                placeholder="Ex : Projet client A"
-                keyboardType="default"
-                helper="Optionnel, pour retrouver cette simulation."
-              />
-            </View>
+            <Input
+              label="Nom de l'estimation"
+              value={form.label}
+              onChangeText={(value) => setFormField('label', value)}
+              placeholder="Ex : Projet client A"
+              keyboardType="default"
+              helper="Optionnel."
+            />
 
-            <View style={styles.tipCard}>
+            <Card style={styles.tipCard}>
               <View style={styles.tipIcon}>
                 <Icon name="flash" size={18} color={colors.primary} />
               </View>
               <View style={styles.tipContent}>
                 <Text style={styles.tipTitle}>Calcul local, sans compte</Text>
                 <Text style={styles.tip}>
-                  Le résultat Free reste complet: net, prélèvements, détail et
-                  alertes essentielles.
+                  Le resultat Free reste complet: net, prelevements, detail et alertes
+                  essentielles.
                 </Text>
               </View>
-            </View>
+            </Card>
           </FadeInView>
         </ScrollView>
 
@@ -153,11 +154,14 @@ const styles = StyleSheet.create({
     paddingTop: spacing.xs,
     paddingBottom: spacing.md,
   },
-  stepContainer: {
-    gap: spacing.md,
+  stack: {
+    gap: spacing.sm,
   },
   heroBlock: {
-    marginBottom: spacing.xs,
+    marginBottom: spacing.xxs,
+  },
+  heroCard: {
+    gap: spacing.sm,
   },
   eyebrow: {
     ...typography.overline,
@@ -173,12 +177,18 @@ const styles = StyleSheet.create({
     ...typography.body,
     color: colors.inkSecondary,
   },
-  section: {
-    gap: spacing.sm,
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   sectionLabel: {
     ...typography.caption,
     color: colors.inkSecondary,
+  },
+  sectionHint: {
+    ...typography.bodySmall,
+    color: colors.inkTertiary,
   },
   summaryCard: {
     flexDirection: 'row',
@@ -188,7 +198,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border,
     paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
+    paddingVertical: 10,
   },
   summaryItem: {
     flex: 1,
@@ -209,27 +219,22 @@ const styles = StyleSheet.create({
     backgroundColor: colors.border,
     marginHorizontal: spacing.md,
   },
-  inputWrapper: {
-    marginTop: spacing.xs,
+  inputBlock: {
+    gap: spacing.sm,
   },
   amountHint: {
     ...typography.caption,
     color: colors.inkTertiary,
     textAlign: 'center',
-    marginTop: spacing.sm,
-  },
-  labelInput: {
-    marginTop: spacing.xs,
   },
   tipCard: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     backgroundColor: colors.surface,
     borderRadius: radius.lg,
-    padding: spacing.md,
+    padding: spacing.sm,
     borderWidth: 1,
     borderColor: colors.border,
-    marginTop: spacing.sm,
   },
   tipIcon: {
     width: 40,

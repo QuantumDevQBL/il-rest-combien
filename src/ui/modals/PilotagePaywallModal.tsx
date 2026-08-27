@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { Badge, Button, Card, Icon } from '../design-system';
 import { ModalContainer } from '../components/ModalContainer';
 import { useSubscriptionContext } from '../context/SubscriptionContext';
+import { Badge, Button, Card, Icon } from '../design-system';
 import { PremiumSource, SubscriptionPackage } from '../subscription/types';
 import { colors, radius, spacing, typography } from '../theme';
 
@@ -21,17 +21,19 @@ function PackageCard({
   active: boolean;
   onPress: () => void;
 }) {
+  const isHighlighted = Boolean(item.highlight);
+
   return (
-    <View style={[styles.packageCard, active && styles.packageCardActive]}>
+    <View style={[styles.packageCard, isHighlighted && styles.packageCardHighlighted, active && styles.packageCardActive]}>
       <View style={styles.packageHeader}>
-        <View>
+        <View style={styles.packageCopy}>
           <Text style={styles.packageTitle}>{item.title}</Text>
           <Text style={styles.packagePrice}>{item.priceLabel}</Text>
         </View>
         {item.highlight ? <Badge label={item.highlight} variant="primary" /> : null}
       </View>
       <Button
-        label={active ? 'Achat en cours…' : `Choisir ${item.title.toLowerCase()}`}
+        label={active ? 'Achat en cours...' : `Choisir ${item.title.toLowerCase()}`}
         onPress={onPress}
         size="md"
         disabled={active}
@@ -64,10 +66,10 @@ export function PilotagePaywallModal({
     <ModalContainer title="Pilotage Premium" onClose={onClose}>
       <Card variant="accent" style={styles.heroCard}>
         <Text style={styles.heroEyebrow}>Pilotage</Text>
-        <Text style={styles.heroTitle}>Pilotez ce que vous pouvez réellement garder.</Text>
+        <Text style={styles.heroTitle}>Pilotez ce que vous pouvez reellement garder.</Text>
         <Text style={styles.heroText}>
-          Débloquez le suivi mensuel, le disponible estimé, la projection annuelle,
-          l’objectif de revenu et les alertes personnalisées.
+          Debloquez le suivi mensuel, le disponible estime, la projection annuelle,
+          l'objectif de revenu et les alertes personnalisees.
         </Text>
       </Card>
 
@@ -77,9 +79,9 @@ export function PilotagePaywallModal({
             <Icon name="wallet" size={18} color={colors.primary} />
           </View>
           <View style={styles.benefitCopy}>
-            <Text style={styles.benefitTitle}>Disponible estimé</Text>
+            <Text style={styles.benefitTitle}>Disponible estime</Text>
             <Text style={styles.benefitText}>
-              Ce que vous pouvez garder après réserves et charges fixes.
+              Ce que vous pouvez garder apres reserves et charges fixes.
             </Text>
           </View>
         </View>
@@ -90,7 +92,7 @@ export function PilotagePaywallModal({
           <View style={styles.benefitCopy}>
             <Text style={styles.benefitTitle}>Projection annuelle</Text>
             <Text style={styles.benefitText}>
-              Où vous atterrissez en décembre avec vos mois déjà encaissés.
+              Ou vous atterrissez en decembre avec vos mois deja encaisses.
             </Text>
           </View>
         </View>
@@ -101,7 +103,7 @@ export function PilotagePaywallModal({
           <View style={styles.benefitCopy}>
             <Text style={styles.benefitTitle}>Objectif de revenu</Text>
             <Text style={styles.benefitText}>
-              Votre cible nette traduite en cap de chiffre d’affaires.
+              Votre cible nette traduite en cap de chiffre d'affaires.
             </Text>
           </View>
         </View>
@@ -110,9 +112,9 @@ export function PilotagePaywallModal({
             <Icon name="warning" size={18} color={colors.primary} />
           </View>
           <View style={styles.benefitCopy}>
-            <Text style={styles.benefitTitle}>Alertes personnalisées</Text>
+            <Text style={styles.benefitTitle}>Alertes personnalisees</Text>
             <Text style={styles.benefitText}>
-              Détection prévisionnelle des seuils micro et TVA.
+              Detection previsionnelle des seuils micro et TVA.
             </Text>
           </View>
         </View>
@@ -138,6 +140,7 @@ export function PilotagePaywallModal({
       ) : null}
 
       <View style={styles.footer}>
+        <Text style={styles.footerNote}>Sans compte. Restauration disponible a tout moment.</Text>
         <Button
           label="Restaurer mes achats"
           onPress={() => void restorePurchases(source)}
@@ -212,6 +215,10 @@ const styles = StyleSheet.create({
     padding: spacing.md,
     backgroundColor: colors.surface,
   },
+  packageCardHighlighted: {
+    borderColor: colors.primary,
+    backgroundColor: colors.primaryLight,
+  },
   packageCardActive: {
     opacity: 0.7,
   },
@@ -221,6 +228,9 @@ const styles = StyleSheet.create({
     gap: spacing.md,
     alignItems: 'center',
     marginBottom: spacing.md,
+  },
+  packageCopy: {
+    flex: 1,
   },
   packageTitle: {
     ...typography.h2,
@@ -244,5 +254,11 @@ const styles = StyleSheet.create({
   footer: {
     marginTop: spacing.lg,
     marginBottom: spacing.xl,
+    gap: spacing.xs,
+  },
+  footerNote: {
+    ...typography.bodySmall,
+    color: colors.inkTertiary,
+    textAlign: 'center',
   },
 });

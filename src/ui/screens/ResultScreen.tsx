@@ -1,14 +1,14 @@
 import React, { useEffect, useRef } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useCalculatorContext } from '../context/CalculatorContext';
-import { AnimatedCounter } from '../components/AnimatedCounter';
-import { FadeInView } from '../components/FadeInView';
-import { PressableScale } from '../components/PressableScale';
-import { MetricPill } from '../components/MetricPill';
-import { Button, Card, Icon, ProgressBar } from '../design-system';
-import { Comparaison } from '../components/Comparaison';
 import { Alertes } from '../components/Alertes';
+import { AnimatedCounter } from '../components/AnimatedCounter';
+import { Comparaison } from '../components/Comparaison';
+import { FadeInView } from '../components/FadeInView';
+import { MetricPill } from '../components/MetricPill';
+import { PressableScale } from '../components/PressableScale';
+import { useCalculatorContext } from '../context/CalculatorContext';
+import { Button, Card, Icon, ProgressBar } from '../design-system';
 import { getActivityLabel } from '../mapping';
 import { colors, radius, shadows, spacing, typography } from '../theme';
 import { PremiumIntroSource, trackEvent } from '../utils/analytics';
@@ -80,23 +80,25 @@ export function ResultScreen({
     void trackEvent('result_viewed');
   }, [result]);
 
-  if (!result) return null;
+  if (!result) {
+    return null;
+  }
 
   const netMensuel = result.revenuNetDisponible / 12;
   const tauxPrelevement = result.tauxPrelevementGlobal * 100;
   const estimationLabel = form.label.trim() || getActivityLabel(form.activity);
   const scenarioLabel =
     result.estEligibleVL === null
-      ? 'Comparaison d’impôt disponible avec votre RFR N-2'
+      ? 'Comparaison fiscale disponible avec votre RFR N-2'
       : result.scenarioLePlusFavorable === 'VL'
-        ? 'Versement libératoire retenu'
-        : 'Barème progressif retenu';
+        ? 'Versement liberatoire retenu'
+        : 'Bareme progressif retenu';
 
   return (
     <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
       <View style={styles.header}>
         <View style={styles.activityBlock}>
-          <Text style={styles.eyebrow}>Résultat estimé</Text>
+          <Text style={styles.eyebrow}>Resultat estime</Text>
           <Text style={styles.activityLabel}>{estimationLabel}</Text>
           <Text style={styles.activityCa}>CA {formatMontant(result.caAnnuelHT)}</Text>
         </View>
@@ -125,7 +127,7 @@ export function ResultScreen({
             onPress={onOpenSettings}
             scale={0.88}
             accessibilityRole="button"
-            accessibilityLabel="Paramètres fiscaux"
+            accessibilityLabel="Parametres fiscaux"
           >
             <View style={styles.iconButton}>
               <Icon name="settings" size={20} color={colors.inkSecondary} />
@@ -141,18 +143,16 @@ export function ResultScreen({
       >
         <FadeInView delay={0}>
           <Card variant="accent" style={styles.heroCard}>
-            <Text style={styles.heroLabel}>Ce qu’il vous reste vraiment par mois</Text>
+            <Text style={styles.heroLabel}>Ce qu'il vous reste vraiment par mois</Text>
             <View style={styles.heroAmountRow}>
-              <Text style={styles.heroCurrency}>€</Text>
+              <Text style={styles.heroCurrency}>EUR</Text>
               <AnimatedCounter
                 value={netMensuel}
                 style={styles.heroAmount}
                 formatter={(value) => Math.round(value).toLocaleString('fr-FR')}
               />
             </View>
-            <Text style={styles.heroCaption}>
-              après cotisations, impôt et charges fixes
-            </Text>
+            <Text style={styles.heroCaption}>apres cotisations, impot et charges fixes</Text>
 
             <View style={styles.progressContainer}>
               <ProgressBar
@@ -174,10 +174,12 @@ export function ResultScreen({
             <View style={styles.heroFooter}>
               <View style={styles.heroFooterItem}>
                 <Text style={styles.heroFooterLabel}>Vous gardez</Text>
-                <Text style={styles.heroFooterValue}>{formatMontant(result.resteSurCent)} / 100 €</Text>
+                <Text style={styles.heroFooterValue}>
+                  {formatMontant(result.resteSurCent)} / 100 EUR
+                </Text>
               </View>
               <View style={styles.heroFooterItem}>
-                <Text style={styles.heroFooterLabel}>Prélèvements</Text>
+                <Text style={styles.heroFooterLabel}>Prelevements</Text>
                 <Text style={styles.heroFooterValue}>{tauxPrelevement.toFixed(1)} %</Text>
               </View>
             </View>
@@ -186,8 +188,8 @@ export function ResultScreen({
 
         <FadeInView delay={100}>
           <View style={styles.summaryGrid}>
-            <SummaryCard label="Net annuel estimé" value={formatMontant(result.revenuNetDisponible)} />
-            <SummaryCard label="Impôt retenu" value={formatMontant(result.impotRetenu)} />
+            <SummaryCard label="Net annuel estime" value={formatMontant(result.revenuNetDisponible)} />
+            <SummaryCard label="Impot retenu" value={formatMontant(result.impotRetenu)} />
             <SummaryCard
               label="Cotisations + CFP"
               value={formatMontant(result.totalPrelevementsSociaux)}
@@ -199,8 +201,16 @@ export function ResultScreen({
         <FadeInView delay={150}>
           <View style={styles.pillsRow}>
             <MetricPill label="Mensuel" value={formatMontant(netMensuel)} variant="success" />
-            <MetricPill label="Annuel" value={formatMontant(result.revenuNetDisponible)} variant="secondary" />
-            <MetricPill label="Sur 100 €" value={formatMontant(result.resteSurCent)} variant="alert" />
+            <MetricPill
+              label="Annuel"
+              value={formatMontant(result.revenuNetDisponible)}
+              variant="secondary"
+            />
+            <MetricPill
+              label="Sur 100 EUR"
+              value={formatMontant(result.resteSurCent)}
+              variant="alert"
+            />
           </View>
         </FadeInView>
 
@@ -210,8 +220,8 @@ export function ResultScreen({
               <View style={styles.pilotageCopy}>
                 <Text style={styles.pilotageTitle}>Pilotage</Text>
                 <Text style={styles.pilotageText}>
-                  Suivez ce que vous avez encaissé, ce qu’il faut réserver, et ce
-                  que vous pouvez réellement garder.
+                  Suivez ce que vous avez encaisse, ce qu'il faut reserver, et ce que vous
+                  pouvez reellement garder.
                 </Text>
               </View>
               <View style={styles.pilotageBadge}>
@@ -238,24 +248,15 @@ export function ResultScreen({
         </FadeInView>
 
         <FadeInView delay={360}>
-          <Card style={styles.actionsIntroCard}>
-            <Text style={styles.actionsIntroTitle}>Approfondir si besoin</Text>
-            <Text style={styles.actionsIntroText}>
-              Le résultat principal reste au-dessus. Les actions ci-dessous servent
-              seulement à détailler ou préparer la suite.
-            </Text>
-          </Card>
-        </FadeInView>
-
-        <FadeInView delay={420}>
+          <Text style={styles.secondarySectionTitle}>Approfondir si besoin</Text>
           <View style={styles.actionsContainer}>
             <PressableScale onPress={onOpenDetail} scale={0.97} style={styles.actionCard}>
               <View style={styles.actionIcon}>
                 <Icon name="statsChart" size={22} color={colors.primary} />
               </View>
               <View style={styles.actionText}>
-                <Text style={styles.actionTitle}>Voir le détail</Text>
-                <Text style={styles.actionDescription}>Décompte poste par poste</Text>
+                <Text style={styles.actionTitle}>Voir le detail</Text>
+                <Text style={styles.actionDescription}>Decompte poste par poste</Text>
               </View>
               <Icon name="arrowForward" size={18} color={colors.inkTertiary} />
             </PressableScale>
@@ -266,27 +267,27 @@ export function ResultScreen({
               </View>
               <View style={styles.actionText}>
                 <Text style={styles.actionTitle}>Objectif de revenu</Text>
-                <Text style={styles.actionDescription}>Combien facturer pour gagner X € ?</Text>
+                <Text style={styles.actionDescription}>Combien facturer pour gagner X EUR ?</Text>
               </View>
               <Icon name="arrowForward" size={18} color={colors.inkTertiary} />
             </PressableScale>
           </View>
         </FadeInView>
 
-        <FadeInView delay={460}>
+        <FadeInView delay={420}>
           <Card style={styles.hypothesesCard}>
             <View style={styles.hypothesesHeader}>
               <Icon name="informationCircle" size={18} color={colors.inkTertiary} />
-              <Text style={styles.hypothesesTitle}>Hypothèses</Text>
+              <Text style={styles.hypothesesTitle}>Hypotheses</Text>
             </View>
             <Text style={styles.hypothesesText}>
-              Micro-entreprise, France métropolitaine, barèmes 2026. Professions
-              réglementées Cipav non couvertes. CFE non incluse.
+              Micro-entreprise, France metropolitaine, baremes 2026. Professions
+              reglementees Cipav non couvertes. CFE non incluse.
             </Text>
           </Card>
         </FadeInView>
 
-        <FadeInView delay={520}>
+        <FadeInView delay={460}>
           <PressableScale onPress={onReset} scale={0.97}>
             <Text style={styles.resetText}>Nouvelle simulation</Text>
           </PressableScale>
@@ -349,6 +350,7 @@ const styles = StyleSheet.create({
   content: {
     paddingHorizontal: spacing.lg,
     paddingBottom: spacing.xxxl,
+    gap: spacing.md,
   },
   heroCard: {
     ...shadows.primaryGlow,
@@ -362,16 +364,15 @@ const styles = StyleSheet.create({
   },
   heroAmountRow: {
     flexDirection: 'row',
-    alignItems: 'flex-start',
+    alignItems: 'center',
     justifyContent: 'center',
     marginTop: spacing.xs,
+    gap: spacing.xs,
   },
   heroCurrency: {
-    ...typography.h2,
+    ...typography.h3,
     color: colors.surface,
-    marginRight: spacing.xs,
-    marginTop: spacing.xs,
-    opacity: 0.9,
+    opacity: 0.92,
   },
   heroAmount: {
     ...typography.display,
@@ -413,7 +414,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     marginHorizontal: -spacing.xs,
-    marginTop: spacing.sm,
   },
   summaryCard: {
     width: '50%',
@@ -451,11 +451,11 @@ const styles = StyleSheet.create({
   pillsRow: {
     flexDirection: 'row',
     gap: spacing.sm,
-    marginTop: spacing.xs,
-    marginBottom: spacing.lg,
+    marginBottom: spacing.xs,
   },
   pilotageCard: {
-    marginBottom: spacing.lg,
+    borderColor: colors.primary,
+    backgroundColor: colors.surfaceElevated,
   },
   pilotageHeader: {
     flexDirection: 'row',
@@ -484,41 +484,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  actionsIntroCard: {
-    marginBottom: spacing.lg,
-  },
-  actionsIntroTitle: {
-    ...typography.h3,
-    color: colors.ink,
-    marginBottom: spacing.xs,
-  },
-  actionsIntroText: {
-    ...typography.bodySmall,
-    color: colors.inkSecondary,
-    lineHeight: 20,
-  },
-  hypothesesCard: {
-    marginBottom: spacing.lg,
-    backgroundColor: colors.surface,
-  },
-  hypothesesHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: spacing.xs,
-  },
-  hypothesesTitle: {
+  secondarySectionTitle: {
     ...typography.caption,
     color: colors.inkTertiary,
-    marginLeft: spacing.xs,
-  },
-  hypothesesText: {
-    ...typography.bodySmall,
-    color: colors.inkSecondary,
-    lineHeight: 18,
+    marginTop: spacing.xs,
   },
   actionsContainer: {
     gap: spacing.md,
-    marginBottom: spacing.lg,
   },
   actionCard: {
     flexDirection: 'row',
@@ -552,11 +524,29 @@ const styles = StyleSheet.create({
     ...typography.bodySmall,
     color: colors.inkTertiary,
   },
+  hypothesesCard: {
+    backgroundColor: colors.surface,
+  },
+  hypothesesHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: spacing.xs,
+  },
+  hypothesesTitle: {
+    ...typography.caption,
+    color: colors.inkTertiary,
+    marginLeft: spacing.xs,
+  },
+  hypothesesText: {
+    ...typography.bodySmall,
+    color: colors.inkSecondary,
+    lineHeight: 18,
+  },
   resetText: {
     ...typography.body,
     color: colors.primary,
     textAlign: 'center',
-    marginBottom: spacing.lg,
+    marginBottom: spacing.md,
     fontWeight: '700',
   },
 });

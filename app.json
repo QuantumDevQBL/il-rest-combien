@@ -32,7 +32,9 @@
     },
     "plugins": [
       "./plugins/withRemovePermissions.js",
-      "expo-localization"
+      "expo-localization",
+      "expo-font",
+      "expo-asset"
     ],
     "extra": {
       "eas": {

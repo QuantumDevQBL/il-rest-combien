@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { PressableScale } from './PressableScale';
 import { Icon, IconName } from '../design-system';
-import { ActivityChoice, ACTIVITY_OPTIONS } from '../mapping';
+import { ActivityChoice, ACTIVITY_OPTIONS, getActivityLabel } from '../mapping';
 import { colors, radius, spacing, typography } from '../theme';
 
 interface ActivityGridProps {
@@ -34,29 +34,17 @@ export function ActivityGrid({ selected, onSelect }: ActivityGridProps) {
             accessibilityLabel={option.label}
           >
             <View style={[styles.pill, isSelected && styles.pillSelected]}>
-              <View style={styles.pillTopRow}>
-                <View style={[styles.iconCircle, isSelected && styles.iconCircleSelected]}>
-                  <Icon
-                    name={ACTIVITY_ICONS[option.value]}
-                    size={15}
-                    color={isSelected ? colors.surface : colors.primary}
-                  />
-                </View>
-                {isSelected ? <View style={styles.selectionDot} /> : null}
+              <View style={[styles.iconCircle, isSelected && styles.iconCircleSelected]}>
+                <Icon
+                  name={ACTIVITY_ICONS[option.value]}
+                  size={15}
+                  color={isSelected ? colors.surface : colors.primary}
+                />
               </View>
-              <View style={styles.textBlock}>
-                <Text style={[styles.label, isSelected && styles.labelSelected]}>
-                  {option.label}
-                </Text>
-                <Text
-                  style={[
-                    styles.description,
-                    isSelected && styles.descriptionSelected,
-                  ]}
-                >
-                  {option.description}
-                </Text>
-              </View>
+              <Text style={[styles.label, isSelected && styles.labelSelected]}>
+                {getActivityLabel(option.value)}
+              </Text>
+              {isSelected ? <View style={styles.selectionDot} /> : null}
             </View>
           </PressableScale>
         );
@@ -76,31 +64,28 @@ const styles = StyleSheet.create({
     width: '48%',
   },
   pill: {
-    minHeight: 64,
+    minHeight: 52,
     backgroundColor: colors.surface,
-    borderRadius: radius.lg,
+    borderRadius: radius.full,
     borderWidth: 1,
     borderColor: colors.border,
     paddingHorizontal: spacing.sm,
-    paddingVertical: 10,
+    paddingVertical: spacing.sm,
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   pillSelected: {
     borderColor: colors.primary,
     backgroundColor: colors.primaryLight,
   },
-  pillTopRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: spacing.xs,
-  },
   iconCircle: {
-    width: 28,
-    height: 28,
-    borderRadius: radius.md,
+    width: 24,
+    height: 24,
+    borderRadius: radius.full,
     backgroundColor: colors.primaryLight,
     alignItems: 'center',
     justifyContent: 'center',
+    marginRight: spacing.xs,
   },
   iconCircleSelected: {
     backgroundColor: colors.primary,
@@ -110,26 +95,15 @@ const styles = StyleSheet.create({
     height: 8,
     borderRadius: radius.full,
     backgroundColor: colors.primary,
-  },
-  textBlock: {
-    flex: 1,
+    marginLeft: 'auto',
   },
   label: {
     ...typography.body,
     color: colors.ink,
     fontWeight: '700',
+    flexShrink: 1,
   },
   labelSelected: {
-    color: colors.primaryDark,
-  },
-  description: {
-    ...typography.bodySmall,
-    color: colors.inkTertiary,
-    marginTop: 2,
-    textTransform: 'none',
-    letterSpacing: 0,
-  },
-  descriptionSelected: {
     color: colors.primaryDark,
   },
 });

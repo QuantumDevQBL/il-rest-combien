@@ -218,6 +218,7 @@ export function ResultScreen({
           <Card style={styles.pilotageCard}>
             <View style={styles.pilotageHeader}>
               <View style={styles.pilotageCopy}>
+                <Text style={styles.pilotageEyebrow}>Version Premium</Text>
                 <Text style={styles.pilotageTitle}>Pilotage</Text>
                 <Text style={styles.pilotageText}>
                   Suivez ce que vous avez encaisse, ce qu'il faut reserver, et ce que vous
@@ -230,7 +231,7 @@ export function ResultScreen({
             </View>
             {onOpenPilotage ? (
               <Button
-                label="Ouvrir Pilotage"
+                label="Voir la version Premium"
                 onPress={() => onOpenPilotage('monthly_tracking')}
                 variant="primary"
                 size="md"
@@ -470,6 +471,11 @@ const styles = StyleSheet.create({
     ...typography.h2,
     color: colors.ink,
     marginBottom: spacing.xs,
+  },
+  pilotageEyebrow: {
+    ...typography.overline,
+    color: colors.primary,
+    marginBottom: spacing.xxs,
   },
   pilotageText: {
     ...typography.bodySmall,

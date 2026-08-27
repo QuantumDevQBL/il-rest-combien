@@ -13,8 +13,8 @@ import { SettingsModal } from '../modals/SettingsModal';
 import { HistoryModal } from '../modals/HistoryModal';
 import { InverseModal } from '../modals/InverseModal';
 import { DetailModal } from '../modals/DetailModal';
-import { Button, Card, Icon } from '../design-system';
-import { colors, spacing, typography } from '../theme';
+import { Badge, Button, Card, Icon } from '../design-system';
+import { colors, radius, spacing, typography } from '../theme';
 
 export type RootStackParamList = {
   MainTabs: undefined;
@@ -101,17 +101,36 @@ function CalculatorStackScreen() {
   );
 }
 
+function PremiumBenefit({ icon, label }: { icon: string; label: string }) {
+  return (
+    <View style={styles.lockedBenefit}>
+      <View style={styles.lockedBenefitIcon}>
+        <Icon name={icon as never} size={16} color={colors.primary} />
+      </View>
+      <Text style={styles.lockedBenefitText}>{label}</Text>
+    </View>
+  );
+}
+
 function PilotageLockedScreen({ onUnlock }: { onUnlock: () => void }) {
   return (
     <View style={styles.lockedContainer}>
       <Card style={styles.lockedCard}>
-        <Text style={styles.lockedEyebrow}>Pilotage Premium</Text>
-        <Text style={styles.lockedTitle}>Débloquez le suivi mois par mois.</Text>
+        <View style={styles.lockedHeader}>
+          <Text style={styles.lockedEyebrow}>Pilotage Premium</Text>
+          <Badge label="Premium" variant="primary" />
+        </View>
+        <Text style={styles.lockedTitle}>Pilotez ce que vous pouvez reellement garder.</Text>
         <Text style={styles.lockedText}>
-          Suivi du CA, disponible estimé, projection annuelle, objectif de revenu et
-          alertes personnalisées.
+          Suivi mensuel, disponible estime, projection annuelle, objectif de revenu et
+          alertes personnalisees.
         </Text>
-        <Button label="Voir l’offre Pilotage" onPress={onUnlock} />
+        <View style={styles.lockedBenefits}>
+          <PremiumBenefit icon="wallet" label="Disponible estime" />
+          <PremiumBenefit icon="statsChart" label="Projection annuelle" />
+          <PremiumBenefit icon="trophy" label="Objectif net" />
+        </View>
+        <Button label="Voir l'offre Pilotage" onPress={onUnlock} />
       </Card>
     </View>
   );
@@ -263,6 +282,12 @@ const styles = StyleSheet.create({
   lockedCard: {
     gap: spacing.md,
   },
+  lockedHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    gap: spacing.sm,
+  },
   lockedEyebrow: {
     ...typography.overline,
     color: colors.primary,
@@ -274,5 +299,31 @@ const styles = StyleSheet.create({
   lockedText: {
     ...typography.body,
     color: colors.inkSecondary,
+  },
+  lockedBenefits: {
+    gap: spacing.sm,
+  },
+  lockedBenefit: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    padding: spacing.sm,
+    borderRadius: radius.lg,
+    backgroundColor: colors.surfaceElevated,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  lockedBenefitIcon: {
+    width: 32,
+    height: 32,
+    borderRadius: radius.md,
+    backgroundColor: colors.primaryLight,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  lockedBenefitText: {
+    ...typography.bodySmall,
+    color: colors.ink,
+    fontWeight: '700',
   },
 });

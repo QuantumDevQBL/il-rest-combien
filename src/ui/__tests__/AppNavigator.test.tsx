@@ -95,7 +95,7 @@ describe('AppNavigator', () => {
       expect(screen.getByText(/Objectif de revenu/)).toBeTruthy();
     });
 
-    fireEvent.press(screen.getByText('Ouvrir Pilotage'));
+    fireEvent.press(screen.getByText('Voir la version Premium'));
 
     await waitFor(() => {
       expect(screen.getByText(/Pilotez ce que vous pouvez reellement garder/)).toBeTruthy();
@@ -113,7 +113,7 @@ describe('AppNavigator', () => {
 
     await waitFor(() => {
       expect(
-        screen.getByText(/Debloquez le suivi mois par mois|D.bloquez le suivi mois par mois/)
+        screen.getByText(/Pilotez ce que vous pouvez reellement garder/)
       ).toBeTruthy();
     });
 

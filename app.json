@@ -31,7 +31,8 @@
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
-      "./plugins/withRemovePermissions.js"
+      "./plugins/withRemovePermissions.js",
+      "expo-localization"
     ],
     "extra": {
       "eas": {

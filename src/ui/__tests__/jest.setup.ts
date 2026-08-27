@@ -1,6 +1,7 @@
 import { mockAsyncStorage } from './__mocks__/async-storage';
 
 jest.mock('@react-native-async-storage/async-storage', () => mockAsyncStorage);
+jest.mock('posthog-react-native');
 jest.mock('react-native-purchases');
 
 jest.mock('react-native-gesture-handler', () => {

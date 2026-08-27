@@ -19,7 +19,8 @@ export type PilotageAlertKind =
   | 'projection_provisional'
   | 'negative_available'
   | 'tva_threshold'
-  | 'micro_threshold';
+  | 'micro_threshold'
+  | 'objective_gap';
 
 export interface PilotageAlert {
   kind: PilotageAlertKind;
@@ -53,12 +54,27 @@ export interface PilotageSummary {
   projectionIsProvisional: boolean;
   projectedAnnualNet: number | null;
   projectedMonthlyNet: number | null;
+  objective: PilotageObjectiveSummary | null;
   contributionsReserve: number;
   taxReserve: number;
   fixedChargesReserve: number;
   totalReserve: number;
   estimatedAvailable: number;
   alerts: PilotageAlert[];
+}
+
+export interface PilotageObjectiveSummary {
+  objectiveNetMonthly: number;
+  requiredAnnualRevenue: number;
+  projectedAnnualRevenue: number | null;
+  annualRevenueGap: number | null;
+  progressRatio: number | null;
+  progressPercent: number | null;
+  remainingMonthlyEffort: number | null;
+  isProvisional: boolean;
+  isReached: boolean;
+  isExceeded: boolean;
+  remainingFutureMonths: number;
 }
 
 export interface BuildPilotageSummaryParams {
@@ -68,4 +84,6 @@ export interface BuildPilotageSummaryParams {
   annualFixedCharges: number;
   activity: ActiviteMicro;
   projectedAnnualResult: ResultatMicro | null;
+  objectiveNetMonthly: number | null;
+  requiredAnnualRevenue: number | null;
 }

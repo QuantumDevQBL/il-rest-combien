@@ -1,4 +1,5 @@
 import { buildAlerts } from './alerts';
+import { buildObjectiveSummary } from './objective';
 import { buildProjection } from './projection';
 import { buildReserves } from './reserves';
 import { BuildPilotageSummaryParams, PilotageSummary } from './types';
@@ -10,6 +11,8 @@ export function buildPilotageSummary(params: BuildPilotageSummaryParams): Pilota
     annualFixedCharges,
     activity,
     projectedAnnualResult,
+    objectiveNetMonthly,
+    requiredAnnualRevenue,
   } = params;
 
   if (entries.length === 0) {
@@ -18,12 +21,18 @@ export function buildPilotageSummary(params: BuildPilotageSummaryParams): Pilota
 
   const projection = buildProjection(entries, currentMonth);
   const reserves = buildReserves(projection, projectedAnnualResult, annualFixedCharges);
+  const objective = buildObjectiveSummary({
+    projection,
+    objectiveNetMonthly,
+    requiredAnnualRevenue,
+  });
   const alerts = buildAlerts({
     activity,
     currentMonth,
     entries,
     projection,
     estimatedAvailable: reserves.estimatedAvailable,
+    objective,
   });
 
   return {
@@ -35,6 +44,7 @@ export function buildPilotageSummary(params: BuildPilotageSummaryParams): Pilota
       projectedAnnualResult !== null
         ? projectedAnnualResult.revenuNetDisponible / 12
         : null,
+    objective,
     contributionsReserve: reserves.contributionsReserve,
     taxReserve: reserves.taxReserve,
     fixedChargesReserve: reserves.fixedChargesReserve,

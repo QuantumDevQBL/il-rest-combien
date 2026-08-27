@@ -6,7 +6,13 @@ import {
   TVA_FRANCHISE_BASE_VENTE,
 } from '../../data/baremes-2026';
 import { ActiviteMicro } from '../../engine/types';
-import { MonthlyRevenueEntry, Month, PilotageAlert, PilotageProjection } from './types';
+import {
+  MonthlyRevenueEntry,
+  Month,
+  PilotageAlert,
+  PilotageObjectiveSummary,
+  PilotageProjection,
+} from './types';
 
 const MONTH_LABELS: Record<Month, string> = {
   1: 'janvier',
@@ -58,7 +64,9 @@ function estimateThresholdMonth(
     return null;
   }
 
-  const monthsNeeded = Math.ceil((threshold - projection.revenueYtd) / projection.averageMonthlyRevenue);
+  const monthsNeeded = Math.ceil(
+    (threshold - projection.revenueYtd) / projection.averageMonthlyRevenue
+  );
   const estimatedMonth = Math.min(12, currentMonth + monthsNeeded) as Month;
   return MONTH_LABELS[estimatedMonth];
 }
@@ -69,8 +77,9 @@ export function buildAlerts(params: {
   entries: MonthlyRevenueEntry[];
   projection: PilotageProjection;
   estimatedAvailable: number;
+  objective: PilotageObjectiveSummary | null;
 }): PilotageAlert[] {
-  const { activity, currentMonth, entries, projection, estimatedAvailable } = params;
+  const { activity, currentMonth, entries, projection, estimatedAvailable, objective } = params;
   const alerts: PilotageAlert[] = [];
 
   if (projection.projectedAnnualRevenue === null) {
@@ -118,6 +127,24 @@ export function buildAlerts(params: {
       message: month
         ? `Au rythme actuel, vous depasseriez le plafond micro en ${month}.`
         : 'Au rythme actuel, vous depasseriez le plafond micro cette annee.',
+    });
+  }
+
+  if (
+    objective &&
+    objective.annualRevenueGap !== null &&
+    objective.annualRevenueGap > 0 &&
+    objective.progressRatio !== null &&
+    objective.progressRatio < 0.9
+  ) {
+    alerts.push({
+      kind: 'objective_gap',
+      severity: objective.remainingFutureMonths === 0 ? 'danger' : 'warning',
+      title: 'Objectif a rattraper',
+      message:
+        objective.remainingMonthlyEffort !== null
+          ? `Au rythme actuel, il manque ${Math.round(objective.remainingMonthlyEffort)} EUR de CA par mois pour atteindre votre objectif.`
+          : 'Au rythme actuel, votre projection reste sous votre objectif annuel.',
     });
   }
 

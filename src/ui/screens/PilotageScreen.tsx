@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { DimensionValue, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
   buildPilotageSummary,
@@ -26,17 +26,17 @@ import { formatMontant, parseMontantSaisi } from '../utils/format';
 
 const MONTH_LABELS = [
   'Jan',
-  'Fév',
+  'Fev',
   'Mar',
   'Avr',
   'Mai',
   'Juin',
   'Juil',
-  'Aoû',
+  'Aou',
   'Sep',
   'Oct',
   'Nov',
-  'Déc',
+  'Dec',
 ] as const;
 
 interface PilotageScreenProps {
@@ -77,34 +77,38 @@ function SummaryMetric({
 }
 
 function AlertCard({ alert }: { alert: PilotageAlert }) {
-  const isWarning = alert.kind === 'projection_provisional';
+  const isInfo = alert.kind === 'projection_provisional';
 
   return (
     <Card
-      style={[
-        styles.alertCard,
-        isWarning ? styles.alertCardWarning : styles.alertCardDanger,
-      ]}
+      style={[styles.alertCard, isInfo ? styles.alertCardWarning : styles.alertCardDanger]}
     >
       <View style={styles.alertRow}>
         <Icon
-          name={isWarning ? 'informationCircle' : 'warning'}
+          name={isInfo ? 'informationCircle' : 'warning'}
           size={18}
-          color={isWarning ? colors.alert : colors.negative}
+          color={isInfo ? colors.alert : colors.negative}
         />
-        <Text style={styles.alertText}>{alert.message}</Text>
+        <View style={styles.alertCopy}>
+          <Text style={styles.alertTitle}>{alert.title}</Text>
+          <Text style={styles.alertText}>{alert.message}</Text>
+        </View>
       </View>
     </Card>
   );
 }
 
 export function PilotageScreen({ onOpenSettings }: PilotageScreenProps) {
-  const { form } = useCalculatorContext();
+  const { form, setFormField, caRequis } = useCalculatorContext();
   const [entries, setEntries] = useState<MonthlyRevenueEntry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [draft, setDraft] = useState<EntryDraft | null>(null);
+  const [isObjectiveModalOpen, setIsObjectiveModalOpen] = useState(false);
+  const [objectiveDraft, setObjectiveDraft] = useState('');
   const openedRef = useRef(false);
   const viewedSummaryRef = useRef<string | null>(null);
+  const viewedObjectiveRef = useRef<string | null>(null);
+  const viewedAlertsRef = useRef<string | null>(null);
 
   const now = new Date();
   const currentMonth = (now.getMonth() + 1) as Month;
@@ -128,10 +132,11 @@ export function PilotageScreen({ onOpenSettings }: PilotageScreenProps) {
     [entries, currentMonth]
   );
   const projectedAnnualResult = useMemo(
-    () => calculateProjectedResult(form, projection?.projectedAnnualRevenue ?? null),
-    [form, projection]
+    () => calculateProjectedResult(form, projection.projectedAnnualRevenue),
+    [form, projection.projectedAnnualRevenue]
   );
   const annualFixedCharges = parseMontantSaisi(form.chargesFixesAnnuelles) ?? 0;
+  const objectiveNetMonthly = parseMontantSaisi(form.objectifNetMensuel);
   const activity = getActivityConfig(form.activity).activite;
 
   const summary = useMemo(
@@ -143,8 +148,19 @@ export function PilotageScreen({ onOpenSettings }: PilotageScreenProps) {
         annualFixedCharges,
         activity,
         projectedAnnualResult,
+        objectiveNetMonthly,
+        requiredAnnualRevenue: caRequis,
       }),
-    [activity, annualFixedCharges, currentMonth, currentYear, entries, projectedAnnualResult]
+    [
+      activity,
+      annualFixedCharges,
+      caRequis,
+      currentMonth,
+      currentYear,
+      entries,
+      objectiveNetMonthly,
+      projectedAnnualResult,
+    ]
   );
 
   useEffect(() => {
@@ -166,6 +182,42 @@ export function PilotageScreen({ onOpenSettings }: PilotageScreenProps) {
     viewedSummaryRef.current = summaryKey;
     void trackEvent('pilotage_summary_viewed');
     void trackEvent('projection_viewed');
+  }, [summary]);
+
+  useEffect(() => {
+    const objective = summary?.objective;
+    if (!objective) {
+      return;
+    }
+
+    const objectiveKey = [
+      objective.objectiveNetMonthly,
+      objective.requiredAnnualRevenue,
+      objective.projectedAnnualRevenue,
+      objective.progressPercent,
+      objective.annualRevenueGap,
+    ].join(':');
+
+    if (viewedObjectiveRef.current === objectiveKey) {
+      return;
+    }
+
+    viewedObjectiveRef.current = objectiveKey;
+    void trackEvent('pilotage_objective_viewed');
+  }, [summary]);
+
+  useEffect(() => {
+    if (!summary || summary.alerts.length === 0) {
+      return;
+    }
+
+    const alertKey = summary.alerts.map((alert) => `${alert.kind}:${alert.severity}`).join('|');
+    if (viewedAlertsRef.current === alertKey) {
+      return;
+    }
+
+    viewedAlertsRef.current = alertKey;
+    void trackEvent('alert_prediction_viewed');
   }, [summary]);
 
   const availableMonths = useMemo(() => {
@@ -199,6 +251,13 @@ export function PilotageScreen({ onOpenSettings }: PilotageScreenProps) {
 
   const closeDraft = () => setDraft(null);
 
+  const openObjectiveModal = () => {
+    setObjectiveDraft(form.objectifNetMensuel);
+    setIsObjectiveModalOpen(true);
+  };
+
+  const closeObjectiveModal = () => setIsObjectiveModalOpen(false);
+
   const saveDraft = async () => {
     if (!draft) {
       return;
@@ -228,18 +287,59 @@ export function PilotageScreen({ onOpenSettings }: PilotageScreenProps) {
     await trackEvent('monthly_revenue_entry_deleted');
   };
 
+  const saveObjective = async () => {
+    const previousObjective = parseMontantSaisi(form.objectifNetMensuel);
+    const nextObjective = parseMontantSaisi(objectiveDraft);
+
+    setFormField('objectifNetMensuel', objectiveDraft);
+    setIsObjectiveModalOpen(false);
+
+    if (nextObjective === null || nextObjective <= 0) {
+      if (previousObjective !== null && previousObjective > 0) {
+        await trackEvent('pilotage_objective_deleted');
+      }
+      return;
+    }
+
+    await trackEvent(
+      previousObjective !== null && previousObjective > 0
+        ? 'pilotage_objective_updated'
+        : 'pilotage_objective_created'
+    );
+  };
+
+  const deleteObjective = async () => {
+    const previousObjective = parseMontantSaisi(form.objectifNetMensuel);
+    setFormField('objectifNetMensuel', '');
+    setObjectiveDraft('');
+    setIsObjectiveModalOpen(false);
+
+    if (previousObjective !== null && previousObjective > 0) {
+      await trackEvent('pilotage_objective_deleted');
+    }
+  };
+
   const sortedEntries = [...entries].sort((left, right) => right.month - left.month);
   const draftRevenue = draft ? parseMontantSaisi(draft.revenue) : null;
   const canSaveDraft = draft !== null && draftRevenue !== null;
+  const objectiveDraftValue = parseMontantSaisi(objectiveDraft);
+  const canSaveObjective =
+    objectiveDraft.trim().length === 0 || objectiveDraftValue !== null;
+  const objective = summary?.objective ?? null;
+  const objectiveProgressPercent =
+    objective?.progressPercent !== null && objective?.progressPercent !== undefined
+      ? Math.round(objective.progressPercent)
+      : 0;
+  const objectiveProgressBarWidth = `${Math.min(Math.max(objectiveProgressPercent, 0), 100)}%` as DimensionValue;
 
   return (
     <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
       <View style={styles.header}>
         <View>
           <Text style={styles.eyebrow}>Pilotage</Text>
-          <Text style={styles.title}>Ce que vous pouvez réellement garder</Text>
+          <Text style={styles.title}>Ce que vous pouvez reellement garder</Text>
         </View>
-        <PressableScale onPress={onOpenSettings} scale={0.9} accessibilityLabel="Paramètres">
+        <PressableScale onPress={onOpenSettings} scale={0.9} accessibilityLabel="Parametres">
           <View style={styles.iconButton}>
             <Icon name="settings" size={20} color={colors.inkSecondary} />
           </View>
@@ -253,7 +353,7 @@ export function PilotageScreen({ onOpenSettings }: PilotageScreenProps) {
       >
         {isLoading ? (
           <Card>
-            <Text style={styles.loadingText}>Chargement du pilotage…</Text>
+            <Text style={styles.loadingText}>Chargement du pilotage...</Text>
           </Card>
         ) : null}
 
@@ -262,7 +362,7 @@ export function PilotageScreen({ onOpenSettings }: PilotageScreenProps) {
             <EmptyState
               iconName="stats-chart"
               title="Commencez votre suivi mensuel"
-              description="Ajoutez votre premier mois encaissé pour voir ce qu’il faut réserver et ce qui reste disponible."
+              description="Ajoutez votre premier mois encaisse pour voir ce qu'il faut reserver et ce qui reste disponible."
             />
             <Button label="Ajouter un mois" onPress={openCreateModal} />
           </Card>
@@ -272,14 +372,14 @@ export function PilotageScreen({ onOpenSettings }: PilotageScreenProps) {
           <>
             <View style={styles.metricStack}>
               <SummaryMetric
-                label="Disponible estimé"
+                label="Disponible estime"
                 value={formatMontant(summary.estimatedAvailable)}
                 featured
                 negative={summary.estimatedAvailable < 0}
               />
               <View style={styles.metricRow}>
-                <SummaryMetric label="Encaissé" value={formatMontant(summary.revenueYtd)} />
-                <SummaryMetric label="À réserver" value={formatMontant(summary.totalReserve)} />
+                <SummaryMetric label="Encaisse" value={formatMontant(summary.revenueYtd)} />
+                <SummaryMetric label="A reserver" value={formatMontant(summary.totalReserve)} />
               </View>
             </View>
 
@@ -293,28 +393,111 @@ export function PilotageScreen({ onOpenSettings }: PilotageScreenProps) {
                 ) : null}
               </View>
               <View style={styles.summaryLine}>
-                <Text style={styles.summaryLineLabel}>CA annuel projeté</Text>
+                <Text style={styles.summaryLineLabel}>CA annuel projete</Text>
                 <Text style={styles.summaryLineValue}>
                   {formatMontant(summary.projectedAnnualRevenue)}
                 </Text>
               </View>
               <View style={styles.summaryLine}>
-                <Text style={styles.summaryLineLabel}>Net annuel projeté</Text>
+                <Text style={styles.summaryLineLabel}>Net annuel projete</Text>
                 <Text style={styles.summaryLineValue}>
                   {formatMontant(summary.projectedAnnualNet)}
                 </Text>
               </View>
               <View style={styles.summaryLine}>
-                <Text style={styles.summaryLineLabel}>Net mensuel projeté</Text>
+                <Text style={styles.summaryLineLabel}>Net mensuel projete</Text>
                 <Text style={styles.summaryLineValue}>
                   {formatMontant(summary.projectedMonthlyNet)}
                 </Text>
               </View>
               {summary.projectionIsProvisional ? (
                 <Text style={styles.helperText}>
-                  Projection indicative basée sur votre mois en cours.
+                  Projection indicative basee sur votre mois en cours.
                 </Text>
               ) : null}
+            </Card>
+
+            <Card style={styles.sectionCard}>
+              <View style={styles.sectionHeader}>
+                <Text style={styles.sectionTitle}>Objectif</Text>
+                <Button
+                  label={objective ? 'Modifier' : 'Definir'}
+                  onPress={openObjectiveModal}
+                  size="md"
+                />
+              </View>
+
+              {objective ? (
+                <>
+                  <View style={styles.summaryLine}>
+                    <Text style={styles.summaryLineLabel}>Objectif net mensuel</Text>
+                    <Text style={styles.summaryLineValue}>
+                      {formatMontant(objective.objectiveNetMonthly)}
+                    </Text>
+                  </View>
+                  <View style={styles.summaryLine}>
+                    <Text style={styles.summaryLineLabel}>CA annuel necessaire</Text>
+                    <Text style={styles.summaryLineValue}>
+                      {formatMontant(objective.requiredAnnualRevenue)}
+                    </Text>
+                  </View>
+                  <View style={styles.summaryLine}>
+                    <Text style={styles.summaryLineLabel}>CA annuel projete</Text>
+                    <Text style={styles.summaryLineValue}>
+                      {formatMontant(objective.projectedAnnualRevenue)}
+                    </Text>
+                  </View>
+
+                  <View style={styles.progressBlock}>
+                    <View style={styles.progressHeader}>
+                      <Text style={styles.summaryLineLabel}>Progression</Text>
+                      <Text style={styles.progressValue}>{objectiveProgressPercent}%</Text>
+                    </View>
+                    <View style={styles.progressTrack}>
+                      <View style={[styles.progressFill, { width: objectiveProgressBarWidth }]} />
+                    </View>
+                  </View>
+
+                  {objective.isExceeded ? (
+                    <Text style={styles.successText}>
+                      Votre projection depasse deja l'objectif de revenu.
+                    </Text>
+                  ) : null}
+                  {objective.isReached && !objective.isExceeded ? (
+                    <Text style={styles.successText}>
+                      Votre projection atteint l'objectif de revenu.
+                    </Text>
+                  ) : null}
+                  {!objective.isReached && !objective.isExceeded && objective.isProvisional ? (
+                    <Text style={styles.helperText}>
+                      Projection indicative. Ajoutez un mois termine pour confirmer votre rythme.
+                    </Text>
+                  ) : null}
+                  {!objective.isReached &&
+                  !objective.isExceeded &&
+                  !objective.isProvisional &&
+                  objective.remainingMonthlyEffort !== null ? (
+                    <Text style={styles.helperText}>
+                      Il manque {formatMontant(objective.annualRevenueGap)} de CA annuel. Effort
+                      restant: {formatMontant(objective.remainingMonthlyEffort)} par mois.
+                    </Text>
+                  ) : null}
+                  {!objective.isReached &&
+                  !objective.isExceeded &&
+                  objective.remainingMonthlyEffort === null ? (
+                    <Text style={styles.alertHelperText}>
+                      Aucun mois futur restant pour rattraper la projection cette annee.
+                    </Text>
+                  ) : null}
+                </>
+              ) : (
+                <View style={styles.objectiveEmptyState}>
+                  <Text style={styles.bodyText}>
+                    Definissez un objectif net mensuel pour voir le CA a atteindre et l'effort
+                    restant.
+                  </Text>
+                </View>
+              )}
             </Card>
 
             {summary.alerts.length > 0 ? (
@@ -383,10 +566,7 @@ export function PilotageScreen({ onOpenSettings }: PilotageScreenProps) {
                   style={styles.monthPickerItem}
                 >
                   <View
-                    style={[
-                      styles.monthPill,
-                      draft.month === month && styles.monthPillSelected,
-                    ]}
+                    style={[styles.monthPill, draft.month === month && styles.monthPillSelected]}
                   >
                     <Text
                       style={[
@@ -409,13 +589,13 @@ export function PilotageScreen({ onOpenSettings }: PilotageScreenProps) {
           )}
 
           <Input
-            label="CA encaissé"
+            label="CA encaisse"
             value={draft.revenue}
             onChangeText={(value) =>
               setDraft((current) => (current ? { ...current, revenue: value } : current))
             }
             placeholder="0"
-            suffix="€"
+            suffix="EUR"
           />
 
           <View style={styles.modalActions}>
@@ -424,6 +604,41 @@ export function PilotageScreen({ onOpenSettings }: PilotageScreenProps) {
               label="Enregistrer"
               onPress={() => void saveDraft()}
               disabled={!canSaveDraft}
+            />
+          </View>
+        </ModalContainer>
+      ) : null}
+
+      {isObjectiveModalOpen ? (
+        <ModalContainer
+          title={objective ? 'Modifier l objectif' : 'Definir un objectif'}
+          onClose={closeObjectiveModal}
+        >
+          <Text style={styles.bodyText}>
+            Indiquez le net mensuel que vous voulez reellement garder.
+          </Text>
+          <Input
+            label="Objectif net mensuel"
+            value={objectiveDraft}
+            onChangeText={setObjectiveDraft}
+            placeholder="0"
+            suffix="EUR"
+            helper="Le Pilotage reutilise le calcul existant pour estimer le CA necessaire."
+          />
+          <View style={styles.modalActions}>
+            {objective ? (
+              <Button
+                label="Supprimer"
+                onPress={() => void deleteObjective()}
+                variant="secondary"
+              />
+            ) : (
+              <Button label="Annuler" onPress={closeObjectiveModal} variant="secondary" />
+            )}
+            <Button
+              label="Enregistrer"
+              onPress={() => void saveObjective()}
+              disabled={!canSaveObjective}
             />
           </View>
         </ModalContainer>
@@ -536,19 +751,64 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingVertical: spacing.xs,
+    gap: spacing.md,
   },
   summaryLineLabel: {
     ...typography.bodySmall,
     color: colors.inkSecondary,
+    flex: 1,
   },
   summaryLineValue: {
     ...typography.body,
     color: colors.ink,
     fontWeight: '800',
+    textAlign: 'right',
   },
   helperText: {
     ...typography.bodySmall,
     color: colors.alert,
+    marginTop: spacing.xs,
+  },
+  alertHelperText: {
+    ...typography.bodySmall,
+    color: colors.negative,
+    marginTop: spacing.xs,
+  },
+  bodyText: {
+    ...typography.body,
+    color: colors.inkSecondary,
+  },
+  objectiveEmptyState: {
+    gap: spacing.sm,
+  },
+  progressBlock: {
+    gap: spacing.xs,
+    marginTop: spacing.xs,
+  },
+  progressHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  progressValue: {
+    ...typography.bodySmall,
+    color: colors.ink,
+    fontWeight: '800',
+  },
+  progressTrack: {
+    height: 10,
+    borderRadius: radius.full,
+    backgroundColor: colors.border,
+    overflow: 'hidden',
+  },
+  progressFill: {
+    height: '100%',
+    borderRadius: radius.full,
+    backgroundColor: colors.primary,
+  },
+  successText: {
+    ...typography.bodySmall,
+    color: colors.primary,
     marginTop: spacing.xs,
   },
   alertsSection: {
@@ -573,6 +833,15 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     gap: spacing.sm,
   },
+  alertCopy: {
+    flex: 1,
+    gap: spacing.xxs,
+  },
+  alertTitle: {
+    ...typography.bodySmall,
+    color: colors.ink,
+    fontWeight: '800',
+  },
   alertText: {
     ...typography.bodySmall,
     color: colors.ink,
@@ -588,6 +857,7 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.sm,
     borderTopWidth: 1,
     borderTopColor: colors.border,
+    gap: spacing.md,
   },
   historyMonth: {
     ...typography.body,

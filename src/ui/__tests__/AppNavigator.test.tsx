@@ -123,4 +123,24 @@ describe('AppNavigator', () => {
       expect(screen.getByText(/Pilotez ce que vous pouvez reellement garder/)).toBeTruthy();
     });
   });
+
+  it('returns to simulation from the Pilotage tab', async () => {
+    render(<AppNavigator />);
+
+    await waitFor(() => {
+      expect(screen.getByText(homePrompt)).toBeTruthy();
+    });
+
+    fireEvent.press(screen.getByText('Pilotage'));
+
+    await waitFor(() => {
+      expect(screen.getByText(/Voir l'offre Pilotage/)).toBeTruthy();
+    });
+
+    fireEvent.press(screen.getAllByText('Simuler')[1]);
+
+    await waitFor(() => {
+      expect(screen.getByText(homePrompt)).toBeTruthy();
+    });
+  });
 });

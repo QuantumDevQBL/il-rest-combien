@@ -41,6 +41,7 @@ const MONTH_LABELS = [
 
 interface PilotageScreenProps {
   onOpenSettings: () => void;
+  onGoToSimulation?: () => void;
 }
 
 interface EntryDraft {
@@ -123,7 +124,7 @@ function AlertCard({ alert }: { alert: PilotageAlert }) {
   );
 }
 
-export function PilotageScreen({ onOpenSettings }: PilotageScreenProps) {
+export function PilotageScreen({ onOpenSettings, onGoToSimulation }: PilotageScreenProps) {
   const { form, setFormField, caRequis } = useCalculatorContext();
   const [entries, setEntries] = useState<MonthlyRevenueEntry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -366,6 +367,9 @@ export function PilotageScreen({ onOpenSettings }: PilotageScreenProps) {
           <Text style={styles.title}>Ce que vous pouvez reellement garder</Text>
         </View>
         <View style={styles.headerActions}>
+          {onGoToSimulation ? (
+            <Button label="Simuler" onPress={onGoToSimulation} variant="secondary" size="md" />
+          ) : null}
           {hasEntries ? (
             <Button label="Ajouter" onPress={openCreateModal} size="md" />
           ) : null}

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator, TransitionPresets } from '@react-navigation/stack';
 import { useOnboarding } from '../hooks/useOnboarding';
@@ -112,27 +113,46 @@ function PremiumBenefit({ icon, label }: { icon: string; label: string }) {
   );
 }
 
-function PilotageLockedScreen({ onUnlock }: { onUnlock: () => void }) {
+function PilotageLockedScreen({
+  onUnlock,
+  onGoToSimulation,
+}: {
+  onUnlock: () => void;
+  onGoToSimulation: () => void;
+}) {
   return (
-    <View style={styles.lockedContainer}>
-      <Card style={styles.lockedCard}>
-        <View style={styles.lockedHeader}>
+    <SafeAreaView style={styles.lockedContainer} edges={['top', 'left', 'right']}>
+      <View style={styles.lockedTopBar}>
+        <View style={styles.lockedTopCopy}>
           <Text style={styles.lockedEyebrow}>Pilotage Premium</Text>
+          <Text style={styles.lockedTopTitle}>Pilotage</Text>
+        </View>
+        <View style={styles.lockedTopActions}>
+          <Button
+            label="Simuler"
+            variant="secondary"
+            size="md"
+            onPress={onGoToSimulation}
+          />
           <Badge label="Premium" variant="primary" />
         </View>
-        <Text style={styles.lockedTitle}>Pilotez ce que vous pouvez reellement garder.</Text>
-        <Text style={styles.lockedText}>
-          Suivi mensuel, disponible estime, projection annuelle, objectif de revenu et
-          alertes personnalisees.
-        </Text>
-        <View style={styles.lockedBenefits}>
-          <PremiumBenefit icon="wallet" label="Disponible estime" />
-          <PremiumBenefit icon="statsChart" label="Projection annuelle" />
-          <PremiumBenefit icon="trophy" label="Objectif net" />
-        </View>
-        <Button label="Voir l'offre Pilotage" onPress={onUnlock} />
-      </Card>
-    </View>
+      </View>
+      <View style={styles.lockedContent}>
+        <Card style={styles.lockedCard}>
+          <Text style={styles.lockedTitle}>Pilotez ce que vous pouvez reellement garder.</Text>
+          <Text style={styles.lockedText}>
+            Suivi mensuel, disponible estime, projection annuelle, objectif de revenu et
+            alertes personnalisees.
+          </Text>
+          <View style={styles.lockedBenefits}>
+            <PremiumBenefit icon="wallet" label="Disponible estime" />
+            <PremiumBenefit icon="statsChart" label="Projection annuelle" />
+            <PremiumBenefit icon="trophy" label="Objectif net" />
+          </View>
+          <Button label="Voir l'offre Pilotage" onPress={onUnlock} />
+        </Card>
+      </View>
+    </SafeAreaView>
   );
 }
 
@@ -171,12 +191,18 @@ function MainTabsScreen() {
         {({ navigation }) =>
           isPremiumActive ? (
             <PilotageScreen
+              onGoToSimulation={() =>
+                navigation.navigate('Simuler' as never, { screen: 'Home' } as never)
+              }
               onOpenSettings={() =>
                 navigation.getParent()?.navigate('SettingsModal' as never)
               }
             />
           ) : (
             <PilotageLockedScreen
+              onGoToSimulation={() =>
+                navigation.navigate('Simuler' as never, { screen: 'Home' } as never)
+              }
               onUnlock={() => {
                 openPaywall('pilotage_tab');
                 navigation.getParent()?.navigate('PilotagePaywallModal' as never);
@@ -276,17 +302,36 @@ const styles = StyleSheet.create({
   lockedContainer: {
     flex: 1,
     backgroundColor: colors.background,
+  },
+  lockedTopBar: {
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.md,
+    paddingBottom: spacing.sm,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: spacing.sm,
+  },
+  lockedTopCopy: {
+    flex: 1,
+  },
+  lockedTopActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+  },
+  lockedTopTitle: {
+    ...typography.h2,
+    color: colors.ink,
+  },
+  lockedContent: {
+    flex: 1,
     justifyContent: 'center',
-    padding: spacing.lg,
+    paddingHorizontal: spacing.lg,
+    paddingBottom: spacing.xl,
   },
   lockedCard: {
     gap: spacing.md,
-  },
-  lockedHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    gap: spacing.sm,
   },
   lockedEyebrow: {
     ...typography.overline,

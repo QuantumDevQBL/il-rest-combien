@@ -95,7 +95,7 @@ describe('AppNavigator', () => {
       expect(screen.getByText(/Objectif de revenu/)).toBeTruthy();
     });
 
-    fireEvent.press(screen.getByText('Voir la version Premium'));
+    fireEvent.press(screen.getByText('Ouvrir Pilotage'));
 
     await waitFor(() => {
       expect(screen.getByText(/Pilotez ce que vous pouvez reellement garder/)).toBeTruthy();

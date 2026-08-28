@@ -104,29 +104,16 @@ export function HomeScreen({ onCalculate, onOpenHistory }: HomeScreenProps) {
               helper="Optionnel."
             />
 
-            <View style={styles.quickStats}>
-              <View style={styles.quickPill}>
-                <Text style={styles.quickPillLabel}>Sans compte</Text>
-              </View>
-              <View style={styles.quickPill}>
-                <Text style={styles.quickPillLabel}>Calcul local</Text>
-              </View>
-              <View style={styles.quickPill}>
-                <Text style={styles.quickPillLabel}>Resultat complet</Text>
-              </View>
-            </View>
-
-            <Card style={styles.previewCard}>
-              <View style={styles.previewRow}>
-                <View style={styles.previewItem}>
-                  <Text style={styles.previewLabel}>Activite</Text>
-                  <Text style={styles.previewValue}>{selectedActivityLabel}</Text>
-                </View>
-                <View style={styles.previewItem}>
-                  <Text style={styles.previewLabel}>CA saisi</Text>
-                  <Text style={styles.previewValue}>{previewAmount ?? 'A renseigner'}</Text>
-                </View>
-              </View>
+            <Card style={styles.infoCard}>
+              <Text style={styles.infoTitle}>Simulation Free complete</Text>
+              <Text style={styles.infoText}>
+                Net, cotisations, impot, detail et alertes essentielles.
+              </Text>
+              {previewAmount ? (
+                <Text style={styles.infoHighlight}>
+                  {selectedActivityLabel} · {previewAmount}
+                </Text>
+              ) : null}
             </Card>
           </FadeInView>
         </ScrollView>
@@ -217,43 +204,23 @@ const styles = StyleSheet.create({
     ...typography.bodySmall,
     color: colors.inkSecondary,
   },
-  quickStats: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: spacing.xs,
-  },
-  quickPill: {
-    paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.xs,
-    borderRadius: radius.full,
+  infoCard: {
     backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
+    gap: spacing.xxs,
   },
-  quickPillLabel: {
-    ...typography.bodySmall,
-    color: colors.inkSecondary,
-    fontWeight: '700',
-  },
-  previewCard: {
-    backgroundColor: colors.surface,
-  },
-  previewRow: {
-    flexDirection: 'row',
-    gap: spacing.md,
-  },
-  previewItem: {
-    flex: 1,
-  },
-  previewLabel: {
-    ...typography.caption,
-    color: colors.inkTertiary,
-    marginBottom: spacing.xxs,
-  },
-  previewValue: {
+  infoTitle: {
     ...typography.body,
     color: colors.ink,
     fontWeight: '800',
+  },
+  infoText: {
+    ...typography.bodySmall,
+    color: colors.inkSecondary,
+  },
+  infoHighlight: {
+    ...typography.caption,
+    color: colors.primary,
+    marginTop: spacing.xxs,
   },
   footer: {
     paddingHorizontal: spacing.lg,

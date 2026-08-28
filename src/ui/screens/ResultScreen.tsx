@@ -43,6 +43,20 @@ function SummaryCard({ label, value, tone = 'default' }: SummaryCardProps) {
   );
 }
 
+interface InlineStatProps {
+  label: string;
+  value: string;
+}
+
+function InlineStat({ label, value }: InlineStatProps) {
+  return (
+    <View style={styles.inlineStat}>
+      <Text style={styles.inlineStatLabel}>{label}</Text>
+      <Text style={styles.inlineStatValue}>{value}</Text>
+    </View>
+  );
+}
+
 export function ResultScreen({
   onReset,
   onOpenSettings,
@@ -187,18 +201,6 @@ export function ResultScreen({
         </FadeInView>
 
         <FadeInView delay={100}>
-          <View style={styles.summaryGrid}>
-            <SummaryCard label="Net annuel estime" value={formatMontant(result.revenuNetDisponible)} />
-            <SummaryCard label="Impot retenu" value={formatMontant(result.impotRetenu)} />
-            <SummaryCard
-              label="Cotisations + CFP"
-              value={formatMontant(result.totalPrelevementsSociaux)}
-            />
-            <SummaryCard label="Option fiscale" value={scenarioLabel} tone="accent" />
-          </View>
-        </FadeInView>
-
-        <FadeInView delay={150}>
           <View style={styles.pillsRow}>
             <MetricPill label="Mensuel" value={formatMontant(netMensuel)} variant="success" />
             <MetricPill
@@ -214,15 +216,39 @@ export function ResultScreen({
           </View>
         </FadeInView>
 
+        <FadeInView delay={160}>
+          <View style={styles.summaryGrid}>
+            <SummaryCard label="Net annuel estime" value={formatMontant(result.revenuNetDisponible)} />
+            <SummaryCard
+              label="Cotisations + CFP"
+              value={formatMontant(result.totalPrelevementsSociaux)}
+            />
+            <SummaryCard label="Option fiscale" value={scenarioLabel} tone="accent" />
+          </View>
+        </FadeInView>
+
         <FadeInView delay={220}>
+          <Card style={styles.quickBreakdownCard}>
+            <View style={styles.quickBreakdownHeader}>
+              <Text style={styles.quickBreakdownTitle}>Lecture rapide</Text>
+              <Text style={styles.quickBreakdownCaption}>Sans rentrer dans le detail</Text>
+            </View>
+            <View style={styles.inlineStatsRow}>
+              <InlineStat label="Impot retenu" value={formatMontant(result.impotRetenu)} />
+              <InlineStat label="Prelevements" value={`${tauxPrelevement.toFixed(1)} %`} />
+            </View>
+          </Card>
+        </FadeInView>
+
+        <FadeInView delay={260}>
           <Card style={styles.pilotageCard}>
             <View style={styles.pilotageHeader}>
               <View style={styles.pilotageCopy}>
                 <Text style={styles.pilotageEyebrow}>Version Premium</Text>
                 <Text style={styles.pilotageTitle}>Pilotage</Text>
                 <Text style={styles.pilotageText}>
-                  Suivez ce que vous avez encaisse, ce qu'il faut reserver, et ce que vous
-                  pouvez reellement garder.
+                  Suivez votre CA, ce qu'il faut reserver et le disponible estime mois apres
+                  mois.
                 </Text>
               </View>
               <View style={styles.pilotageBadge}>
@@ -231,7 +257,7 @@ export function ResultScreen({
             </View>
             {onOpenPilotage ? (
               <Button
-                label="Voir la version Premium"
+                label="Ouvrir Pilotage"
                 onPress={() => onOpenPilotage('monthly_tracking')}
                 variant="primary"
                 size="md"
@@ -240,15 +266,15 @@ export function ResultScreen({
           </Card>
         </FadeInView>
 
-        <FadeInView delay={260}>
+        <FadeInView delay={300}>
           <Comparaison result={result} />
         </FadeInView>
 
-        <FadeInView delay={320}>
+        <FadeInView delay={340}>
           <Alertes result={result} />
         </FadeInView>
 
-        <FadeInView delay={360}>
+        <FadeInView delay={380}>
           <Text style={styles.secondarySectionTitle}>Approfondir si besoin</Text>
           <View style={styles.actionsContainer}>
             <PressableScale onPress={onOpenDetail} scale={0.97} style={styles.actionCard}>
@@ -452,11 +478,48 @@ const styles = StyleSheet.create({
   pillsRow: {
     flexDirection: 'row',
     gap: spacing.sm,
-    marginBottom: spacing.xs,
+  },
+  quickBreakdownCard: {
+    gap: spacing.sm,
+    paddingVertical: spacing.md,
+  },
+  quickBreakdownHeader: {
+    gap: spacing.xxs,
+  },
+  quickBreakdownTitle: {
+    ...typography.body,
+    color: colors.ink,
+    fontWeight: '800',
+  },
+  quickBreakdownCaption: {
+    ...typography.bodySmall,
+    color: colors.inkTertiary,
+  },
+  inlineStatsRow: {
+    flexDirection: 'row',
+    gap: spacing.sm,
+  },
+  inlineStat: {
+    flex: 1,
+    backgroundColor: colors.surfaceElevated,
+    borderRadius: radius.lg,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+  },
+  inlineStatLabel: {
+    ...typography.caption,
+    color: colors.inkTertiary,
+    marginBottom: spacing.xxs,
+  },
+  inlineStatValue: {
+    ...typography.body,
+    color: colors.ink,
+    fontWeight: '800',
   },
   pilotageCard: {
     borderColor: colors.primary,
     backgroundColor: colors.surfaceElevated,
+    paddingVertical: spacing.md,
   },
   pilotageHeader: {
     flexDirection: 'row',
@@ -496,14 +559,14 @@ const styles = StyleSheet.create({
     marginTop: spacing.xs,
   },
   actionsContainer: {
-    gap: spacing.md,
+    gap: spacing.sm,
   },
   actionCard: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: colors.surface,
     borderRadius: radius.xl,
-    padding: spacing.md,
+    padding: spacing.sm + spacing.xxs,
     borderWidth: 1,
     borderColor: colors.border,
     ...shadows.sm,

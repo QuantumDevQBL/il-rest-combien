@@ -57,7 +57,7 @@ describe('ResultScreen', () => {
     });
 
     expect(screen.getByText(/72.*\/ 100/)).toBeTruthy();
-    expect(screen.getByText('28.0 %')).toBeTruthy();
+    expect(screen.getAllByText('28.0 %').length).toBeGreaterThan(0);
   });
 
   it('calls existing navigation callbacks', () => {

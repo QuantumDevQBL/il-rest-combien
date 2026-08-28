@@ -76,6 +76,31 @@ function SummaryMetric({
   );
 }
 
+function CompactRow({
+  label,
+  value,
+  tone = 'default',
+}: {
+  label: string;
+  value: string;
+  tone?: 'default' | 'success' | 'warning';
+}) {
+  return (
+    <View style={styles.compactRow}>
+      <Text style={styles.compactRowLabel}>{label}</Text>
+      <Text
+        style={[
+          styles.compactRowValue,
+          tone === 'success' && styles.compactRowValueSuccess,
+          tone === 'warning' && styles.compactRowValueWarning,
+        ]}
+      >
+        {value}
+      </Text>
+    </View>
+  );
+}
+
 function AlertCard({ alert }: { alert: PilotageAlert }) {
   const isInfo = alert.kind === 'projection_provisional';
 
@@ -331,19 +356,25 @@ export function PilotageScreen({ onOpenSettings }: PilotageScreenProps) {
       ? Math.round(objective.progressPercent)
       : 0;
   const objectiveProgressBarWidth = `${Math.min(Math.max(objectiveProgressPercent, 0), 100)}%` as DimensionValue;
+  const hasEntries = entries.length > 0;
 
   return (
     <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
       <View style={styles.header}>
-        <View>
+        <View style={styles.headerCopy}>
           <Text style={styles.eyebrow}>Pilotage</Text>
           <Text style={styles.title}>Ce que vous pouvez reellement garder</Text>
         </View>
-        <PressableScale onPress={onOpenSettings} scale={0.9} accessibilityLabel="Parametres">
-          <View style={styles.iconButton}>
-            <Icon name="settings" size={20} color={colors.inkSecondary} />
-          </View>
-        </PressableScale>
+        <View style={styles.headerActions}>
+          {hasEntries ? (
+            <Button label="Ajouter" onPress={openCreateModal} size="md" />
+          ) : null}
+          <PressableScale onPress={onOpenSettings} scale={0.9} accessibilityLabel="Parametres">
+            <View style={styles.iconButton}>
+              <Icon name="settings" size={20} color={colors.inkSecondary} />
+            </View>
+          </PressableScale>
+        </View>
       </View>
 
       <ScrollView
@@ -392,23 +423,20 @@ export function PilotageScreen({ onOpenSettings }: PilotageScreenProps) {
                   </View>
                 ) : null}
               </View>
-              <View style={styles.summaryLine}>
-                <Text style={styles.summaryLineLabel}>CA annuel projete</Text>
-                <Text style={styles.summaryLineValue}>
-                  {formatMontant(summary.projectedAnnualRevenue)}
-                </Text>
-              </View>
-              <View style={styles.summaryLine}>
-                <Text style={styles.summaryLineLabel}>Net annuel projete</Text>
-                <Text style={styles.summaryLineValue}>
-                  {formatMontant(summary.projectedAnnualNet)}
-                </Text>
-              </View>
-              <View style={styles.summaryLine}>
-                <Text style={styles.summaryLineLabel}>Net mensuel projete</Text>
-                <Text style={styles.summaryLineValue}>
-                  {formatMontant(summary.projectedMonthlyNet)}
-                </Text>
+              <View style={styles.compactGroup}>
+                <CompactRow
+                  label="CA annuel projete"
+                  value={formatMontant(summary.projectedAnnualRevenue)}
+                />
+                <CompactRow
+                  label="Net annuel projete"
+                  value={formatMontant(summary.projectedAnnualNet)}
+                />
+                <CompactRow
+                  label="Net mensuel projete"
+                  value={formatMontant(summary.projectedMonthlyNet)}
+                  tone="success"
+                />
               </View>
               {summary.projectionIsProvisional ? (
                 <Text style={styles.helperText}>
@@ -429,23 +457,22 @@ export function PilotageScreen({ onOpenSettings }: PilotageScreenProps) {
 
               {objective ? (
                 <>
-                  <View style={styles.summaryLine}>
-                    <Text style={styles.summaryLineLabel}>Objectif net mensuel</Text>
-                    <Text style={styles.summaryLineValue}>
-                      {formatMontant(objective.objectiveNetMonthly)}
-                    </Text>
-                  </View>
-                  <View style={styles.summaryLine}>
-                    <Text style={styles.summaryLineLabel}>CA annuel necessaire</Text>
-                    <Text style={styles.summaryLineValue}>
-                      {formatMontant(objective.requiredAnnualRevenue)}
-                    </Text>
-                  </View>
-                  <View style={styles.summaryLine}>
-                    <Text style={styles.summaryLineLabel}>CA annuel projete</Text>
-                    <Text style={styles.summaryLineValue}>
-                      {formatMontant(objective.projectedAnnualRevenue)}
-                    </Text>
+                  <View style={styles.compactGroup}>
+                    <CompactRow
+                      label="Objectif net mensuel"
+                      value={formatMontant(objective.objectiveNetMonthly)}
+                    />
+                    <CompactRow
+                      label="CA annuel necessaire"
+                      value={formatMontant(objective.requiredAnnualRevenue)}
+                    />
+                    <CompactRow
+                      label="CA annuel projete"
+                      value={formatMontant(objective.projectedAnnualRevenue)}
+                      tone={
+                        objective.isReached || objective.isExceeded ? 'success' : 'default'
+                      }
+                    />
                   </View>
 
                   <View style={styles.progressBlock}>
@@ -514,7 +541,7 @@ export function PilotageScreen({ onOpenSettings }: PilotageScreenProps) {
             <Card style={styles.sectionCard}>
               <View style={styles.sectionHeader}>
                 <Text style={styles.sectionTitle}>Historique mensuel</Text>
-                <Button label="Ajouter" onPress={openCreateModal} size="md" />
+                <Text style={styles.historyCount}>{sortedEntries.length} mois</Text>
               </View>
               <View style={styles.historyStack}>
                 {sortedEntries.map((entry) => (
@@ -655,10 +682,19 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'flex-start',
+    alignItems: 'center',
     paddingHorizontal: spacing.lg,
     paddingTop: spacing.md,
     paddingBottom: spacing.sm,
+  },
+  headerCopy: {
+    flex: 1,
+    marginRight: spacing.sm,
+  },
+  headerActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
   },
   eyebrow: {
     ...typography.overline,
@@ -764,6 +800,36 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     textAlign: 'right',
   },
+  compactGroup: {
+    gap: spacing.xs,
+  },
+  compactRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    gap: spacing.md,
+    backgroundColor: colors.surfaceElevated,
+    borderRadius: radius.lg,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+  },
+  compactRowLabel: {
+    ...typography.bodySmall,
+    color: colors.inkSecondary,
+    flex: 1,
+  },
+  compactRowValue: {
+    ...typography.body,
+    color: colors.ink,
+    fontWeight: '800',
+    textAlign: 'right',
+  },
+  compactRowValueSuccess: {
+    color: colors.primary,
+  },
+  compactRowValueWarning: {
+    color: colors.alert,
+  },
   helperText: {
     ...typography.bodySmall,
     color: colors.alert,
@@ -783,7 +849,7 @@ const styles = StyleSheet.create({
   },
   progressBlock: {
     gap: spacing.xs,
-    marginTop: spacing.xs,
+    marginTop: spacing.sm,
   },
   progressHeader: {
     flexDirection: 'row',
@@ -850,10 +916,15 @@ const styles = StyleSheet.create({
   historyStack: {
     gap: spacing.sm,
   },
+  historyCount: {
+    ...typography.bodySmall,
+    color: colors.inkTertiary,
+    fontWeight: '700',
+  },
   historyItem: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     paddingVertical: spacing.sm,
     borderTopWidth: 1,
     borderTopColor: colors.border,
@@ -870,7 +941,8 @@ const styles = StyleSheet.create({
   },
   historyActions: {
     flexDirection: 'row',
-    gap: spacing.md,
+    gap: spacing.sm,
+    marginTop: spacing.xxs,
   },
   linkText: {
     ...typography.bodySmall,

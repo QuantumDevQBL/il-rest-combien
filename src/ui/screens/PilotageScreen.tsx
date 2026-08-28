@@ -726,7 +726,7 @@ const styles = StyleSheet.create({
   content: {
     paddingHorizontal: spacing.lg,
     paddingBottom: spacing.xxxl,
-    gap: spacing.lg,
+    gap: spacing.md,
   },
   loadingText: {
     ...typography.body,
@@ -734,11 +734,11 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   metricStack: {
-    gap: spacing.sm,
+    gap: spacing.xs,
   },
   metricRow: {
     flexDirection: 'row',
-    gap: spacing.sm,
+    gap: spacing.xs,
   },
   metricCard: {
     flex: 1,
@@ -764,7 +764,7 @@ const styles = StyleSheet.create({
     color: colors.negative,
   },
   sectionCard: {
-    gap: spacing.sm,
+    gap: spacing.xs,
   },
   sectionHeader: {
     flexDirection: 'row',
@@ -882,10 +882,10 @@ const styles = StyleSheet.create({
     marginTop: spacing.xs,
   },
   alertsSection: {
-    gap: spacing.sm,
+    gap: spacing.xs,
   },
   alertsStack: {
-    gap: spacing.sm,
+    gap: spacing.xs,
   },
   alertCard: {
     paddingVertical: spacing.sm,
@@ -918,7 +918,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   historyStack: {
-    gap: spacing.sm,
+    gap: spacing.xs,
   },
   historyCount: {
     ...typography.bodySmall,

@@ -93,16 +93,15 @@ export function HomeScreen({ onCalculate, onOpenHistory }: HomeScreenProps) {
                 <ActivityGrid selected={form.activity} onSelect={handleActivitySelect} />
                 <Text style={styles.activityHint}>{selectedActivityDescription}</Text>
               </View>
+              <Input
+                label="Nom de l'estimation"
+                value={form.label}
+                onChangeText={(value) => setFormField('label', value)}
+                placeholder="Ex : Projet client A"
+                keyboardType="default"
+                helper="Optionnel."
+              />
             </Card>
-
-            <Input
-              label="Nom de l'estimation"
-              value={form.label}
-              onChangeText={(value) => setFormField('label', value)}
-              placeholder="Ex : Projet client A"
-              keyboardType="default"
-              helper="Optionnel."
-            />
 
             <Card style={styles.infoCard}>
               <Text style={styles.infoTitle}>Simulation Free complete</Text>
@@ -149,13 +148,13 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.md,
   },
   stack: {
-    gap: spacing.sm,
+    gap: spacing.xs,
   },
   heroBlock: {
     marginBottom: spacing.xs,
   },
   mainCard: {
-    gap: spacing.md,
+    gap: spacing.sm,
   },
   eyebrow: {
     ...typography.overline,
@@ -190,10 +189,10 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   inputBlock: {
-    gap: spacing.sm,
+    gap: spacing.xs,
   },
   activitySection: {
-    gap: spacing.sm,
+    gap: spacing.xs,
   },
   amountHint: {
     ...typography.caption,
@@ -207,6 +206,7 @@ const styles = StyleSheet.create({
   infoCard: {
     backgroundColor: colors.surface,
     gap: spacing.xxs,
+    paddingVertical: spacing.sm,
   },
   infoTitle: {
     ...typography.body,

@@ -229,10 +229,6 @@ export function ResultScreen({
 
         <FadeInView delay={220}>
           <Card style={styles.quickBreakdownCard}>
-            <View style={styles.quickBreakdownHeader}>
-              <Text style={styles.quickBreakdownTitle}>Lecture rapide</Text>
-              <Text style={styles.quickBreakdownCaption}>Sans rentrer dans le detail</Text>
-            </View>
             <View style={styles.inlineStatsRow}>
               <InlineStat label="Impot retenu" value={formatMontant(result.impotRetenu)} />
               <InlineStat label="Prelevements" value={`${tauxPrelevement.toFixed(1)} %`} />
@@ -480,20 +476,7 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
   },
   quickBreakdownCard: {
-    gap: spacing.sm,
-    paddingVertical: spacing.md,
-  },
-  quickBreakdownHeader: {
-    gap: spacing.xxs,
-  },
-  quickBreakdownTitle: {
-    ...typography.body,
-    color: colors.ink,
-    fontWeight: '800',
-  },
-  quickBreakdownCaption: {
-    ...typography.bodySmall,
-    color: colors.inkTertiary,
+    paddingVertical: spacing.sm,
   },
   inlineStatsRow: {
     flexDirection: 'row',

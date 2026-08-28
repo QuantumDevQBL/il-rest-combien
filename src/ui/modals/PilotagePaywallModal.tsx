@@ -73,52 +73,58 @@ export function PilotagePaywallModal({
         </Text>
       </Card>
 
-      <View style={styles.benefits}>
-        <View style={styles.benefitRow}>
-          <View style={styles.benefitIcon}>
-            <Icon name="wallet" size={18} color={colors.primary} />
+      <Card style={styles.benefitsCard}>
+        <View style={styles.benefitsHeader}>
+          <Text style={styles.benefitsTitle}>Ce que vous debloquez</Text>
+          <Text style={styles.benefitsCaption}>Concu pour un suivi mobile, mois apres mois.</Text>
+        </View>
+        <View style={styles.benefits}>
+          <View style={styles.benefitRow}>
+            <View style={styles.benefitIcon}>
+              <Icon name="wallet" size={18} color={colors.primary} />
+            </View>
+            <View style={styles.benefitCopy}>
+              <Text style={styles.benefitTitle}>Disponible estime</Text>
+              <Text style={styles.benefitText}>
+                Ce que vous pouvez garder apres reserves et charges fixes.
+              </Text>
+            </View>
           </View>
-          <View style={styles.benefitCopy}>
-            <Text style={styles.benefitTitle}>Disponible estime</Text>
-            <Text style={styles.benefitText}>
-              Ce que vous pouvez garder apres reserves et charges fixes.
-            </Text>
+          <View style={styles.benefitRow}>
+            <View style={styles.benefitIcon}>
+              <Icon name="statsChart" size={18} color={colors.primary} />
+            </View>
+            <View style={styles.benefitCopy}>
+              <Text style={styles.benefitTitle}>Projection annuelle</Text>
+              <Text style={styles.benefitText}>
+                Ou vous atterrissez en decembre avec vos mois deja encaisses.
+              </Text>
+            </View>
+          </View>
+          <View style={styles.benefitRow}>
+            <View style={styles.benefitIcon}>
+              <Icon name="trophy" size={18} color={colors.primary} />
+            </View>
+            <View style={styles.benefitCopy}>
+              <Text style={styles.benefitTitle}>Objectif de revenu</Text>
+              <Text style={styles.benefitText}>
+                Votre cible nette traduite en cap de chiffre d'affaires.
+              </Text>
+            </View>
+          </View>
+          <View style={styles.benefitRow}>
+            <View style={styles.benefitIcon}>
+              <Icon name="warning" size={18} color={colors.primary} />
+            </View>
+            <View style={styles.benefitCopy}>
+              <Text style={styles.benefitTitle}>Alertes personnalisees</Text>
+              <Text style={styles.benefitText}>
+                Detection previsionnelle des seuils micro et TVA.
+              </Text>
+            </View>
           </View>
         </View>
-        <View style={styles.benefitRow}>
-          <View style={styles.benefitIcon}>
-            <Icon name="statsChart" size={18} color={colors.primary} />
-          </View>
-          <View style={styles.benefitCopy}>
-            <Text style={styles.benefitTitle}>Projection annuelle</Text>
-            <Text style={styles.benefitText}>
-              Ou vous atterrissez en decembre avec vos mois deja encaisses.
-            </Text>
-          </View>
-        </View>
-        <View style={styles.benefitRow}>
-          <View style={styles.benefitIcon}>
-            <Icon name="trophy" size={18} color={colors.primary} />
-          </View>
-          <View style={styles.benefitCopy}>
-            <Text style={styles.benefitTitle}>Objectif de revenu</Text>
-            <Text style={styles.benefitText}>
-              Votre cible nette traduite en cap de chiffre d'affaires.
-            </Text>
-          </View>
-        </View>
-        <View style={styles.benefitRow}>
-          <View style={styles.benefitIcon}>
-            <Icon name="warning" size={18} color={colors.primary} />
-          </View>
-          <View style={styles.benefitCopy}>
-            <Text style={styles.benefitTitle}>Alertes personnalisees</Text>
-            <Text style={styles.benefitText}>
-              Detection previsionnelle des seuils micro et TVA.
-            </Text>
-          </View>
-        </View>
-      </View>
+      </Card>
 
       {packages.length > 0 ? (
         <View style={styles.packages}>
@@ -155,7 +161,7 @@ export function PilotagePaywallModal({
 
 const styles = StyleSheet.create({
   heroCard: {
-    marginBottom: spacing.lg,
+    marginBottom: spacing.sm,
   },
   heroEyebrow: {
     ...typography.overline,
@@ -174,9 +180,23 @@ const styles = StyleSheet.create({
     lineHeight: 19,
     opacity: 0.92,
   },
-  benefits: {
+  benefitsCard: {
     gap: spacing.md,
-    marginBottom: spacing.lg,
+  },
+  benefitsHeader: {
+    gap: spacing.xxs,
+  },
+  benefitsTitle: {
+    ...typography.body,
+    color: colors.ink,
+    fontWeight: '800',
+  },
+  benefitsCaption: {
+    ...typography.bodySmall,
+    color: colors.inkTertiary,
+  },
+  benefits: {
+    gap: spacing.sm,
   },
   benefitRow: {
     flexDirection: 'row',
@@ -252,8 +272,8 @@ const styles = StyleSheet.create({
     lineHeight: 18,
   },
   footer: {
-    marginTop: spacing.lg,
-    marginBottom: spacing.xl,
+    marginTop: spacing.sm,
+    marginBottom: spacing.lg,
     gap: spacing.xs,
   },
   footerNote: {

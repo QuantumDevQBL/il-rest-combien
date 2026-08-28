@@ -1,11 +1,12 @@
 import React from 'react';
-import { SafeAreaView, StyleSheet, Text, View } from 'react-native';
-import { useCalculatorContext } from '../context/CalculatorContext';
-import { ModalContainer } from '../components/ModalContainer';
-import { Decompte } from '../components/Decompte';
-import { RepartitionChart } from '../components/RepartitionChart';
-import { Comparaison } from '../components/Comparaison';
+import { StyleSheet, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Alertes } from '../components/Alertes';
+import { Comparaison } from '../components/Comparaison';
+import { Decompte } from '../components/Decompte';
+import { ModalContainer } from '../components/ModalContainer';
+import { RepartitionChart } from '../components/RepartitionChart';
+import { useCalculatorContext } from '../context/CalculatorContext';
 import { colors, typography } from '../theme';
 
 interface DetailModalProps {
@@ -17,16 +18,16 @@ export function DetailModal({ onClose }: DetailModalProps) {
 
   if (!result) {
     return (
-      <SafeAreaView style={styles.emptyContainer}>
+      <SafeAreaView style={styles.emptyContainer} edges={['top', 'left', 'right']}>
         <View style={styles.empty}>
-          <Text style={styles.emptyText}>Aucun résultat à afficher.</Text>
+          <Text style={styles.emptyText}>Aucun resultat a afficher.</Text>
         </View>
       </SafeAreaView>
     );
   }
 
   return (
-    <ModalContainer title="Détail complet" onClose={onClose}>
+    <ModalContainer title="Detail complet" onClose={onClose}>
       <Decompte result={result} />
       <RepartitionChart result={result} />
       <Comparaison result={result} />

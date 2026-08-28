@@ -52,7 +52,12 @@ export function ModalContainer({
 
             <View style={styles.header}>
               <Text style={styles.title}>{title}</Text>
-              <PressableScale onPress={onClose} scale={0.88} accessibilityRole="button" accessibilityLabel="Fermer">
+              <PressableScale
+                onPress={onClose}
+                scale={0.88}
+                accessibilityRole="button"
+                accessibilityLabel="Fermer"
+              >
                 <View style={styles.closeButton}>
                   <Icon name="close" size={22} color={colors.ink} />
                 </View>
@@ -87,7 +92,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border,
     borderBottomWidth: 0,
-    maxHeight: '92%',
+    maxHeight: '90%',
     ...shadows.lg,
   },
   handleBar: {
@@ -108,11 +113,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: spacing.lg,
     paddingTop: spacing.sm,
-    paddingBottom: spacing.md,
+    paddingBottom: spacing.sm,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
   },
   title: {
     ...typography.h2,
     color: colors.ink,
+    flex: 1,
+    marginRight: spacing.md,
   },
   closeButton: {
     width: 40,
@@ -130,10 +139,14 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingHorizontal: spacing.lg,
+    paddingTop: spacing.md,
     paddingBottom: spacing.xxxl,
+    gap: spacing.md,
   },
   content: {
     paddingHorizontal: spacing.lg,
+    paddingTop: spacing.md,
     paddingBottom: spacing.xxxl,
+    gap: spacing.md,
   },
 });

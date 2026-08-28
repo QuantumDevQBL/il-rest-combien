@@ -65,6 +65,7 @@ export function HistoryModal({ onClose }: HistoryModalProps) {
           data={items}
           keyExtractor={(item) => item.id}
           contentContainerStyle={styles.listContent}
+          ItemSeparatorComponent={() => <View style={styles.listSeparator} />}
           showsVerticalScrollIndicator={false}
           renderItem={({ item }) => (
             <PressableScale
@@ -123,11 +124,13 @@ const styles = StyleSheet.create({
   listContent: {
     paddingBottom: spacing.xl,
   },
+  listSeparator: {
+    height: spacing.sm,
+  },
   item: {
     backgroundColor: colors.surfaceElevated,
     borderRadius: radius.lg,
     padding: spacing.md,
-    marginBottom: spacing.md,
     borderWidth: 1,
     borderColor: colors.border,
   },
@@ -160,15 +163,18 @@ const styles = StyleSheet.create({
   itemFooter: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
+    alignItems: 'flex-end',
+    gap: spacing.sm,
   },
   itemCa: {
     ...typography.bodySmall,
     color: colors.inkSecondary,
+    flex: 1,
   },
   itemNet: {
     ...typography.amountLarge,
     color: colors.primary,
+    textAlign: 'right',
   },
   badge: {
     alignSelf: 'flex-start',

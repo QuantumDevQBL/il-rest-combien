@@ -1,13 +1,13 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { useCalculatorContext } from '../context/CalculatorContext';
-import { ModalContainer } from '../components/ModalContainer';
-import { Input } from '../components/Input';
-import { Card, Icon } from '../design-system';
 import { AnimatedCounter } from '../components/AnimatedCounter';
+import { Input } from '../components/Input';
+import { ModalContainer } from '../components/ModalContainer';
+import { useCalculatorContext } from '../context/CalculatorContext';
+import { Card, Icon } from '../design-system';
+import { JOURS_FACTURES_REFERENCE } from '../constants';
 import { colors, spacing, typography } from '../theme';
 import { formatMontant, parseMontantSaisi } from '../utils/format';
-import { JOURS_FACTURES_REFERENCE } from '../constants';
 
 interface InverseModalProps {
   onClose: () => void;
@@ -22,17 +22,21 @@ export function InverseModal({ onClose }: InverseModalProps) {
 
   return (
     <ModalContainer title="Objectif de revenu" onClose={onClose}>
-      <Text style={styles.intro}>
-        Indique le net mensuel que tu souhaites. On calcule le chiffre d'affaires à facturer.
-      </Text>
+      <Card style={styles.introCard}>
+        <Text style={styles.introTitle}>Objectif mensuel</Text>
+        <Text style={styles.intro}>
+          Indique le net mensuel que tu souhaites. On calcule le chiffre d'affaires a
+          facturer.
+        </Text>
+      </Card>
 
       <Input
         label="Objectif net mensuel"
         value={form.objectifNetMensuel}
         onChangeText={(value) => setFormField('objectifNetMensuel', value)}
         placeholder="0"
-        suffix="€"
-        helper="Après cotisations, impôt et charges fixes."
+        suffix="EUR"
+        helper="Apres cotisations, impot et charges fixes."
       />
 
       {hasResult ? (
@@ -40,11 +44,11 @@ export function InverseModal({ onClose }: InverseModalProps) {
           <Card variant="glass" style={styles.heroCard}>
             <Text style={styles.heroLabel}>Chiffre d'affaires annuel requis</Text>
             <View style={styles.heroAmountRow}>
-              <Text style={styles.heroCurrency}>€</Text>
+              <Text style={styles.heroCurrency}>EUR</Text>
               <AnimatedCounter
                 value={caRequis}
                 style={styles.heroAmount}
-                formatter={(v) => Math.round(v).toLocaleString('fr-FR')}
+                formatter={(value) => Math.round(value).toLocaleString('fr-FR')}
               />
             </View>
             <Text style={styles.heroSubtitle}>
@@ -52,23 +56,28 @@ export function InverseModal({ onClose }: InverseModalProps) {
             </Text>
           </Card>
 
-          {tjmRequis !== null && (
+          {tjmRequis !== null ? (
             <Card style={styles.tjmCard}>
               <View style={styles.tjmHeader}>
-                <Icon name="briefcase" size={22} color={colors.primary} />
-                <Text style={styles.tjmTitle}>TJM indicatif</Text>
+                <View style={styles.tjmTitleRow}>
+                  <Icon name="briefcase" size={20} color={colors.primary} />
+                  <Text style={styles.tjmTitle}>TJM indicatif</Text>
+                </View>
+                <Text style={styles.tjmAmount}>{formatMontant(tjmRequis)}</Text>
               </View>
-              <Text style={styles.tjmAmount}>{formatMontant(tjmRequis)}</Text>
               <Text style={styles.tjmCaption}>
-                Base {JOURS_FACTURES_REFERENCE} jours facturés par an
+                Base {JOURS_FACTURES_REFERENCE} jours factures par an
               </Text>
             </Card>
-          )}
+          ) : null}
         </View>
-      ) : hasValidObjective ? (
+      ) : null}
+
+      {!hasResult && hasValidObjective ? (
         <Card style={styles.infoCard}>
           <Text style={styles.infoText}>
-            Complète les paramètres fiscaux pour obtenir une estimation du chiffre d'affaires requis.
+            Complete les parametres fiscaux pour obtenir une estimation du chiffre
+            d'affaires requis.
           </Text>
         </Card>
       ) : null}
@@ -77,19 +86,25 @@ export function InverseModal({ onClose }: InverseModalProps) {
 }
 
 const styles = StyleSheet.create({
+  introCard: {
+    gap: spacing.xxs,
+  },
+  introTitle: {
+    ...typography.body,
+    color: colors.ink,
+    fontWeight: '800',
+  },
   intro: {
     ...typography.bodySmall,
     color: colors.inkTertiary,
-    marginBottom: spacing.xl,
     lineHeight: 20,
   },
   results: {
-    marginTop: spacing.xl,
     gap: spacing.md,
   },
   heroCard: {
     alignItems: 'center',
-    paddingVertical: spacing.xxl,
+    paddingVertical: spacing.xl,
   },
   heroLabel: {
     ...typography.overline,
@@ -98,14 +113,13 @@ const styles = StyleSheet.create({
   },
   heroAmountRow: {
     flexDirection: 'row',
-    alignItems: 'flex-start',
+    alignItems: 'center',
     justifyContent: 'center',
+    gap: spacing.xs,
   },
   heroCurrency: {
-    ...typography.h2,
+    ...typography.h3,
     color: colors.primary,
-    marginRight: spacing.xs,
-    marginTop: spacing.sm,
   },
   heroAmount: {
     ...typography.hero,
@@ -115,16 +129,22 @@ const styles = StyleSheet.create({
     ...typography.body,
     color: colors.inkSecondary,
     marginTop: spacing.sm,
+    textAlign: 'center',
   },
   tjmCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    gap: spacing.xs,
   },
   tjmHeader: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    gap: spacing.md,
+  },
+  tjmTitleRow: {
+    flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.sm,
+    flex: 1,
   },
   tjmTitle: {
     ...typography.body,
@@ -134,14 +154,13 @@ const styles = StyleSheet.create({
   tjmAmount: {
     ...typography.amountLarge,
     color: colors.primary,
+    textAlign: 'right',
   },
   tjmCaption: {
     ...typography.caption,
     color: colors.inkTertiary,
-    marginTop: spacing.xxs,
   },
   infoCard: {
-    marginTop: spacing.xl,
     backgroundColor: colors.secondaryLight,
     borderColor: colors.secondary,
   },

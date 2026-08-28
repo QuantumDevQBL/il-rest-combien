@@ -78,6 +78,6 @@ describe('DetailModal', () => {
         <DetailModal onClose={jest.fn()} />
       </CalculatorProvider>
     );
-    expect(screen.getByText('Aucun résultat à afficher.')).toBeTruthy();
+    expect(screen.getByText('Aucun resultat a afficher.')).toBeTruthy();
   });
 });

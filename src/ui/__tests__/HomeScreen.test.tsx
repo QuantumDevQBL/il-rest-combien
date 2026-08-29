@@ -15,7 +15,7 @@ describe('HomeScreen', () => {
   it('renders the compact single-screen flow', () => {
     render(<HomeScreen onCalculate={jest.fn()} />);
     expect(screen.getByText(/Le vrai net/)).toBeTruthy();
-    expect(screen.getByText('Vente')).toBeTruthy();
+    expect(screen.getAllByText('Vente').length).toBeGreaterThan(0);
     expect(screen.getAllByText(/Lib/).length).toBeGreaterThan(0);
     expect(screen.getByText('Calculer mon net')).toBeTruthy();
   });

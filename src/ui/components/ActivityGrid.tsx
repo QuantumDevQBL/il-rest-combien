@@ -1,5 +1,5 @@
-import React, { useMemo, useState } from 'react';
-import { LayoutChangeEvent, StyleSheet, Text, View } from 'react-native';
+import React from 'react';
+import { StyleSheet, Text, View } from 'react-native';
 import { PressableScale } from './PressableScale';
 import { Icon, IconName } from '../design-system';
 import { ActivityChoice, ACTIVITY_OPTIONS, getActivityLabel } from '../mapping';
@@ -18,23 +18,8 @@ const ACTIVITY_ICONS: Record<ActivityChoice, IconName> = {
 };
 
 export function ActivityGrid({ selected, onSelect }: ActivityGridProps) {
-  const [containerWidth, setContainerWidth] = useState(0);
-
-  const cardWidth = useMemo(() => {
-    if (containerWidth <= 0) {
-      return undefined;
-    }
-
-    const availableWidth = containerWidth - spacing.xs;
-    return availableWidth / 2;
-  }, [containerWidth]);
-
-  const handleLayout = (event: LayoutChangeEvent) => {
-    setContainerWidth(event.nativeEvent.layout.width);
-  };
-
   return (
-    <View style={styles.grid} onLayout={handleLayout}>
+    <View style={styles.grid}>
       {ACTIVITY_OPTIONS.map((option) => {
         const isSelected = selected === option.value;
 
@@ -43,13 +28,30 @@ export function ActivityGrid({ selected, onSelect }: ActivityGridProps) {
             key={option.value}
             onPress={() => onSelect(option.value)}
             scale={0.98}
-            style={[styles.item, cardWidth ? { width: cardWidth } : styles.itemFallback]}
+            style={styles.item}
             accessibilityRole="radio"
             accessibilityState={{ checked: isSelected }}
             accessibilityLabel={option.label}
           >
-            <View style={[styles.pill, isSelected && styles.pillSelected]}>
-              <View style={styles.selectionBadge}>
+            <View style={[styles.rowCard, isSelected && styles.rowCardSelected]}>
+              <View style={[styles.iconCircle, isSelected && styles.iconCircleSelected]}>
+                <Icon
+                  name={ACTIVITY_ICONS[option.value]}
+                  size={18}
+                  color={isSelected ? colors.surface : colors.primary}
+                />
+              </View>
+
+              <View style={styles.content}>
+                <Text style={[styles.label, isSelected && styles.labelSelected]}>
+                  {getActivityLabel(option.value)}
+                </Text>
+                <Text style={[styles.meta, isSelected && styles.metaSelected]}>
+                  {option.label}
+                </Text>
+              </View>
+
+              <View style={[styles.selectionBadge, isSelected && styles.selectionBadgeSelected]}>
                 <View
                   style={[
                     styles.selectionDot,
@@ -57,16 +59,6 @@ export function ActivityGrid({ selected, onSelect }: ActivityGridProps) {
                   ]}
                 />
               </View>
-              <View style={[styles.iconCircle, isSelected && styles.iconCircleSelected]}>
-                <Icon
-                  name={ACTIVITY_ICONS[option.value]}
-                  size={16}
-                  color={isSelected ? colors.surface : colors.primary}
-                />
-              </View>
-              <Text style={[styles.label, isSelected && styles.labelSelected]} numberOfLines={2}>
-                {getActivityLabel(option.value)}
-              </Text>
             </View>
           </PressableScale>
         );
@@ -78,73 +70,79 @@ export function ActivityGrid({ selected, onSelect }: ActivityGridProps) {
 const styles = StyleSheet.create({
   grid: {
     width: '100%',
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-    rowGap: spacing.xs,
+    gap: spacing.xs,
   },
   item: {
-    flexGrow: 0,
+    width: '100%',
   },
-  itemFallback: {
-    width: '48%',
-  },
-  pill: {
-    minHeight: 112,
+  rowCard: {
+    minHeight: 88,
     backgroundColor: colors.surface,
     borderRadius: radius.xl,
     borderWidth: 1,
     borderColor: colors.border,
-    paddingHorizontal: spacing.xs,
+    paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
+    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    position: 'relative',
+    columnGap: spacing.sm,
   },
-  pillSelected: {
+  rowCardSelected: {
     borderColor: colors.primary,
     backgroundColor: colors.primaryLight,
   },
-  selectionBadge: {
-    position: 'absolute',
-    top: spacing.sm,
-    right: spacing.sm,
-    width: 10,
-    height: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   iconCircle: {
-    width: 40,
-    height: 40,
+    width: 44,
+    height: 44,
     borderRadius: radius.full,
     backgroundColor: colors.primaryLight,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: spacing.sm,
+    flexShrink: 0,
   },
   iconCircleSelected: {
     backgroundColor: colors.primary,
   },
+  content: {
+    flex: 1,
+    gap: spacing.xxs,
+  },
+  label: {
+    ...typography.body,
+    color: colors.ink,
+    fontWeight: '800',
+  },
+  labelSelected: {
+    color: colors.primaryDark,
+  },
+  meta: {
+    ...typography.bodySmall,
+    color: colors.inkSecondary,
+  },
+  metaSelected: {
+    color: colors.primaryDark,
+  },
+  selectionBadge: {
+    width: 24,
+    height: 24,
+    borderRadius: radius.full,
+    borderWidth: 1,
+    borderColor: colors.border,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 0,
+  },
+  selectionBadgeSelected: {
+    borderColor: colors.primary,
+    backgroundColor: colors.surface,
+  },
   selectionDot: {
-    width: 8,
-    height: 8,
+    width: 10,
+    height: 10,
     borderRadius: radius.full,
     backgroundColor: colors.primary,
   },
   selectionDotHidden: {
     opacity: 0,
-  },
-  label: {
-    ...typography.caption,
-    color: colors.ink,
-    fontWeight: '700',
-    textAlign: 'center',
-    lineHeight: 16,
-    minHeight: 32,
-    width: '100%',
-  },
-  labelSelected: {
-    color: colors.primaryDark,
   },
 });

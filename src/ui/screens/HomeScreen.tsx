@@ -7,7 +7,7 @@ import {
   Text,
   View,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ActivityGrid } from '../components/ActivityGrid';
 import { FadeInView } from '../components/FadeInView';
 import { Input } from '../components/Input';
@@ -27,6 +27,7 @@ interface HomeScreenProps {
 }
 
 export function HomeScreen({ onCalculate, onOpenHistory }: HomeScreenProps) {
+  const insets = useSafeAreaInsets();
   const { form, result, setFormField } = useCalculatorContext();
 
   const handleActivitySelect = (activity: ActivityChoice) => {
@@ -85,14 +86,6 @@ export function HomeScreen({ onCalculate, onOpenHistory }: HomeScreenProps) {
                 <Text style={styles.amountHint}>CA annuel HT estime</Text>
               </View>
 
-              <View style={styles.activitySection}>
-                <View style={styles.sectionHeader}>
-                  <Text style={styles.sectionLabel}>Activite</Text>
-                  <Text style={styles.inlineBadge}>{selectedActivityLabel}</Text>
-                </View>
-                <ActivityGrid selected={form.activity} onSelect={handleActivitySelect} />
-                <Text style={styles.activityHint}>{selectedActivityDescription}</Text>
-              </View>
               <Input
                 label="Nom de l'estimation"
                 value={form.label}
@@ -101,6 +94,15 @@ export function HomeScreen({ onCalculate, onOpenHistory }: HomeScreenProps) {
                 keyboardType="default"
                 helper="Optionnel."
               />
+
+              <View style={styles.activitySection}>
+                <View style={styles.sectionHeader}>
+                  <Text style={styles.sectionLabel}>Activite</Text>
+                  <Text style={styles.inlineBadge}>{selectedActivityLabel}</Text>
+                </View>
+                <ActivityGrid selected={form.activity} onSelect={handleActivitySelect} />
+                <Text style={styles.activityHint}>{selectedActivityDescription}</Text>
+              </View>
             </Card>
 
             <Card style={styles.infoCard}>
@@ -117,7 +119,7 @@ export function HomeScreen({ onCalculate, onOpenHistory }: HomeScreenProps) {
           </FadeInView>
         </ScrollView>
 
-        <View style={styles.footer}>
+        <View style={[styles.footer, { paddingBottom: Math.max(insets.bottom, spacing.md) }]}>
           <Button
             label="Calculer mon net"
             onPress={handleCalculate}

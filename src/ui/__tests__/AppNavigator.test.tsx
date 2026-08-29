@@ -24,6 +24,20 @@ describe('AppNavigator', () => {
     });
   });
 
+  it('shows an empty result tab before the first simulation', async () => {
+    render(<AppNavigator />);
+
+    await waitFor(() => {
+      expect(screen.getByText(homePrompt)).toBeTruthy();
+    });
+
+    fireEvent.press(screen.getByText('Resultat'));
+
+    await waitFor(() => {
+      expect(screen.getByText(/Le resultat apparait ici/)).toBeTruthy();
+    });
+  });
+
   it('navigates from home to result', async () => {
     render(<AppNavigator />);
 
@@ -137,7 +151,7 @@ describe('AppNavigator', () => {
       expect(screen.getByText(/Voir l'offre Pilotage/)).toBeTruthy();
     });
 
-    fireEvent.press(screen.getAllByText('Simuler')[1]);
+    fireEvent.press(screen.getByText('Accueil'));
 
     await waitFor(() => {
       expect(screen.getByText(homePrompt)).toBeTruthy();

@@ -5,6 +5,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator, TransitionPresets } from '@react-navigation/stack';
 import { useOnboarding } from '../hooks/useOnboarding';
 import { useHistorySync } from '../hooks/useHistorySync';
+import { useCalculatorContext } from '../context/CalculatorContext';
 import { useSubscriptionContext } from '../context/SubscriptionContext';
 import { HomeScreen } from '../screens/HomeScreen';
 import { PilotageScreen } from '../screens/PilotageScreen';
@@ -27,18 +28,13 @@ export type RootStackParamList = {
 };
 
 type MainTabParamList = {
-  Simuler: undefined;
+  Accueil: undefined;
+  Resultat: undefined;
   Pilotage: undefined;
-};
-
-type CalculatorStackParamList = {
-  Home: undefined;
-  Result: undefined;
 };
 
 const RootStack = createStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator<MainTabParamList>();
-const CalculatorStack = createStackNavigator<CalculatorStackParamList>();
 const IS_TEST_ENV = process.env.NODE_ENV === 'test';
 
 function HistorySync() {
@@ -46,59 +42,16 @@ function HistorySync() {
   return null;
 }
 
-function CalculatorStackScreen() {
-  const { isPremiumActive, openPaywall } = useSubscriptionContext();
-
+function HomeTabScreen({
+  navigation,
+}: {
+  navigation: { getParent: () => any; navigate: (name: string) => void };
+}) {
   return (
-    <CalculatorStack.Navigator
-      screenOptions={{
-        headerShown: false,
-        cardStyle: { backgroundColor: colors.background },
-        animationEnabled: !IS_TEST_ENV,
-        gestureEnabled: true,
-        detachPreviousScreen: false,
-        ...TransitionPresets.SlideFromRightIOS,
-      }}
-    >
-      <CalculatorStack.Screen name="Home">
-        {({ navigation }) => (
-          <HomeScreen
-            onCalculate={() => navigation.navigate('Result')}
-            onOpenHistory={() =>
-              navigation.getParent()?.getParent()?.navigate('HistoryModal' as never)
-            }
-          />
-        )}
-      </CalculatorStack.Screen>
-      <CalculatorStack.Screen name="Result">
-        {({ navigation }) => (
-          <ResultScreen
-            onReset={() => navigation.replace('Home')}
-            onOpenSettings={() =>
-              navigation.getParent()?.getParent()?.navigate('SettingsModal' as never)
-            }
-            onOpenHistory={() =>
-              navigation.getParent()?.getParent()?.navigate('HistoryModal' as never)
-            }
-            onOpenInverse={() =>
-              navigation.getParent()?.getParent()?.navigate('InverseModal' as never)
-            }
-            onOpenDetail={() =>
-              navigation.getParent()?.getParent()?.navigate('DetailModal' as never)
-            }
-            onOpenPilotage={() => {
-              if (isPremiumActive) {
-                navigation.getParent()?.navigate('Pilotage' as never);
-                return;
-              }
-
-              openPaywall('result');
-              navigation.getParent()?.getParent()?.navigate('PilotagePaywallModal' as never);
-            }}
-          />
-        )}
-      </CalculatorStack.Screen>
-    </CalculatorStack.Navigator>
+    <HomeScreen
+      onCalculate={() => navigation.navigate('Resultat')}
+      onOpenHistory={() => navigation.getParent()?.navigate('HistoryModal' as never)}
+    />
   );
 }
 
@@ -110,6 +63,61 @@ function PremiumBenefit({ icon, label }: { icon: string; label: string }) {
       </View>
       <Text style={styles.lockedBenefitText}>{label}</Text>
     </View>
+  );
+}
+
+function ResultEmptyScreen({ onGoToSimulation }: { onGoToSimulation: () => void }) {
+  return (
+    <SafeAreaView style={styles.lockedContainer} edges={['top', 'left', 'right']}>
+      <View style={styles.lockedTopBar}>
+        <View style={styles.lockedTopCopy}>
+          <Text style={styles.lockedEyebrow}>Resultat</Text>
+          <Text style={styles.lockedTopTitle}>Votre estimation</Text>
+        </View>
+      </View>
+      <View style={styles.lockedContent}>
+        <Card style={styles.lockedCard}>
+          <Text style={styles.lockedTitle}>Le resultat apparait ici apres votre simulation.</Text>
+          <Text style={styles.lockedText}>
+            Entrez votre CA, choisissez votre activite, puis retrouvez ici votre net mensuel,
+            votre net annuel et les alertes essentielles.
+          </Text>
+          <Button label="Faire une simulation" onPress={onGoToSimulation} />
+        </Card>
+      </View>
+    </SafeAreaView>
+  );
+}
+
+function ResultTabScreen({
+  navigation,
+}: {
+  navigation: { getParent: () => any; navigate: (name: string) => void };
+}) {
+  const { result } = useCalculatorContext();
+  const { isPremiumActive, openPaywall } = useSubscriptionContext();
+
+  if (!result) {
+    return <ResultEmptyScreen onGoToSimulation={() => navigation.navigate('Accueil')} />;
+  }
+
+  return (
+    <ResultScreen
+      onReset={() => navigation.navigate('Accueil')}
+      onOpenSettings={() => navigation.getParent()?.navigate('SettingsModal' as never)}
+      onOpenHistory={() => navigation.getParent()?.navigate('HistoryModal' as never)}
+      onOpenInverse={() => navigation.getParent()?.navigate('InverseModal' as never)}
+      onOpenDetail={() => navigation.getParent()?.navigate('DetailModal' as never)}
+      onOpenPilotage={() => {
+        if (isPremiumActive) {
+          navigation.navigate('Pilotage');
+          return;
+        }
+
+        openPaywall('result');
+        navigation.getParent()?.navigate('PilotagePaywallModal' as never);
+      }}
+    />
   );
 }
 
@@ -128,12 +136,7 @@ function PilotageLockedScreen({
           <Text style={styles.lockedTopTitle}>Pilotage</Text>
         </View>
         <View style={styles.lockedTopActions}>
-          <Button
-            label="Simuler"
-            variant="secondary"
-            size="md"
-            onPress={onGoToSimulation}
-          />
+          <Button label="Simuler" variant="secondary" size="md" onPress={onGoToSimulation} />
           <Badge label="Premium" variant="primary" />
         </View>
       </View>
@@ -163,11 +166,12 @@ function MainTabsScreen() {
 
   return (
     <Tab.Navigator
-      initialRouteName="Simuler"
+      initialRouteName="Accueil"
       screenOptions={({ route }) => ({
         headerShown: false,
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.inkTertiary,
+        tabBarHideOnKeyboard: true,
         tabBarStyle: {
           backgroundColor: colors.surface,
           borderTopColor: colors.border,
@@ -181,30 +185,31 @@ function MainTabsScreen() {
         },
         tabBarIcon: ({ color, size }) => (
           <Icon
-            name={route.name === 'Simuler' ? 'calculator' : 'statsChart'}
+            name={
+              route.name === 'Accueil'
+                ? 'home'
+                : route.name === 'Resultat'
+                  ? 'calculator'
+                  : 'statsChart'
+            }
             color={color}
             size={size}
           />
         ),
       })}
     >
-      <Tab.Screen name="Simuler" component={CalculatorStackScreen} />
+      <Tab.Screen name="Accueil" component={HomeTabScreen} />
+      <Tab.Screen name="Resultat" component={ResultTabScreen} />
       <Tab.Screen name="Pilotage">
         {({ navigation }) =>
           isPremiumActive ? (
             <PilotageScreen
-              onGoToSimulation={() =>
-                navigation.navigate('Simuler' as never, { screen: 'Home' } as never)
-              }
-              onOpenSettings={() =>
-                navigation.getParent()?.navigate('SettingsModal' as never)
-              }
+              onGoToSimulation={() => navigation.navigate('Accueil' as never)}
+              onOpenSettings={() => navigation.getParent()?.navigate('SettingsModal' as never)}
             />
           ) : (
             <PilotageLockedScreen
-              onGoToSimulation={() =>
-                navigation.navigate('Simuler' as never, { screen: 'Home' } as never)
-              }
+              onGoToSimulation={() => navigation.navigate('Accueil' as never)}
               onUnlock={() => {
                 openPaywall('pilotage_tab');
                 navigation.getParent()?.navigate('PilotagePaywallModal' as never);

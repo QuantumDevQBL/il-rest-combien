@@ -77,6 +77,21 @@ function SummaryMetric({
   );
 }
 
+function InlineMetric({
+  label,
+  value,
+}: {
+  label: string;
+  value: string;
+}) {
+  return (
+    <View style={styles.inlineMetric}>
+      <Text style={styles.inlineMetricLabel}>{label}</Text>
+      <Text style={styles.inlineMetricValue}>{value}</Text>
+    </View>
+  );
+}
+
 function CompactRow({
   label,
   value,
@@ -370,9 +385,6 @@ export function PilotageScreen({ onOpenSettings, onGoToSimulation }: PilotageScr
           {onGoToSimulation ? (
             <Button label="Simuler" onPress={onGoToSimulation} variant="secondary" size="md" />
           ) : null}
-          {hasEntries ? (
-            <Button label="Ajouter" onPress={openCreateModal} size="md" />
-          ) : null}
           <PressableScale onPress={onOpenSettings} scale={0.9} accessibilityLabel="Parametres">
             <View style={styles.iconButton}>
               <Icon name="settings" size={20} color={colors.inkSecondary} />
@@ -412,15 +424,20 @@ export function PilotageScreen({ onOpenSettings, onGoToSimulation }: PilotageScr
                 featured
                 negative={summary.estimatedAvailable < 0}
               />
-              <View style={styles.metricRow}>
-                <SummaryMetric label="Encaisse" value={formatMontant(summary.revenueYtd)} />
-                <SummaryMetric label="A reserver" value={formatMontant(summary.totalReserve)} />
-              </View>
+              <Card style={styles.metricsDetailCard}>
+                <View style={styles.metricsDetailRow}>
+                  <InlineMetric label="Encaisse" value={formatMontant(summary.revenueYtd)} />
+                  <InlineMetric label="A reserver" value={formatMontant(summary.totalReserve)} />
+                </View>
+              </Card>
             </View>
 
             <Card style={styles.sectionCard}>
               <View style={styles.sectionHeader}>
-                <Text style={styles.sectionTitle}>Projection annuelle</Text>
+                <View style={styles.sectionTitleBlock}>
+                  <Text style={styles.sectionEyebrow}>Projection</Text>
+                  <Text style={styles.sectionTitle}>Projection annuelle</Text>
+                </View>
                 {summary.projectionIsProvisional ? (
                   <View style={styles.badge}>
                     <Text style={styles.badgeText}>Indicative</Text>
@@ -451,7 +468,10 @@ export function PilotageScreen({ onOpenSettings, onGoToSimulation }: PilotageScr
 
             <Card style={styles.sectionCard}>
               <View style={styles.sectionHeader}>
-                <Text style={styles.sectionTitle}>Objectif</Text>
+                <View style={styles.sectionTitleBlock}>
+                  <Text style={styles.sectionEyebrow}>Decision</Text>
+                  <Text style={styles.sectionTitle}>Objectif</Text>
+                </View>
                 <Button
                   label={objective ? 'Modifier' : 'Definir'}
                   onPress={openObjectiveModal}
@@ -532,20 +552,29 @@ export function PilotageScreen({ onOpenSettings, onGoToSimulation }: PilotageScr
             </Card>
 
             {summary.alerts.length > 0 ? (
-              <View style={styles.alertsSection}>
-                <Text style={styles.sectionTitle}>Alertes</Text>
+              <Card style={styles.sectionCard}>
+                <View style={styles.sectionTitleBlock}>
+                  <Text style={styles.sectionEyebrow}>Attention</Text>
+                  <Text style={styles.sectionTitle}>Alertes</Text>
+                </View>
                 <View style={styles.alertsStack}>
                   {summary.alerts.map((alert) => (
                     <AlertCard key={`${alert.kind}-${alert.message}`} alert={alert} />
                   ))}
                 </View>
-              </View>
+              </Card>
             ) : null}
 
             <Card style={styles.sectionCard}>
               <View style={styles.sectionHeader}>
-                <Text style={styles.sectionTitle}>Historique mensuel</Text>
-                <Text style={styles.historyCount}>{sortedEntries.length} mois</Text>
+                <View style={styles.sectionTitleBlock}>
+                  <Text style={styles.sectionEyebrow}>Suivi</Text>
+                  <Text style={styles.sectionTitle}>Historique mensuel</Text>
+                </View>
+                <View style={styles.historyHeaderActions}>
+                  <Text style={styles.historyCount}>{sortedEntries.length} mois</Text>
+                  <Button label="Ajouter" onPress={openCreateModal} size="md" />
+                </View>
               </View>
               <View style={styles.historyStack}>
                 {sortedEntries.map((entry) => (
@@ -736,10 +765,6 @@ const styles = StyleSheet.create({
   metricStack: {
     gap: spacing.xs,
   },
-  metricRow: {
-    flexDirection: 'row',
-    gap: spacing.xs,
-  },
   metricCard: {
     flex: 1,
   },
@@ -763,14 +788,47 @@ const styles = StyleSheet.create({
   metricValueNegative: {
     color: colors.negative,
   },
+  metricsDetailCard: {
+    paddingVertical: spacing.sm,
+  },
+  metricsDetailRow: {
+    flexDirection: 'row',
+    gap: spacing.sm,
+  },
+  inlineMetric: {
+    flex: 1,
+    backgroundColor: colors.surfaceElevated,
+    borderRadius: radius.lg,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+  },
+  inlineMetricLabel: {
+    ...typography.caption,
+    color: colors.inkTertiary,
+    marginBottom: spacing.xxs,
+  },
+  inlineMetricValue: {
+    ...typography.body,
+    color: colors.ink,
+    fontWeight: '800',
+  },
   sectionCard: {
-    gap: spacing.xs,
+    gap: spacing.sm,
   },
   sectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: spacing.sm,
+    alignItems: 'flex-start',
+    gap: spacing.md,
+    marginBottom: spacing.xs,
+  },
+  sectionTitleBlock: {
+    flex: 1,
+  },
+  sectionEyebrow: {
+    ...typography.overline,
+    color: colors.primary,
+    marginBottom: spacing.xxs,
   },
   sectionTitle: {
     ...typography.h2,
@@ -881,9 +939,6 @@ const styles = StyleSheet.create({
     color: colors.primary,
     marginTop: spacing.xs,
   },
-  alertsSection: {
-    gap: spacing.xs,
-  },
   alertsStack: {
     gap: spacing.xs,
   },
@@ -924,6 +979,10 @@ const styles = StyleSheet.create({
     ...typography.bodySmall,
     color: colors.inkTertiary,
     fontWeight: '700',
+  },
+  historyHeaderActions: {
+    alignItems: 'flex-end',
+    gap: spacing.xs,
   },
   historyItem: {
     flexDirection: 'row',

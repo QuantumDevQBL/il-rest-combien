@@ -1,5 +1,5 @@
-import React from 'react';
-import { StyleSheet, Text, useWindowDimensions, View } from 'react-native';
+import React, { useMemo, useState } from 'react';
+import { LayoutChangeEvent, StyleSheet, Text, View } from 'react-native';
 import { PressableScale } from './PressableScale';
 import { Icon, IconName } from '../design-system';
 import { ActivityChoice, ACTIVITY_OPTIONS, getActivityLabel } from '../mapping';
@@ -18,11 +18,23 @@ const ACTIVITY_ICONS: Record<ActivityChoice, IconName> = {
 };
 
 export function ActivityGrid({ selected, onSelect }: ActivityGridProps) {
-  const { width } = useWindowDimensions();
-  const isCompactScreen = width < 390;
+  const [containerWidth, setContainerWidth] = useState(0);
+
+  const cardWidth = useMemo(() => {
+    if (containerWidth <= 0) {
+      return undefined;
+    }
+
+    const availableWidth = containerWidth - spacing.xs;
+    return availableWidth / 2;
+  }, [containerWidth]);
+
+  const handleLayout = (event: LayoutChangeEvent) => {
+    setContainerWidth(event.nativeEvent.layout.width);
+  };
 
   return (
-    <View style={styles.grid}>
+    <View style={styles.grid} onLayout={handleLayout}>
       {ACTIVITY_OPTIONS.map((option) => {
         const isSelected = selected === option.value;
 
@@ -31,7 +43,7 @@ export function ActivityGrid({ selected, onSelect }: ActivityGridProps) {
             key={option.value}
             onPress={() => onSelect(option.value)}
             scale={0.98}
-            style={[styles.item, isCompactScreen ? styles.itemCompact : styles.itemRegular]}
+            style={[styles.item, cardWidth ? { width: cardWidth } : styles.itemFallback]}
             accessibilityRole="radio"
             accessibilityState={{ checked: isSelected }}
             accessibilityLabel={option.label}
@@ -72,21 +84,18 @@ const styles = StyleSheet.create({
     rowGap: spacing.xs,
   },
   item: {
-    width: '100%',
+    flexGrow: 0,
   },
-  itemRegular: {
+  itemFallback: {
     width: '48%',
   },
-  itemCompact: {
-    width: '100%',
-  },
   pill: {
-    minHeight: 94,
+    minHeight: 112,
     backgroundColor: colors.surface,
     borderRadius: radius.xl,
     borderWidth: 1,
     borderColor: colors.border,
-    paddingHorizontal: spacing.sm,
+    paddingHorizontal: spacing.xs,
     paddingVertical: spacing.sm,
     alignItems: 'center',
     justifyContent: 'center',
@@ -106,13 +115,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   iconCircle: {
-    width: 34,
-    height: 34,
+    width: 40,
+    height: 40,
     borderRadius: radius.full,
     backgroundColor: colors.primaryLight,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: spacing.xs,
+    marginBottom: spacing.sm,
   },
   iconCircleSelected: {
     backgroundColor: colors.primary,
@@ -127,11 +136,13 @@ const styles = StyleSheet.create({
     opacity: 0,
   },
   label: {
-    ...typography.bodySmall,
+    ...typography.caption,
     color: colors.ink,
     fontWeight: '700',
     textAlign: 'center',
-    minHeight: 34,
+    lineHeight: 16,
+    minHeight: 32,
+    width: '100%',
   },
   labelSelected: {
     color: colors.primaryDark,

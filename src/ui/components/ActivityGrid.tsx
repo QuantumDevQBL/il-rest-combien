@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import { PressableScale } from './PressableScale';
 import { Icon, IconName } from '../design-system';
 import { ActivityChoice, ACTIVITY_OPTIONS, getActivityLabel } from '../mapping';
@@ -18,6 +18,9 @@ const ACTIVITY_ICONS: Record<ActivityChoice, IconName> = {
 };
 
 export function ActivityGrid({ selected, onSelect }: ActivityGridProps) {
+  const { width } = useWindowDimensions();
+  const isCompactScreen = width < 390;
+
   return (
     <View style={styles.grid}>
       {ACTIVITY_OPTIONS.map((option) => {
@@ -28,7 +31,7 @@ export function ActivityGrid({ selected, onSelect }: ActivityGridProps) {
             key={option.value}
             onPress={() => onSelect(option.value)}
             scale={0.98}
-            style={styles.item}
+            style={[styles.item, isCompactScreen ? styles.itemCompact : styles.itemRegular]}
             accessibilityRole="radio"
             accessibilityState={{ checked: isSelected }}
             accessibilityLabel={option.label}
@@ -69,7 +72,13 @@ const styles = StyleSheet.create({
     rowGap: spacing.xs,
   },
   item: {
+    width: '100%',
+  },
+  itemRegular: {
     width: '48%',
+  },
+  itemCompact: {
+    width: '100%',
   },
   pill: {
     minHeight: 94,

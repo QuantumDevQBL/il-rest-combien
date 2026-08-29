@@ -7,7 +7,7 @@ import {
   Text,
   View,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { PressableScale } from './PressableScale';
 import { Icon } from '../design-system';
 import { colors, radius, shadows, spacing, typography } from '../theme';
@@ -25,17 +25,23 @@ export function ModalContainer({
   children,
   scrollable = true,
 }: ModalContainerProps) {
+  const insets = useSafeAreaInsets();
   const content = scrollable ? (
     <ScrollView
       style={styles.scroll}
-      contentContainerStyle={styles.scrollContent}
+      contentContainerStyle={[
+        styles.scrollContent,
+        { paddingBottom: Math.max(insets.bottom, spacing.xl) },
+      ]}
       showsVerticalScrollIndicator={false}
       keyboardShouldPersistTaps="handled"
     >
       {children}
     </ScrollView>
   ) : (
-    <View style={styles.content}>{children}</View>
+    <View style={[styles.content, { paddingBottom: Math.max(insets.bottom, spacing.xl) }]}>
+      {children}
+    </View>
   );
 
   return (
@@ -84,6 +90,7 @@ const styles = StyleSheet.create({
   overlay: {
     flex: 1,
     justifyContent: 'flex-end',
+    paddingTop: spacing.xl,
   },
   sheet: {
     backgroundColor: colors.surface,
@@ -92,7 +99,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border,
     borderBottomWidth: 0,
-    maxHeight: '90%',
+    maxHeight: '92%',
     ...shadows.lg,
   },
   handleBar: {
@@ -113,7 +120,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: spacing.lg,
     paddingTop: spacing.sm,
-    paddingBottom: spacing.sm,
+    paddingBottom: spacing.md,
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
   },
@@ -124,9 +131,9 @@ const styles = StyleSheet.create({
     marginRight: spacing.md,
   },
   closeButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     backgroundColor: colors.surfaceElevated,
     alignItems: 'center',
     justifyContent: 'center',

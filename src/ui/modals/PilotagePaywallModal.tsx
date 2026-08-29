@@ -24,11 +24,22 @@ function PackageCard({
   const isHighlighted = Boolean(item.highlight);
 
   return (
-    <View style={[styles.packageCard, isHighlighted && styles.packageCardHighlighted, active && styles.packageCardActive]}>
+    <View
+      style={[
+        styles.packageCard,
+        isHighlighted && styles.packageCardHighlighted,
+        active && styles.packageCardActive,
+      ]}
+    >
       <View style={styles.packageHeader}>
         <View style={styles.packageCopy}>
           <Text style={styles.packageTitle}>{item.title}</Text>
           <Text style={styles.packagePrice}>{item.priceLabel}</Text>
+          <Text style={styles.packageCaption}>
+            {item.plan === 'annual'
+              ? 'La formule la plus avantageuse pour suivre votre activite dans la duree.'
+              : 'Souple pour demarrer et tester le Pilotage sur un mois.'}
+          </Text>
         </View>
         {item.highlight ? <Badge label={item.highlight} variant="primary" /> : null}
       </View>
@@ -56,6 +67,18 @@ export function PilotagePaywallModal({
     restorePurchases,
   } = useSubscriptionContext();
 
+  const orderedPackages = [...packages].sort((left, right) => {
+    if (left.highlight && !right.highlight) {
+      return -1;
+    }
+
+    if (!left.highlight && right.highlight) {
+      return 1;
+    }
+
+    return 0;
+  });
+
   useEffect(() => {
     if (isPremiumActive) {
       onSuccess();
@@ -76,7 +99,9 @@ export function PilotagePaywallModal({
       <Card style={styles.benefitsCard}>
         <View style={styles.benefitsHeader}>
           <Text style={styles.benefitsTitle}>Ce que vous debloquez</Text>
-          <Text style={styles.benefitsCaption}>Concu pour un suivi mobile, mois apres mois.</Text>
+          <Text style={styles.benefitsCaption}>
+            Concu pour un suivi mobile, mois apres mois.
+          </Text>
         </View>
         <View style={styles.benefits}>
           <View style={styles.benefitRow}>
@@ -126,9 +151,9 @@ export function PilotagePaywallModal({
         </View>
       </Card>
 
-      {packages.length > 0 ? (
+      {orderedPackages.length > 0 ? (
         <View style={styles.packages}>
-          {packages.map((item) => (
+          {orderedPackages.map((item) => (
             <PackageCard
               key={item.plan}
               item={item}
@@ -137,7 +162,22 @@ export function PilotagePaywallModal({
             />
           ))}
         </View>
-      ) : null}
+      ) : !isLoading ? (
+        <Card style={styles.infoCard}>
+          <Text style={styles.infoTitle}>Offres temporairement indisponibles</Text>
+          <Text style={styles.infoText}>
+            Le store ne repond pas pour le moment. Vous pouvez reessayer ou restaurer vos
+            achats si vous etes deja abonne.
+          </Text>
+        </Card>
+      ) : (
+        <Card style={styles.infoCard}>
+          <Text style={styles.infoTitle}>Chargement des offres...</Text>
+          <Text style={styles.infoText}>
+            Recuperation des tarifs localises depuis le store.
+          </Text>
+        </Card>
+      )}
 
       {errorMessage ? (
         <Card style={styles.errorCard}>
@@ -260,6 +300,27 @@ const styles = StyleSheet.create({
     ...typography.bodySmall,
     color: colors.inkSecondary,
     marginTop: spacing.xxs,
+  },
+  packageCaption: {
+    ...typography.bodySmall,
+    color: colors.inkTertiary,
+    marginTop: spacing.xs,
+    lineHeight: 18,
+  },
+  infoCard: {
+    backgroundColor: colors.surfaceElevated,
+    borderColor: colors.border,
+  },
+  infoTitle: {
+    ...typography.body,
+    color: colors.ink,
+    fontWeight: '800',
+    marginBottom: spacing.xxs,
+  },
+  infoText: {
+    ...typography.bodySmall,
+    color: colors.inkSecondary,
+    lineHeight: 18,
   },
   errorCard: {
     marginTop: spacing.lg,

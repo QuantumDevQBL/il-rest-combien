@@ -34,17 +34,24 @@ export function ActivityGrid({ selected, onSelect }: ActivityGridProps) {
             accessibilityLabel={option.label}
           >
             <View style={[styles.pill, isSelected && styles.pillSelected]}>
+              <View style={styles.selectionBadge}>
+                <View
+                  style={[
+                    styles.selectionDot,
+                    !isSelected && styles.selectionDotHidden,
+                  ]}
+                />
+              </View>
               <View style={[styles.iconCircle, isSelected && styles.iconCircleSelected]}>
                 <Icon
                   name={ACTIVITY_ICONS[option.value]}
-                  size={15}
+                  size={16}
                   color={isSelected ? colors.surface : colors.primary}
                 />
               </View>
-              <Text style={[styles.label, isSelected && styles.labelSelected]}>
+              <Text style={[styles.label, isSelected && styles.labelSelected]} numberOfLines={2}>
                 {getActivityLabel(option.value)}
               </Text>
-              {isSelected ? <View style={styles.selectionDot} /> : null}
             </View>
           </PressableScale>
         );
@@ -58,34 +65,45 @@ const styles = StyleSheet.create({
     width: '100%',
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: spacing.xs,
+    justifyContent: 'space-between',
+    rowGap: spacing.xs,
   },
   item: {
-    width: '48.5%',
+    width: '48%',
   },
   pill: {
-    minHeight: 48,
+    minHeight: 94,
     backgroundColor: colors.surface,
-    borderRadius: radius.full,
+    borderRadius: radius.xl,
     borderWidth: 1,
     borderColor: colors.border,
     paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.xs,
-    flexDirection: 'row',
+    paddingVertical: spacing.sm,
     alignItems: 'center',
+    justifyContent: 'center',
+    position: 'relative',
   },
   pillSelected: {
     borderColor: colors.primary,
     backgroundColor: colors.primaryLight,
   },
+  selectionBadge: {
+    position: 'absolute',
+    top: spacing.sm,
+    right: spacing.sm,
+    width: 10,
+    height: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   iconCircle: {
-    width: 22,
-    height: 22,
+    width: 34,
+    height: 34,
     borderRadius: radius.full,
     backgroundColor: colors.primaryLight,
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: spacing.xs,
+    marginBottom: spacing.xs,
   },
   iconCircleSelected: {
     backgroundColor: colors.primary,
@@ -95,13 +113,16 @@ const styles = StyleSheet.create({
     height: 8,
     borderRadius: radius.full,
     backgroundColor: colors.primary,
-    marginLeft: 'auto',
+  },
+  selectionDotHidden: {
+    opacity: 0,
   },
   label: {
     ...typography.bodySmall,
     color: colors.ink,
     fontWeight: '700',
-    flexShrink: 1,
+    textAlign: 'center',
+    minHeight: 34,
   },
   labelSelected: {
     color: colors.primaryDark,

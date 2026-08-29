@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator, TransitionPresets } from '@react-navigation/stack';
 import { useOnboarding } from '../hooks/useOnboarding';
@@ -158,6 +158,8 @@ function PilotageLockedScreen({
 
 function MainTabsScreen() {
   const { isPremiumActive, openPaywall } = useSubscriptionContext();
+  const insets = useSafeAreaInsets();
+  const tabBarBottomInset = Math.max(insets.bottom, 8);
 
   return (
     <Tab.Navigator
@@ -169,9 +171,9 @@ function MainTabsScreen() {
         tabBarStyle: {
           backgroundColor: colors.surface,
           borderTopColor: colors.border,
-          height: 68,
+          height: 60 + tabBarBottomInset,
           paddingTop: 6,
-          paddingBottom: 8,
+          paddingBottom: tabBarBottomInset,
         },
         tabBarLabelStyle: {
           fontSize: 12,

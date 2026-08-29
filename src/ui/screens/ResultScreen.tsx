@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Alertes } from '../components/Alertes';
@@ -6,6 +6,7 @@ import { AnimatedCounter } from '../components/AnimatedCounter';
 import { Comparaison } from '../components/Comparaison';
 import { FadeInView } from '../components/FadeInView';
 import { PressableScale } from '../components/PressableScale';
+import { SegmentedTabs } from '../components/SegmentedTabs';
 import { useCalculatorContext } from '../context/CalculatorContext';
 import { Button, Card, Icon, ProgressBar } from '../design-system';
 import { getActivityLabel } from '../mapping';
@@ -22,6 +23,8 @@ interface ResultScreenProps {
   onOpenDetail: () => void;
   onOpenPilotage?: (source: PremiumIntroSource) => void;
 }
+
+type ResultTabKey = 'summary' | 'details' | 'alerts';
 
 function SummaryMetric({
   label,
@@ -40,6 +43,21 @@ function SummaryMetric({
       <Text style={[styles.summaryMetricValue, tone === 'accent' && styles.summaryMetricValueAccent]}>
         {value}
       </Text>
+    </View>
+  );
+}
+
+function MiniMetric({
+  label,
+  value,
+}: {
+  label: string;
+  value: string;
+}) {
+  return (
+    <View style={styles.miniMetric}>
+      <Text style={styles.miniMetricLabel}>{label}</Text>
+      <Text style={styles.miniMetricValue}>{value}</Text>
     </View>
   );
 }
@@ -96,6 +114,7 @@ export function ResultScreen({
 }: ResultScreenProps) {
   const { result, form } = useCalculatorContext();
   const trackedResultRef = useRef<string | null>(null);
+  const [activeTab, setActiveTab] = useState<ResultTabKey>('summary');
 
   useEffect(() => {
     if (result) {
@@ -179,6 +198,18 @@ export function ResultScreen({
         </View>
       </View>
 
+      <View style={styles.tabsWrap}>
+        <SegmentedTabs
+          value={activeTab}
+          onChange={setActiveTab}
+          options={[
+            { key: 'summary', label: 'Resume' },
+            { key: 'details', label: 'Detail' },
+            { key: 'alerts', label: 'Alertes' },
+          ]}
+        />
+      </View>
+
       <ScrollView
         style={styles.scroll}
         contentContainerStyle={styles.content}
@@ -213,120 +244,140 @@ export function ResultScreen({
                 height={10}
               />
             </View>
+          </Card>
+        </FadeInView>
 
-            <View style={styles.heroFooter}>
-              <View style={styles.heroFooterItem}>
-                <Text style={styles.heroFooterLabel}>Net annuel</Text>
-                <Text style={styles.heroFooterValue}>
-                  {formatMontant(result.revenuNetDisponible)}
+        {activeTab === 'summary' ? (
+          <>
+            <FadeInView delay={80}>
+              <Card style={styles.summaryCard}>
+                <View style={styles.sectionHeader}>
+                  <View>
+                    <Text style={styles.sectionEyebrow}>Lecture rapide</Text>
+                    <Text style={styles.sectionTitle}>L'essentiel de votre simulation</Text>
+                  </View>
+                </View>
+
+                <SummaryMetric label="Mensuel" value={formatMontant(netMensuel)} tone="accent" />
+
+                <View style={styles.miniMetricRow}>
+                  <MiniMetric label="Net annuel" value={formatMontant(result.revenuNetDisponible)} />
+                  <MiniMetric
+                    label="Cotisations + CFP"
+                    value={formatMontant(result.totalPrelevementsSociaux)}
+                  />
+                </View>
+
+                <View style={styles.miniMetricRow}>
+                  <MiniMetric
+                    label="Vous gardez"
+                    value={`${formatMontant(result.resteSurCent)} / 100 EUR`}
+                  />
+                  <MiniMetric
+                    label="Prelevements"
+                    value={`${tauxPrelevement.toFixed(1)} %`}
+                  />
+                </View>
+              </Card>
+            </FadeInView>
+
+            <FadeInView delay={120}>
+              <Card style={styles.pilotageCard}>
+                <View style={styles.sectionHeader}>
+                  <View style={styles.pilotageCopy}>
+                    <Text style={styles.sectionEyebrow}>Pilotage</Text>
+                    <Text style={styles.sectionTitle}>Pilotez ce que vous pouvez vraiment garder</Text>
+                    <Text style={styles.pilotageText}>
+                      Un espace dedie pour suivre votre CA, vos reserves et votre disponible estime.
+                    </Text>
+                  </View>
+                  <View style={styles.pilotageBadge}>
+                    <Icon name="statsChart" size={18} color={colors.primary} />
+                  </View>
+                </View>
+                {onOpenPilotage ? (
+                  <Button
+                    label="Ouvrir Pilotage"
+                    onPress={() => onOpenPilotage('monthly_tracking')}
+                    variant="primary"
+                    size="md"
+                  />
+                ) : null}
+              </Card>
+            </FadeInView>
+          </>
+        ) : null}
+
+        {activeTab === 'details' ? (
+          <>
+            <FadeInView delay={80}>
+              <Card style={styles.summaryCard}>
+                <View style={styles.sectionHeader}>
+                  <View>
+                    <Text style={styles.sectionEyebrow}>Detail</Text>
+                    <Text style={styles.sectionTitle}>Decompte de votre resultat</Text>
+                  </View>
+                </View>
+
+                <View style={styles.compactGroup}>
+                  <CompactRow label="Impot retenu" value={formatMontant(result.impotRetenu)} />
+                  <CompactRow
+                    label="Prelevements globaux"
+                    value={`${tauxPrelevement.toFixed(1)} %`}
+                    emphasize
+                  />
+                  <CompactRow label="Option fiscale" value={scenarioLabel} />
+                </View>
+              </Card>
+            </FadeInView>
+
+            <FadeInView delay={120}>
+              <Card style={styles.toolsCard}>
+                <Text style={styles.sectionEyebrow}>Approfondir</Text>
+                <Text style={styles.sectionTitle}>Aller plus loin si besoin</Text>
+                <View style={styles.shortcutsStack}>
+                  <ShortcutCard
+                    icon="statsChart"
+                    title="Voir le detail"
+                    description="Decompte poste par poste"
+                    onPress={onOpenDetail}
+                  />
+                  <ShortcutCard
+                    icon="swapHorizontal"
+                    title="Objectif de revenu"
+                    description="Combien facturer pour gagner X EUR ?"
+                    onPress={onOpenInverse}
+                  />
+                </View>
+              </Card>
+            </FadeInView>
+
+            <FadeInView delay={160}>
+              <Card style={styles.hypothesesCard}>
+                <View style={styles.hypothesesHeader}>
+                  <Icon name="informationCircle" size={18} color={colors.inkTertiary} />
+                  <Text style={styles.hypothesesTitle}>Hypotheses</Text>
+                </View>
+                <Text style={styles.hypothesesText}>
+                  Micro-entreprise, France metropolitaine, baremes 2026. Professions
+                  reglementees Cipav non couvertes. CFE non incluse.
                 </Text>
-              </View>
-              <View style={styles.heroFooterItem}>
-                <Text style={styles.heroFooterLabel}>Vous gardez</Text>
-                <Text style={styles.heroFooterValue}>
-                  {formatMontant(result.resteSurCent)} / 100 EUR
-                </Text>
-              </View>
-            </View>
-          </Card>
-        </FadeInView>
+              </Card>
+            </FadeInView>
+          </>
+        ) : null}
 
-        <FadeInView delay={80}>
-          <Card style={styles.summaryCard}>
-            <View style={styles.sectionHeader}>
-              <View>
-                <Text style={styles.sectionEyebrow}>Lecture rapide</Text>
-                <Text style={styles.sectionTitle}>L'essentiel de votre simulation</Text>
-              </View>
-            </View>
+        {activeTab === 'alerts' ? (
+          <>
+            <FadeInView delay={80}>
+              <Alertes result={result} />
+            </FadeInView>
 
-            <View style={styles.summaryMetricsRow}>
-              <SummaryMetric label="Mensuel" value={formatMontant(netMensuel)} tone="accent" />
-              <SummaryMetric
-                label="Cotisations + CFP"
-                value={formatMontant(result.totalPrelevementsSociaux)}
-              />
-            </View>
-
-            <View style={styles.compactGroup}>
-              <CompactRow label="Impot retenu" value={formatMontant(result.impotRetenu)} />
-              <CompactRow
-                label="Prelevements globaux"
-                value={`${tauxPrelevement.toFixed(1)} %`}
-                emphasize
-              />
-              <CompactRow label="Option fiscale" value={scenarioLabel} />
-            </View>
-          </Card>
-        </FadeInView>
-
-        <FadeInView delay={120}>
-          <Card style={styles.pilotageCard}>
-            <View style={styles.sectionHeader}>
-              <View style={styles.pilotageCopy}>
-                <Text style={styles.sectionEyebrow}>Pilotage</Text>
-                <Text style={styles.sectionTitle}>Pilotez ce que vous pouvez vraiment garder</Text>
-                <Text style={styles.pilotageText}>
-                  Suivez votre CA, ce qu'il faut reserver et votre disponible estime mois
-                  apres mois.
-                </Text>
-              </View>
-              <View style={styles.pilotageBadge}>
-                <Icon name="statsChart" size={18} color={colors.primary} />
-              </View>
-            </View>
-            {onOpenPilotage ? (
-              <Button
-                label="Ouvrir Pilotage"
-                onPress={() => onOpenPilotage('monthly_tracking')}
-                variant="primary"
-                size="md"
-              />
-            ) : null}
-          </Card>
-        </FadeInView>
-
-        <FadeInView delay={160}>
-          <Card style={styles.toolsCard}>
-            <Text style={styles.sectionEyebrow}>Approfondir</Text>
-            <Text style={styles.sectionTitle}>Aller plus loin si besoin</Text>
-            <View style={styles.shortcutsStack}>
-              <ShortcutCard
-                icon="statsChart"
-                title="Voir le detail"
-                description="Decompte poste par poste"
-                onPress={onOpenDetail}
-              />
-              <ShortcutCard
-                icon="swapHorizontal"
-                title="Objectif de revenu"
-                description="Combien facturer pour gagner X EUR ?"
-                onPress={onOpenInverse}
-              />
-            </View>
-          </Card>
-        </FadeInView>
-
-        <FadeInView delay={200}>
-          <Alertes result={result} />
-        </FadeInView>
-
-        <FadeInView delay={240}>
-          <Comparaison result={result} />
-        </FadeInView>
-
-        <FadeInView delay={280}>
-          <Card style={styles.hypothesesCard}>
-            <View style={styles.hypothesesHeader}>
-              <Icon name="informationCircle" size={18} color={colors.inkTertiary} />
-              <Text style={styles.hypothesesTitle}>Hypotheses</Text>
-            </View>
-            <Text style={styles.hypothesesText}>
-              Micro-entreprise, France metropolitaine, baremes 2026. Professions
-              reglementees Cipav non couvertes. CFE non incluse.
-            </Text>
-          </Card>
-        </FadeInView>
+            <FadeInView delay={120}>
+              <Comparaison result={result} />
+            </FadeInView>
+          </>
+        ) : null}
       </ScrollView>
     </SafeAreaView>
   );
@@ -343,7 +394,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     paddingHorizontal: spacing.lg,
     paddingTop: spacing.md,
-    paddingBottom: spacing.sm,
+    paddingBottom: spacing.xs,
   },
   activityBlock: {
     flex: 1,
@@ -378,6 +429,10 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border,
     ...shadows.sm,
+  },
+  tabsWrap: {
+    paddingHorizontal: spacing.lg,
+    paddingBottom: spacing.sm,
   },
   scroll: {
     flex: 1,
@@ -422,28 +477,6 @@ const styles = StyleSheet.create({
   },
   progressContainer: {
     marginTop: spacing.md,
-    marginBottom: spacing.md,
-  },
-  heroFooter: {
-    flexDirection: 'row',
-    gap: spacing.sm,
-  },
-  heroFooterItem: {
-    flex: 1,
-    backgroundColor: 'rgba(255,255,255,0.14)',
-    borderRadius: radius.lg,
-    padding: spacing.sm,
-  },
-  heroFooterLabel: {
-    ...typography.caption,
-    color: colors.surface,
-    opacity: 0.85,
-    marginBottom: spacing.xxs,
-  },
-  heroFooterValue: {
-    ...typography.body,
-    color: colors.surface,
-    fontWeight: '800',
   },
   sectionHeader: {
     flexDirection: 'row',
@@ -463,19 +496,14 @@ const styles = StyleSheet.create({
   summaryCard: {
     gap: spacing.md,
   },
-  summaryMetricsRow: {
-    flexDirection: 'row',
-    gap: spacing.sm,
-  },
   summaryMetric: {
-    flex: 1,
+    minHeight: 88,
     backgroundColor: colors.surfaceElevated,
     borderRadius: radius.xl,
     borderWidth: 1,
     borderColor: colors.border,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.md,
-    minHeight: 96,
     justifyContent: 'space-between',
   },
   summaryMetricAccent: {
@@ -490,12 +518,36 @@ const styles = StyleSheet.create({
     color: colors.primaryDark,
   },
   summaryMetricValue: {
-    ...typography.h3,
+    ...typography.h2,
     color: colors.ink,
     fontWeight: '800',
   },
   summaryMetricValueAccent: {
     color: colors.primaryDark,
+  },
+  miniMetricRow: {
+    flexDirection: 'row',
+    gap: spacing.sm,
+  },
+  miniMetric: {
+    flex: 1,
+    minHeight: 76,
+    borderRadius: radius.xl,
+    borderWidth: 1,
+    borderColor: colors.border,
+    backgroundColor: colors.surfaceElevated,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    justifyContent: 'space-between',
+  },
+  miniMetricLabel: {
+    ...typography.caption,
+    color: colors.inkTertiary,
+  },
+  miniMetricValue: {
+    ...typography.bodySmall,
+    color: colors.ink,
+    fontWeight: '800',
   },
   compactGroup: {
     gap: spacing.xs,

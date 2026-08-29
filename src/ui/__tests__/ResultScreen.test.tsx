@@ -48,7 +48,7 @@ describe('ResultScreen', () => {
     expect(screen.getAllByText(/36/).length).toBeGreaterThan(0);
   });
 
-  it('displays the rest per 100 EUR and global tax rate', () => {
+  it('displays the rest per 100 EUR and global tax rate in the summary tab', () => {
     renderWithResult({
       activity: 'PROFESSION_LIBERALE',
       caAnnuelHT: '50000',
@@ -58,6 +58,20 @@ describe('ResultScreen', () => {
 
     expect(screen.getByText(/72.*\/ 100/)).toBeTruthy();
     expect(screen.getAllByText('28.0 %').length).toBeGreaterThan(0);
+  });
+
+  it('switches to the detail tab to expose advanced actions', () => {
+    renderWithResult({
+      activity: 'PROFESSION_LIBERALE',
+      caAnnuelHT: '50000',
+      rfrN2: '25000',
+      partsFiscalesN2: '1',
+    });
+
+    fireEvent.press(screen.getByLabelText('Detail'));
+
+    expect(screen.getByText(/Objectif de revenu/)).toBeTruthy();
+    expect(screen.getByText(/Voir le detail/)).toBeTruthy();
   });
 
   it('calls existing navigation callbacks', () => {
@@ -79,7 +93,7 @@ describe('ResultScreen', () => {
       handlers
     );
 
-    fireEvent.press(screen.getByLabelText(/Accueil/));
+    fireEvent.press(screen.getByLabelText('Accueil'));
     expect(handlers.onReset).toHaveBeenCalled();
 
     fireEvent.press(screen.getByLabelText(/Param/));
@@ -88,6 +102,7 @@ describe('ResultScreen', () => {
     fireEvent.press(screen.getByLabelText('Historique'));
     expect(handlers.onOpenHistory).toHaveBeenCalled();
 
+    fireEvent.press(screen.getByLabelText('Detail'));
     fireEvent.press(screen.getByText(/Objectif de revenu/));
     expect(handlers.onOpenInverse).toHaveBeenCalled();
 

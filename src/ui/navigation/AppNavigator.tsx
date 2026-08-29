@@ -3,24 +3,23 @@ import { StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator, TransitionPresets } from '@react-navigation/stack';
-import { useOnboarding } from '../hooks/useOnboarding';
-import { useHistorySync } from '../hooks/useHistorySync';
 import { useCalculatorContext } from '../context/CalculatorContext';
 import { useSubscriptionContext } from '../context/SubscriptionContext';
-import { HomeScreen } from '../screens/HomeScreen';
-import { PilotageScreen } from '../screens/PilotageScreen';
-import { ResultScreen } from '../screens/ResultScreen';
-import { PilotagePaywallModal } from '../modals/PilotagePaywallModal';
-import { SettingsModal } from '../modals/SettingsModal';
+import { Button, Card, Icon } from '../design-system';
+import { useHistorySync } from '../hooks/useHistorySync';
+import { useOnboarding } from '../hooks/useOnboarding';
+import { DetailModal } from '../modals/DetailModal';
 import { HistoryModal } from '../modals/HistoryModal';
 import { InverseModal } from '../modals/InverseModal';
-import { DetailModal } from '../modals/DetailModal';
-import { Badge, Button, Card, Icon } from '../design-system';
-import { colors, radius, spacing, typography } from '../theme';
+import { SettingsModal } from '../modals/SettingsModal';
+import { HomeScreen } from '../screens/HomeScreen';
+import { PilotageLockedScreen } from '../screens/PilotageLockedScreen';
+import { PilotageScreen } from '../screens/PilotageScreen';
+import { ResultScreen } from '../screens/ResultScreen';
+import { colors, spacing, typography } from '../theme';
 
 export type RootStackParamList = {
   MainTabs: undefined;
-  PilotagePaywallModal: undefined;
   SettingsModal: undefined;
   HistoryModal: undefined;
   InverseModal: undefined;
@@ -45,40 +44,29 @@ function HistorySync() {
 function HomeTabScreen({
   navigation,
 }: {
-  navigation: { getParent: () => any; navigate: (name: string) => void };
+  navigation: { getParent: () => unknown; navigate: (name: string) => void };
 }) {
   return (
     <HomeScreen
       onCalculate={() => navigation.navigate('Resultat')}
-      onOpenHistory={() => navigation.getParent()?.navigate('HistoryModal' as never)}
+      onOpenHistory={() => (navigation.getParent() as { navigate: (name: string) => void } | undefined)?.navigate('HistoryModal')}
     />
-  );
-}
-
-function PremiumBenefit({ icon, label }: { icon: string; label: string }) {
-  return (
-    <View style={styles.lockedBenefit}>
-      <View style={styles.lockedBenefitIcon}>
-        <Icon name={icon as never} size={16} color={colors.primary} />
-      </View>
-      <Text style={styles.lockedBenefitText}>{label}</Text>
-    </View>
   );
 }
 
 function ResultEmptyScreen({ onGoToSimulation }: { onGoToSimulation: () => void }) {
   return (
-    <SafeAreaView style={styles.lockedContainer} edges={['top', 'left', 'right']}>
-      <View style={styles.lockedTopBar}>
-        <View style={styles.lockedTopCopy}>
-          <Text style={styles.lockedEyebrow}>Resultat</Text>
-          <Text style={styles.lockedTopTitle}>Votre estimation</Text>
+    <SafeAreaView style={styles.emptyContainer} edges={['top', 'left', 'right']}>
+      <View style={styles.emptyTopBar}>
+        <View style={styles.emptyTopCopy}>
+          <Text style={styles.emptyEyebrow}>Resultat</Text>
+          <Text style={styles.emptyTopTitle}>Votre estimation</Text>
         </View>
       </View>
-      <View style={styles.lockedContent}>
-        <Card style={styles.lockedCard}>
-          <Text style={styles.lockedTitle}>Le resultat apparait ici apres votre simulation.</Text>
-          <Text style={styles.lockedText}>
+      <View style={styles.emptyContent}>
+        <Card style={styles.emptyCard}>
+          <Text style={styles.emptyTitle}>Le resultat apparait ici apres votre simulation.</Text>
+          <Text style={styles.emptyText}>
             Entrez votre CA, choisissez votre activite, puis retrouvez ici votre net mensuel,
             votre net annuel et les alertes essentielles.
           </Text>
@@ -92,10 +80,11 @@ function ResultEmptyScreen({ onGoToSimulation }: { onGoToSimulation: () => void 
 function ResultTabScreen({
   navigation,
 }: {
-  navigation: { getParent: () => any; navigate: (name: string) => void };
+  navigation: { getParent: () => unknown; navigate: (name: string) => void };
 }) {
   const { result } = useCalculatorContext();
   const { isPremiumActive, openPaywall } = useSubscriptionContext();
+  const parent = navigation.getParent() as { navigate: (name: string) => void } | undefined;
 
   if (!result) {
     return <ResultEmptyScreen onGoToSimulation={() => navigation.navigate('Accueil')} />;
@@ -104,10 +93,10 @@ function ResultTabScreen({
   return (
     <ResultScreen
       onReset={() => navigation.navigate('Accueil')}
-      onOpenSettings={() => navigation.getParent()?.navigate('SettingsModal' as never)}
-      onOpenHistory={() => navigation.getParent()?.navigate('HistoryModal' as never)}
-      onOpenInverse={() => navigation.getParent()?.navigate('InverseModal' as never)}
-      onOpenDetail={() => navigation.getParent()?.navigate('DetailModal' as never)}
+      onOpenSettings={() => parent?.navigate('SettingsModal')}
+      onOpenHistory={() => parent?.navigate('HistoryModal')}
+      onOpenInverse={() => parent?.navigate('InverseModal')}
+      onOpenDetail={() => parent?.navigate('DetailModal')}
       onOpenPilotage={() => {
         if (isPremiumActive) {
           navigation.navigate('Pilotage');
@@ -115,47 +104,9 @@ function ResultTabScreen({
         }
 
         openPaywall('result');
-        navigation.getParent()?.navigate('PilotagePaywallModal' as never);
+        navigation.navigate('Pilotage');
       }}
     />
-  );
-}
-
-function PilotageLockedScreen({
-  onUnlock,
-  onGoToSimulation,
-}: {
-  onUnlock: () => void;
-  onGoToSimulation: () => void;
-}) {
-  return (
-    <SafeAreaView style={styles.lockedContainer} edges={['top', 'left', 'right']}>
-      <View style={styles.lockedTopBar}>
-        <View style={styles.lockedTopCopy}>
-          <Text style={styles.lockedEyebrow}>Pilotage Premium</Text>
-          <Text style={styles.lockedTopTitle}>Pilotage</Text>
-        </View>
-        <View style={styles.lockedTopActions}>
-          <Button label="Simuler" variant="secondary" size="md" onPress={onGoToSimulation} />
-          <Badge label="Premium" variant="primary" />
-        </View>
-      </View>
-      <View style={styles.lockedContent}>
-        <Card style={styles.lockedCard}>
-          <Text style={styles.lockedTitle}>Pilotez ce que vous pouvez reellement garder.</Text>
-          <Text style={styles.lockedText}>
-            Suivi mensuel, disponible estime, projection annuelle, objectif de revenu et
-            alertes personnalisees.
-          </Text>
-          <View style={styles.lockedBenefits}>
-            <PremiumBenefit icon="wallet" label="Disponible estime" />
-            <PremiumBenefit icon="statsChart" label="Projection annuelle" />
-            <PremiumBenefit icon="trophy" label="Objectif net" />
-          </View>
-          <Button label="Voir l'offre Pilotage" onPress={onUnlock} />
-        </Card>
-      </View>
-    </SafeAreaView>
   );
 }
 
@@ -175,7 +126,7 @@ function MainTabsScreen() {
         tabBarStyle: {
           backgroundColor: colors.surface,
           borderTopColor: colors.border,
-          height: 60 + tabBarBottomInset,
+          height: 62 + tabBarBottomInset,
           paddingTop: 6,
           paddingBottom: tabBarBottomInset,
         },
@@ -200,21 +151,28 @@ function MainTabsScreen() {
     >
       <Tab.Screen name="Accueil" component={HomeTabScreen} />
       <Tab.Screen name="Resultat" component={ResultTabScreen} />
-      <Tab.Screen name="Pilotage">
+      <Tab.Screen
+        name="Pilotage"
+        listeners={{
+          tabPress: () => {
+            if (!isPremiumActive) {
+              openPaywall('pilotage_tab');
+            }
+          },
+        }}
+      >
         {({ navigation }) =>
           isPremiumActive ? (
             <PilotageScreen
               onGoToSimulation={() => navigation.navigate('Accueil' as never)}
-              onOpenSettings={() => navigation.getParent()?.navigate('SettingsModal' as never)}
+              onOpenSettings={() =>
+                (navigation.getParent() as { navigate: (name: string) => void } | undefined)?.navigate(
+                  'SettingsModal'
+                )
+              }
             />
           ) : (
-            <PilotageLockedScreen
-              onGoToSimulation={() => navigation.navigate('Accueil' as never)}
-              onUnlock={() => {
-                openPaywall('pilotage_tab');
-                navigation.getParent()?.navigate('PilotagePaywallModal' as never);
-              }}
-            />
+            <PilotageLockedScreen onGoToSimulation={() => navigation.navigate('Accueil' as never)} />
           )
         }
       </Tab.Screen>
@@ -224,7 +182,6 @@ function MainTabsScreen() {
 
 export function AppNavigator() {
   const { isLoading, markAsSeen } = useOnboarding();
-  const { paywallSource, closePaywall } = useSubscriptionContext();
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
@@ -270,23 +227,6 @@ export function AppNavigator() {
             animationEnabled: !IS_TEST_ENV,
           }}
         >
-          <RootStack.Screen name="PilotagePaywallModal">
-            {({ navigation }) =>
-              paywallSource ? (
-                <PilotagePaywallModal
-                  source={paywallSource}
-                  onClose={() => {
-                    closePaywall();
-                    navigation.goBack();
-                  }}
-                  onSuccess={() => {
-                    closePaywall();
-                    navigation.navigate('MainTabs' as never, { screen: 'Pilotage' } as never);
-                  }}
-                />
-              ) : null
-            }
-          </RootStack.Screen>
           <RootStack.Screen name="SettingsModal">
             {({ navigation }) => <SettingsModal onClose={() => navigation.goBack()} />}
           </RootStack.Screen>
@@ -306,76 +246,42 @@ export function AppNavigator() {
 }
 
 const styles = StyleSheet.create({
-  lockedContainer: {
+  emptyContainer: {
     flex: 1,
     backgroundColor: colors.background,
   },
-  lockedTopBar: {
+  emptyTopBar: {
     paddingHorizontal: spacing.lg,
     paddingTop: spacing.md,
     paddingBottom: spacing.sm,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: spacing.sm,
   },
-  lockedTopCopy: {
+  emptyTopCopy: {
     flex: 1,
   },
-  lockedTopActions: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
+  emptyEyebrow: {
+    ...typography.overline,
+    color: colors.primary,
+    marginBottom: spacing.xxs,
   },
-  lockedTopTitle: {
+  emptyTopTitle: {
     ...typography.h2,
     color: colors.ink,
   },
-  lockedContent: {
+  emptyContent: {
     flex: 1,
     justifyContent: 'center',
     paddingHorizontal: spacing.lg,
     paddingBottom: spacing.xl,
   },
-  lockedCard: {
+  emptyCard: {
     gap: spacing.md,
   },
-  lockedEyebrow: {
-    ...typography.overline,
-    color: colors.primary,
-  },
-  lockedTitle: {
+  emptyTitle: {
     ...typography.h1,
     color: colors.ink,
   },
-  lockedText: {
+  emptyText: {
     ...typography.body,
     color: colors.inkSecondary,
-  },
-  lockedBenefits: {
-    gap: spacing.sm,
-  },
-  lockedBenefit: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-    padding: spacing.sm,
-    borderRadius: radius.lg,
-    backgroundColor: colors.surfaceElevated,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  lockedBenefitIcon: {
-    width: 32,
-    height: 32,
-    borderRadius: radius.md,
-    backgroundColor: colors.primaryLight,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  lockedBenefitText: {
-    ...typography.bodySmall,
-    color: colors.ink,
-    fontWeight: '700',
   },
 });

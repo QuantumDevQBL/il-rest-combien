@@ -49,7 +49,7 @@ describe('AppNavigator', () => {
     fireEvent.press(screen.getByText('Calculer mon net'));
 
     await waitFor(() => {
-      expect(screen.getByText(/Objectif de revenu/)).toBeTruthy();
+      expect(screen.getByText(/Ouvrir Pilotage/)).toBeTruthy();
     });
   });
 
@@ -64,7 +64,7 @@ describe('AppNavigator', () => {
     fireEvent.press(screen.getByText('Calculer mon net'));
 
     await waitFor(() => {
-      expect(screen.getByText(/Objectif de revenu/)).toBeTruthy();
+      expect(screen.getByText(/Ouvrir Pilotage/)).toBeTruthy();
     });
 
     fireEvent.press(screen.getByLabelText(/Param/));
@@ -95,7 +95,7 @@ describe('AppNavigator', () => {
     });
   });
 
-  it('opens the paywall from the result screen when pilotage is locked', async () => {
+  it('opens the locked Pilotage screen from the result screen when premium is inactive', async () => {
     render(<AppNavigator />);
 
     await waitFor(() => {
@@ -106,17 +106,17 @@ describe('AppNavigator', () => {
     fireEvent.press(screen.getByText('Calculer mon net'));
 
     await waitFor(() => {
-      expect(screen.getByText(/Objectif de revenu/)).toBeTruthy();
+      expect(screen.getByText(/Ouvrir Pilotage/)).toBeTruthy();
     });
 
     fireEvent.press(screen.getByText('Ouvrir Pilotage'));
 
     await waitFor(() => {
-      expect(screen.getByText(/Pilotez ce que vous pouvez reellement garder/)).toBeTruthy();
+      expect(screen.getByText(/Un vrai espace de pilotage/)).toBeTruthy();
     });
   });
 
-  it('opens the paywall from the Pilotage tab when premium is inactive', async () => {
+  it('opens the locked Pilotage screen from the Pilotage tab when premium is inactive', async () => {
     render(<AppNavigator />);
 
     await waitFor(() => {
@@ -126,16 +126,10 @@ describe('AppNavigator', () => {
     fireEvent.press(screen.getByText('Pilotage'));
 
     await waitFor(() => {
-      expect(
-        screen.getByText(/Pilotez ce que vous pouvez reellement garder/)
-      ).toBeTruthy();
+      expect(screen.getByText(/Un vrai espace de pilotage/)).toBeTruthy();
     });
 
-    fireEvent.press(screen.getByText(/Voir/));
-
-    await waitFor(() => {
-      expect(screen.getByText(/Pilotez ce que vous pouvez reellement garder/)).toBeTruthy();
-    });
+    expect(screen.getByText(/Restaurer mes achats/)).toBeTruthy();
   });
 
   it('returns to simulation from the Pilotage tab', async () => {
@@ -148,10 +142,10 @@ describe('AppNavigator', () => {
     fireEvent.press(screen.getByText('Pilotage'));
 
     await waitFor(() => {
-      expect(screen.getByText(/Voir l'offre Pilotage/)).toBeTruthy();
+      expect(screen.getByText(/Restaurer mes achats/)).toBeTruthy();
     });
 
-    fireEvent.press(screen.getByText('Accueil'));
+    fireEvent.press(screen.getByText('Retour'));
 
     await waitFor(() => {
       expect(screen.getByText(homePrompt)).toBeTruthy();

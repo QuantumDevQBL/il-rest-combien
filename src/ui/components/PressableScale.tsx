@@ -6,6 +6,7 @@ import {
   StyleProp,
   ViewStyle,
 } from 'react-native';
+import { animation } from '../theme';
 
 interface PressableScaleProps extends PressableProps {
   children: React.ReactNode;
@@ -28,7 +29,8 @@ export function PressableScale({
     Animated.spring(animatedValue, {
       toValue: scale,
       useNativeDriver: true,
-      friction: 5,
+      friction: animation.spring.friction,
+      tension: animation.spring.tension,
     }).start();
   };
 
@@ -37,7 +39,8 @@ export function PressableScale({
     Animated.spring(animatedValue, {
       toValue: 1,
       useNativeDriver: true,
-      friction: 5,
+      friction: animation.springSoft.friction,
+      tension: animation.springSoft.tension,
     }).start();
   };
 

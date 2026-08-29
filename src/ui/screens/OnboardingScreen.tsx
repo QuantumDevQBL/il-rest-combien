@@ -10,50 +10,71 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Button, Icon, IconName } from '../design-system';
-import { colors, shadows, spacing, typography } from '../theme';
+import { Button, Card, Icon, IconName } from '../design-system';
+import { colors, radius, shadows, spacing, typography } from '../theme';
 import { PressableScale } from '../components/PressableScale';
 import { hapticSelection } from '../utils/haptics';
 
 const { width } = Dimensions.get('window');
+const SLIDE_WIDTH = width;
 
 interface Slide {
   id: string;
+  kicker: string;
   title: string;
   description: string;
   icon: IconName;
-  kicker: string;
+  statLabel: string;
+  statValue: string;
+  bullets: [string, string];
 }
 
 const SLIDES: Slide[] = [
   {
     id: '1',
-    kicker: 'Le besoin',
-    title: 'Tu saisis ton CA, tu vois ton vrai net',
+    kicker: 'Le vrai sujet',
+    title: 'Votre vrai revenu, avant de le depenser',
     description:
-      "Pas un simulateur administratif de plus. L'app répond vite à la vraie question d'un freelance : combien il me reste réellement ?",
-    icon: 'cash',
+      "Vous saisissez votre CA et l'app vous montre tout de suite ce que vous pouvez vraiment garder.",
+    icon: 'wallet',
+    statLabel: 'Lecture immediate',
+    statValue: 'Net mensuel',
+    bullets: ['Simulation rapide', 'Sans compte'],
   },
   {
     id: '2',
-    kicker: 'La valeur',
-    title: 'Cotisations, impôt, reste sur 100 €',
+    kicker: 'La decision',
+    title: 'Comprendre ce qui part et ce qui reste',
     description:
-      "Le résultat met d'abord l'essentiel en avant : ton net mensuel, ton net annuel et la part absorbée par les prélèvements.",
+      'Cotisations, impot, reste sur 100 EUR et option fiscale sont reunis dans une lecture claire.',
     icon: 'statsChart',
+    statLabel: 'Vue utile',
+    statValue: 'Reste sur 100',
+    bullets: ['Detail lisible', 'Alertes essentielles'],
   },
   {
     id: '3',
-    kicker: 'Le cadre',
-    title: 'Simple, local, pensé pour la micro',
+    kicker: 'Le pilotage',
+    title: 'Suivre votre activite mois apres mois',
     description:
-      "Barèmes 2026, calcul local sur le téléphone, paramètres avancés seulement si tu veux affiner. Tu peux commencer sans tout renseigner.",
-    icon: 'shieldCheckmark',
+      'Ajoutez vos encaissements, anticipez vos reserves et gardez une vision nette de votre annee.',
+    icon: 'sparkles',
+    statLabel: 'Bientot actif',
+    statValue: 'Pilotage',
+    bullets: ['Projection annuelle', 'Objectif de revenu'],
   },
 ];
 
 interface OnboardingScreenProps {
   onComplete: () => void;
+}
+
+function SlideChip({ label }: { label: string }) {
+  return (
+    <View style={styles.chip}>
+      <Text style={styles.chipText}>{label}</Text>
+    </View>
+  );
 }
 
 export function OnboardingScreen({ onComplete }: OnboardingScreenProps) {
@@ -62,7 +83,7 @@ export function OnboardingScreen({ onComplete }: OnboardingScreenProps) {
   const scrollX = useRef(new Animated.Value(0)).current;
 
   const handleMomentumScrollEnd = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-    const newIndex = Math.round(event.nativeEvent.contentOffset.x / width);
+    const newIndex = Math.round(event.nativeEvent.contentOffset.x / SLIDE_WIDTH);
     setCurrentIndex(newIndex);
     void hapticSelection();
   };
@@ -72,37 +93,75 @@ export function OnboardingScreen({ onComplete }: OnboardingScreenProps) {
       const nextIndex = currentIndex + 1;
       setCurrentIndex(nextIndex);
       flatListRef.current?.scrollToIndex({ index: nextIndex, animated: true });
-    } else {
-      onComplete();
+      return;
     }
+
+    onComplete();
   };
 
   const renderItem = ({ item, index }: { item: Slide; index: number }) => {
-    const inputRange = [(index - 1) * width, index * width, (index + 1) * width];
+    const inputRange = [(index - 1) * SLIDE_WIDTH, index * SLIDE_WIDTH, (index + 1) * SLIDE_WIDTH];
     const opacity = scrollX.interpolate({
       inputRange,
-      outputRange: [0.2, 1, 0.2],
+      outputRange: [0.25, 1, 0.25],
       extrapolate: 'clamp',
     });
     const translateY = scrollX.interpolate({
       inputRange,
-      outputRange: [24, 0, 24],
+      outputRange: [26, 0, 26],
       extrapolate: 'clamp',
     });
     const scale = scrollX.interpolate({
       inputRange,
-      outputRange: [0.92, 1, 0.92],
+      outputRange: [0.94, 1, 0.94],
       extrapolate: 'clamp',
     });
 
     return (
       <Animated.View style={[styles.slide, { opacity, transform: [{ translateY }, { scale }] }]}>
-        <View style={styles.iconCircle}>
-          <Icon name={item.icon} size={44} color={colors.background} />
+        <View style={styles.heroShell}>
+          <View style={styles.orbLarge} />
+          <View style={styles.orbSmall} />
+
+          <View style={styles.topLine}>
+            <Text style={styles.brandMark}>Quantumdev</Text>
+            <SlideChip label={item.kicker} />
+          </View>
+
+          <View style={styles.iconHero}>
+            <Icon name={item.icon} size={30} color={colors.surface} />
+          </View>
+
+          <Text style={styles.title}>{item.title}</Text>
+          <Text style={styles.description}>{item.description}</Text>
+
+          <Card style={styles.previewCard}>
+            <View style={styles.previewHeader}>
+              <Text style={styles.previewLabel}>{item.statLabel}</Text>
+              <View style={styles.previewBadge}>
+                <Text style={styles.previewBadgeText}>{item.statValue}</Text>
+              </View>
+            </View>
+
+            <View style={styles.previewMetricRow}>
+              <View style={styles.previewMetric}>
+                <Text style={styles.previewMetricValue}>2 980 EUR</Text>
+                <Text style={styles.previewMetricCaption}>Disponible estime</Text>
+              </View>
+              <View style={styles.previewMetricDivider} />
+              <View style={styles.previewMetric}>
+                <Text style={styles.previewMetricValue}>1 020 EUR</Text>
+                <Text style={styles.previewMetricCaption}>A reserver</Text>
+              </View>
+            </View>
+
+            <View style={styles.chipsRow}>
+              {item.bullets.map((bullet) => (
+                <SlideChip key={bullet} label={bullet} />
+              ))}
+            </View>
+          </Card>
         </View>
-        <Text style={styles.kicker}>{item.kicker}</Text>
-        <Text style={styles.title}>{item.title}</Text>
-        <Text style={styles.description}>{item.description}</Text>
       </Animated.View>
     );
   };
@@ -110,7 +169,7 @@ export function OnboardingScreen({ onComplete }: OnboardingScreenProps) {
   return (
     <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
       <View style={styles.skipContainer}>
-        <PressableScale onPress={onComplete} scale={0.95}>
+        <PressableScale onPress={onComplete} scale={0.97}>
           <Text style={styles.skipText}>Passer</Text>
         </PressableScale>
       </View>
@@ -129,21 +188,16 @@ export function OnboardingScreen({ onComplete }: OnboardingScreenProps) {
           useNativeDriver: false,
         })}
         onScrollToIndexFailed={() => {
-          // Fallback for environments where layout metrics are unavailable (tests).
+          // Metrics may be unavailable in tests.
         }}
         scrollEventThrottle={16}
       />
 
       <View style={styles.footer}>
-        <View style={styles.progressContainer}>
-          {SLIDES.map((_, index) => {
+        <View style={styles.progressRow}>
+          {SLIDES.map((slide, index) => {
             const isActive = index === currentIndex;
-            return (
-              <Animated.View
-                key={index}
-                style={[styles.dot, isActive && styles.dotActive]}
-              />
-            );
+            return <View key={slide.id} style={[styles.dot, isActive && styles.dotActive]} />;
           })}
         </View>
 
@@ -170,67 +224,163 @@ const styles = StyleSheet.create({
   },
   skipText: {
     ...typography.bodySmall,
-    color: colors.inkTertiary,
-    fontWeight: '600',
+    color: colors.inkSecondary,
+    fontWeight: '700',
   },
   slide: {
-    width,
-    paddingHorizontal: spacing.xl,
-    alignItems: 'center',
-    justifyContent: 'center',
+    width: SLIDE_WIDTH,
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.sm,
+    paddingBottom: spacing.lg,
   },
-  iconCircle: {
-    width: 108,
-    height: 108,
-    borderRadius: 54,
+  heroShell: {
+    flex: 1,
+    borderRadius: radius.xxl,
+    backgroundColor: colors.surface,
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.lg,
+    paddingBottom: spacing.xl,
+    overflow: 'hidden',
+    ...shadows.lg,
+  },
+  orbLarge: {
+    position: 'absolute',
+    top: -56,
+    right: -32,
+    width: 180,
+    height: 180,
+    borderRadius: 90,
+    backgroundColor: colors.primaryLight,
+  },
+  orbSmall: {
+    position: 'absolute',
+    bottom: 84,
+    left: -28,
+    width: 110,
+    height: 110,
+    borderRadius: 55,
+    backgroundColor: colors.secondaryLight,
+  },
+  topLine: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: spacing.xxl,
+  },
+  brandMark: {
+    ...typography.caption,
+    color: colors.inkTertiary,
+  },
+  iconHero: {
+    width: 64,
+    height: 64,
+    borderRadius: 22,
     backgroundColor: colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: spacing.xl,
-    ...shadows.md,
-  },
-  kicker: {
-    ...typography.overline,
-    color: colors.primary,
-    marginBottom: spacing.sm,
+    marginBottom: spacing.lg,
+    ...shadows.primaryGlow,
   },
   title: {
     ...typography.h1,
     color: colors.ink,
-    textAlign: 'center',
-    marginBottom: spacing.md,
+    marginBottom: spacing.sm,
+    maxWidth: 280,
   },
   description: {
     ...typography.body,
     color: colors.inkSecondary,
-    textAlign: 'center',
-    lineHeight: 24,
+    lineHeight: 22,
     maxWidth: 320,
+    marginBottom: spacing.xl,
+  },
+  previewCard: {
+    marginTop: 'auto',
+    backgroundColor: colors.surfaceGlass,
+    borderWidth: 1,
+    borderColor: colors.border,
+    gap: spacing.md,
+  },
+  previewHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    gap: spacing.md,
+  },
+  previewLabel: {
+    ...typography.caption,
+    color: colors.inkTertiary,
+  },
+  previewBadge: {
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xxs,
+    borderRadius: radius.full,
+    backgroundColor: colors.primaryLight,
+  },
+  previewBadgeText: {
+    ...typography.caption,
+    color: colors.primaryDark,
+  },
+  previewMetricRow: {
+    flexDirection: 'row',
+    alignItems: 'stretch',
+  },
+  previewMetric: {
+    flex: 1,
+  },
+  previewMetricDivider: {
+    width: 1,
+    backgroundColor: colors.border,
+    marginHorizontal: spacing.sm,
+  },
+  previewMetricValue: {
+    ...typography.h2,
+    color: colors.ink,
+    marginBottom: spacing.xxs,
+  },
+  previewMetricCaption: {
+    ...typography.bodySmall,
+    color: colors.inkSecondary,
+  },
+  chipsRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: spacing.xs,
+  },
+  chip: {
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xxs,
+    borderRadius: radius.full,
+    backgroundColor: colors.background,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  chipText: {
+    ...typography.caption,
+    color: colors.inkSecondary,
   },
   footer: {
     paddingHorizontal: spacing.lg,
     paddingBottom: spacing.xxl,
+    paddingTop: spacing.sm,
   },
-  progressContainer: {
+  progressRow: {
     flexDirection: 'row',
-    justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: spacing.xl,
+    justifyContent: 'center',
     gap: spacing.sm,
+    marginBottom: spacing.lg,
   },
   dot: {
     width: 8,
     height: 8,
     borderRadius: 4,
     backgroundColor: colors.inkTertiary,
-    opacity: 0.3,
-    transform: [{ scale: 0.85 }],
+    opacity: 0.26,
   },
   dotActive: {
-    width: 22,
-    borderRadius: 4,
+    width: 26,
     backgroundColor: colors.primary,
     opacity: 1,
-    transform: [{ scale: 1 }],
   },
 });

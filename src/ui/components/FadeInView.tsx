@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { Animated, ViewStyle } from 'react-native';
+import { animation } from '../theme';
 
 interface FadeInViewProps {
   children: React.ReactNode;
@@ -15,8 +16,8 @@ export function FadeInView({
   children,
   style,
   delay = 0,
-  duration = 500,
-  translateY = 20,
+  duration = animation.fadeIn.duration,
+  translateY = animation.fadeIn.translateY,
 }: FadeInViewProps) {
   const opacity = useRef(new Animated.Value(IS_TEST_ENV ? 1 : 0)).current;
   const translate = useRef(new Animated.Value(IS_TEST_ENV ? 0 : translateY)).current;
@@ -33,7 +34,7 @@ export function FadeInView({
       }),
       Animated.timing(translate, {
         toValue: 0,
-        duration,
+        duration: Math.max(280, duration - 60),
         delay,
         useNativeDriver: true,
       }),

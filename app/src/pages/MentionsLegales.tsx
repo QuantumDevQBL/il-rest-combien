@@ -16,11 +16,11 @@ export default function MentionsLegales() {
         <p>
           Ce site et l'application mobile « Il reste combien ? » sont édités par Quentin
           Balohé-Lacourrège, exerçant sous le nom commercial QuantumDev, entrepreneur individuel
-          (micro-entreprise) domicilié à Tours (37), France.
+          (micro-entreprise).
         </p>
         <ul className="mt-2 list-disc space-y-1 pl-5">
-          <li>SIRET : <TODO>SIRET à compléter</TODO></li>
-          <li>Adresse : <TODO>adresse postale complète à compléter</TODO> — Tours (37), France</li>
+          <li>SIRET : 853 750 198 00022</li>
+          <li>Adresse : 97 rue Deslandes, 37000 Tours, France</li>
           <li>Email de contact : <TODO>email de contact à compléter</TODO></li>
           <li>Régime : franchise en base de TVA, article 293 B du Code général des impôts — TVA non applicable</li>
         </ul>

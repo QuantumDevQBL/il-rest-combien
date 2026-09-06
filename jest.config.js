@@ -7,6 +7,12 @@ module.exports = {
       testMatch: ['**/src/engine/__tests__/**/*.test.ts'],
     },
     {
+      displayName: 'domain',
+      preset: 'ts-jest',
+      testEnvironment: 'node',
+      testMatch: ['**/src/domain/**/*.test.ts'],
+    },
+    {
       displayName: 'ui',
       preset: 'jest-expo',
       testMatch: ['**/src/ui/__tests__/**/*.test.{ts,tsx}'],

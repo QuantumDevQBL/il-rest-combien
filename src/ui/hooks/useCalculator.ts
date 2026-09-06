@@ -93,6 +93,9 @@ export function useCalculator(initialForm?: Partial<CalculatorForm>): Calculator
         setError(err);
       } else {
         setError(null);
+        if (__DEV__) {
+          console.warn('[useCalculator] Erreur inattendue lors du calcul du resultat', err);
+        }
       }
     }
   }, [form]);
@@ -115,9 +118,12 @@ export function useCalculator(initialForm?: Partial<CalculatorForm>): Calculator
       );
       setCaRequis(ca);
       setTjmRequis(tjm);
-    } catch {
+    } catch (err) {
       setCaRequis(null);
       setTjmRequis(null);
+      if (!(err instanceof ValidationError) && __DEV__) {
+        console.warn('[useCalculator] Erreur inattendue lors du calcul du CA requis', err);
+      }
     }
   }, [form]);
 

@@ -87,7 +87,10 @@ export function calculateProjectedResult(
 
   try {
     return calculerMicroEntreprise(buildDirectInputs(form, annualRevenue));
-  } catch {
+  } catch (err) {
+    if (!(err instanceof ValidationError) && __DEV__) {
+      console.warn('[calculateProjectedResult] Erreur inattendue lors du calcul', err);
+    }
     return null;
   }
 }

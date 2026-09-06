@@ -9,7 +9,7 @@ module.exports = {
     {
       displayName: 'ui',
       preset: 'jest-expo',
-      testMatch: ['**/src/ui/__tests__/**/*.test.tsx'],
+      testMatch: ['**/src/ui/__tests__/**/*.test.{ts,tsx}'],
       setupFilesAfterEnv: ['<rootDir>/src/ui/__tests__/jest.setup.ts'],
       transformIgnorePatterns: [
         'node_modules/(?!((react-native.*)?|(@react-native.*)?|expo.*|@expo.*))',

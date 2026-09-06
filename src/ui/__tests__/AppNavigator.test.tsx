@@ -1,7 +1,7 @@
 import React from 'react';
 import { AppNavigator } from '../navigation/AppNavigator';
 import * as analytics from '../utils/analytics';
-import { resetAsyncStorage } from './__mocks__/async-storage';
+import { mockAsyncStorage, resetAsyncStorage } from './__mocks__/async-storage';
 import { fireEvent, render, screen, waitFor } from './test-utils';
 
 beforeEach(() => {
@@ -13,8 +13,52 @@ afterEach(() => {
   jest.restoreAllMocks();
 });
 
+describe('AppNavigator onboarding', () => {
+  it('shows the onboarding slides on first launch', async () => {
+    render(<AppNavigator />);
+
+    await waitFor(() => {
+      expect(screen.getByText(/Votre vrai revenu, avant de le depenser/)).toBeTruthy();
+    });
+  });
+
+  it('goes to the home screen and persists the flag once onboarding is skipped', async () => {
+    render(<AppNavigator />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Passer')).toBeTruthy();
+    });
+
+    fireEvent.press(screen.getByText('Passer'));
+
+    await waitFor(() => {
+      expect(screen.getByText(/Le vrai net/)).toBeTruthy();
+    });
+
+    expect(mockAsyncStorage.setItem).toHaveBeenCalledWith('onboarding-vu', 'true');
+  });
+
+  it('skips onboarding on a later launch once already seen', async () => {
+    await mockAsyncStorage.setItem('onboarding-vu', 'true');
+
+    render(<AppNavigator />);
+
+    await waitFor(() => {
+      expect(screen.getByText(/Le vrai net/)).toBeTruthy();
+    });
+
+    expect(screen.queryByText('Passer')).toBeNull();
+  });
+});
+
 describe('AppNavigator', () => {
   const homePrompt = /Le vrai net/;
+
+  beforeEach(async () => {
+    // These tests exercise the main tab navigation, not the onboarding
+    // flow (covered above), so treat the user as a returning one.
+    await mockAsyncStorage.setItem('onboarding-vu', 'true');
+  });
 
   it('shows home on launch', async () => {
     render(<AppNavigator />);

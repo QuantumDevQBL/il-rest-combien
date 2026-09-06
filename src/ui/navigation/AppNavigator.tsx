@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -13,6 +13,7 @@ import { HistoryModal } from '../modals/HistoryModal';
 import { InverseModal } from '../modals/InverseModal';
 import { SettingsModal } from '../modals/SettingsModal';
 import { HomeScreen } from '../screens/HomeScreen';
+import { OnboardingScreen } from '../screens/OnboardingScreen';
 import { PilotageLockedScreen } from '../screens/PilotageLockedScreen';
 import { PilotageScreen } from '../screens/PilotageScreen';
 import { ResultScreen } from '../screens/ResultScreen';
@@ -181,23 +182,14 @@ function MainTabsScreen() {
 }
 
 export function AppNavigator() {
-  const { isLoading, markAsSeen } = useOnboarding();
-  const [isReady, setIsReady] = useState(false);
+  const { hasSeenOnboarding, isLoading, markAsSeen } = useOnboarding();
 
-  useEffect(() => {
-    if (!isLoading) {
-      setIsReady(true);
-    }
-  }, [isLoading]);
-
-  useEffect(() => {
-    if (!isLoading) {
-      void markAsSeen();
-    }
-  }, [isLoading, markAsSeen]);
-
-  if (!isReady) {
+  if (isLoading) {
     return null;
+  }
+
+  if (!hasSeenOnboarding) {
+    return <OnboardingScreen onComplete={() => void markAsSeen()} />;
   }
 
   return (

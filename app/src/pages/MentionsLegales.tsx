@@ -1,13 +1,5 @@
 import { LegalLayout } from '../components/LegalLayout'
 
-function TODO({ children }: { children: string }) {
-  return (
-    <span className="rounded bg-amber-100 px-1.5 py-0.5 font-mono text-sm text-amber-800">
-      [{children}]
-    </span>
-  )
-}
-
 export default function MentionsLegales() {
   return (
     <LegalLayout title="Mentions légales" updatedAt="6 septembre 2026">
@@ -38,9 +30,7 @@ export default function MentionsLegales() {
 
       <section>
         <h2 className="text-lg font-bold text-slate-900">Hébergement du site</h2>
-        <p>
-          <TODO>nom et adresse de l'hébergeur à compléter</TODO>
-        </p>
+        <p>O2switch SAS — Chemin des Pardiaux, 63000 Clermont-Ferrand, France.</p>
       </section>
 
       <section>

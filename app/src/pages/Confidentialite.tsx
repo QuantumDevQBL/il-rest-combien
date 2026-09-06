@@ -1,13 +1,5 @@
 import { LegalLayout } from '../components/LegalLayout'
 
-function TODO({ children }: { children: string }) {
-  return (
-    <span className="rounded bg-amber-100 px-1.5 py-0.5 font-mono text-sm text-amber-800">
-      [{children}]
-    </span>
-  )
-}
-
 export default function Confidentialite() {
   return (
     <LegalLayout title="Politique de confidentialité" updatedAt="6 septembre 2026">
@@ -17,7 +9,11 @@ export default function Confidentialite() {
           Quentin Balohé-Lacourrège, exerçant sous le nom commercial QuantumDev (entrepreneur
           individuel, Tours, France), est responsable du traitement des données décrites
           ci-dessous pour ce site et l'application mobile « Il reste combien ? ». Pour toute
-          question, contactez <TODO>email de contact à compléter</TODO>.
+          question, contactez{' '}
+          <a href="mailto:contact@quantumdev.fr" className="font-semibold text-emerald-700 hover:text-emerald-800">
+            contact@quantumdev.fr
+          </a>
+          .
         </p>
       </section>
 
@@ -92,7 +88,10 @@ export default function Confidentialite() {
         <p>
           Conformément au RGPD, vous disposez d'un droit d'accès, de rectification, d'effacement,
           de limitation, d'opposition et de portabilité de vos données. Pour l'exercer, contactez{' '}
-          <TODO>email de contact à compléter</TODO>. Vous pouvez également introduire une
+          <a href="mailto:contact@quantumdev.fr" className="font-semibold text-emerald-700 hover:text-emerald-800">
+            contact@quantumdev.fr
+          </a>
+          . Vous pouvez également introduire une
           réclamation auprès de la CNIL (
           <a href="https://www.cnil.fr" className="font-semibold text-emerald-700 hover:text-emerald-800">
             cnil.fr

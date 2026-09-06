@@ -21,7 +21,12 @@ export default function MentionsLegales() {
         <ul className="mt-2 list-disc space-y-1 pl-5">
           <li>SIRET : 853 750 198 00022</li>
           <li>Adresse : 97 rue Deslandes, 37000 Tours, France</li>
-          <li>Email de contact : <TODO>email de contact à compléter</TODO></li>
+          <li>
+            Email de contact :{' '}
+            <a href="mailto:contact@quantumdev.fr" className="font-semibold text-emerald-700 hover:text-emerald-800">
+              contact@quantumdev.fr
+            </a>
+          </li>
           <li>Régime : franchise en base de TVA, article 293 B du Code général des impôts — TVA non applicable</li>
         </ul>
       </section>

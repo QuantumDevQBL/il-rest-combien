@@ -2,6 +2,21 @@ import { calculerMicroEntreprise } from './micro-entreprise';
 import { InputsMicroEntreprise } from './types';
 
 /**
+ * Levée quand aucun CA (même très élevé) ne permet d'atteindre le revenu
+ * net visé avec les paramètres fournis, pour que l'appelant distingue ce
+ * cas d'un résultat valide plutôt que de recevoir silencieusement une
+ * valeur qui n'atteint pas réellement l'objectif.
+ */
+export class UnreachableTargetError extends Error {
+  constructor(netVise: number) {
+    super(
+      `Aucun chiffre d'affaires ne permet d'atteindre un revenu net disponible de ${netVise} € avec ces paramètres.`
+    );
+    this.name = 'UnreachableTargetError';
+  }
+}
+
+/**
  * Calcule le CA annuel HT (et le TJM associé) nécessaire pour atteindre
  * un revenu net disponible visé.
  *
@@ -45,7 +60,16 @@ export function calculerCARequis(
     borneHaute *= 2;
   }
 
+  if (dernierNet < netVise) {
+    // Même après 10 doublements de la borne haute, le net visé reste hors
+    // de portée : ne pas poursuivre la dichotomie sur un intervalle qui ne
+    // contient pas la solution.
+    throw new UnreachableTargetError(netVise);
+  }
+
   let caRequis = borneBasse;
+  let netCalcule = 0;
+  let aConverge = false;
   for (let i = 0; i < 40; i++) {
     caRequis = (borneBasse + borneHaute) / 2;
     const resultat = calculerMicroEntreprise({
@@ -55,9 +79,10 @@ export function calculerCARequis(
       tjm: null,
       joursFactures: null,
     });
-    const netCalcule = resultat.revenuNetDisponible;
+    netCalcule = resultat.revenuNetDisponible;
 
     if (Math.abs(netCalcule - netVise) < 1) {
+      aConverge = true;
       break;
     }
 
@@ -66,6 +91,10 @@ export function calculerCARequis(
     } else {
       borneHaute = caRequis;
     }
+  }
+
+  if (!aConverge) {
+    throw new UnreachableTargetError(netVise);
   }
 
   return {

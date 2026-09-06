@@ -12,7 +12,7 @@ import {
   VERSEMENT_LIBERATOIRE_BIC_VENTE,
   VERSEMENT_LIBERATOIRE_BNC,
 } from '../data/baremes-2026';
-export { calculerCARequis } from './inverse';
+export { calculerCARequis, UnreachableTargetError } from './inverse';
 
 import { arrondiEuro } from './arrondi';
 import { calculerPrelevementsSociaux } from './cotisations';

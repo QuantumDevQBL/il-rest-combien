@@ -1,6 +1,8 @@
 import { motion, useReducedMotion, useScroll, useTransform, AnimatePresence } from 'framer-motion'
-import { useId, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
+import { Link } from 'react-router'
 import { ArrowRight, Bell, ChartPie, Check, Shield, Smartphone, Star, Wallet, Zap, CalendarClock, TrendingUp, Quote, ChevronDown, Calculator } from 'lucide-react'
+import { AnimatedLogo } from '../components/AnimatedLogo'
 
 /* ---------- Données ---------- */
 const features = [
@@ -9,7 +11,7 @@ const features = [
   { icon: TrendingUp, title: 'Calcul inverse', desc: 'Fixez un objectif de revenu net et obtenez le chiffre d’affaires à réaliser.' },
   { icon: Bell, title: 'Alertes plafonds micro et seuils TVA', desc: 'Soyez prévenu avant de dépasser les plafonds 2026 ou les seuils de franchise en base de TVA.' },
   { icon: CalendarClock, title: 'Historique des simulations', desc: 'Enregistrez et consultez vos simulations pour suivre votre rentabilité au fil du temps.' },
-  { icon: Shield, title: '100 % offline, données sur l’appareil', desc: 'Vos calculs restent sur votre téléphone. Aucune connexion requise, aucune donnée partagée.' },
+  { icon: Shield, title: 'Vos chiffres restent sur votre appareil', desc: 'Chiffre d’affaires, charges et historique sont stockés uniquement sur votre téléphone, jamais transmis à nos serveurs.' },
 ]
 
 const steps = [
@@ -58,67 +60,6 @@ function useReveal() {
       show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: easing } },
     },
   }
-}
-
-/* ---------- Logo SVG animé (draw-in) ---------- */
-function AnimatedLogo({ size = 36 }: { size?: number }) {
-  const reduce = useReducedMotion()
-  const gradId = useId()
-  const draw = reduce
-    ? {}
-    : {
-        initial: { pathLength: 0, opacity: 0 },
-        animate: { pathLength: 1, opacity: 1 },
-      }
-  return (
-    <motion.svg
-      width={size}
-      height={size}
-      viewBox="0 0 48 48"
-      fill="none"
-      aria-hidden="true"
-      initial={reduce ? {} : { scale: 0.8, opacity: 0 }}
-      animate={{ scale: 1, opacity: 1 }}
-      transition={{ duration: 0.6, ease: easing }}
-      className="drop-shadow-md"
-    >
-      <defs>
-        <linearGradient id={gradId} x1="0" y1="0" x2="48" y2="48" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#10b981" />
-          <stop offset="1" stopColor="#0d9488" />
-        </linearGradient>
-      </defs>
-      <rect x="2" y="2" width="44" height="44" rx="13" fill={`url(#${gradId})`} />
-      {/* Billet */}
-      <motion.path
-        d="M11 20c0-1.66 1.34-3 3-3h20c1.66 0 3 1.34 3 3v8c0 1.66-1.34 3-3 3H14c-1.66 0-3-1.34-3-3v-8Z"
-        stroke="#fff"
-        strokeWidth="2.4"
-        strokeLinecap="round"
-        {...draw}
-        transition={{ duration: 0.9, delay: reduce ? 0 : 0.3, ease: easing }}
-      />
-      {/* Symbole € */}
-      <motion.path
-        d="M29 21.5c-.9-.9-2.2-1.5-3.6-1.5-2.8 0-5 1.8-5 4s2.2 4 5 4c1.4 0 2.7-.6 3.6-1.5M19.5 22.8h4.4M19.5 25.2h4.4"
-        stroke="#fff"
-        strokeWidth="2.2"
-        strokeLinecap="round"
-        {...draw}
-        transition={{ duration: 0.9, delay: reduce ? 0 : 0.7, ease: easing }}
-      />
-      {/* Pièce qui monte */}
-      <motion.circle
-        cx="34"
-        cy="14"
-        r="4.5"
-        fill="#a7f3d0"
-        initial={reduce ? {} : { y: 6, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.6, delay: reduce ? 0 : 1.2, ease: easing }}
-      />
-    </motion.svg>
-  )
 }
 
 /* ---------- Calculateur interactif ---------- */
@@ -681,8 +622,8 @@ export default function Home() {
             <span className="font-extrabold text-white">Il reste combien ?</span>
           </a>
           <nav aria-label="Liens de pied de page" className="flex gap-8 text-sm">
-            <a href="#" className="rounded transition hover:text-emerald-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400">Mentions légales</a>
-            <a href="#" className="rounded transition hover:text-emerald-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400">Confidentialité</a>
+            <Link to="/mentions-legales" className="rounded transition hover:text-emerald-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400">Mentions légales</Link>
+            <Link to="/confidentialite" className="rounded transition hover:text-emerald-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400">Confidentialité</Link>
             <a href="#" className="rounded transition hover:text-emerald-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400">Contact</a>
           </nav>
           <p className="text-xs">© 2026 Il reste combien ?. Fait avec 💚 pour les freelances.</p>

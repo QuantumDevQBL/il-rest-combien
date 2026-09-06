@@ -7,6 +7,7 @@ import * as pilotageStorage from '../../storage/pilotageStorage';
 import { CalculatorProvider } from '../context/CalculatorContext';
 import { PilotageScreen } from '../screens/PilotageScreen';
 import * as analytics from '../utils/analytics';
+import { formatMontant } from '../utils/format';
 import { resetAsyncStorage } from './__mocks__/async-storage';
 
 jest.mock('../../storage/pilotageStorage');
@@ -160,5 +161,96 @@ describe('PilotageScreen objective and alerts', () => {
     });
 
     expect(analytics.trackEvent).toHaveBeenCalledWith('monthly_revenue_entry_deleted');
+  });
+});
+
+describe('PilotageScreen fixed charges', () => {
+  const mockedStorage = pilotageStorage as jest.Mocked<typeof pilotageStorage>;
+  const baseEntry: MonthlyRevenueEntry = {
+    year: 2026,
+    month: 7,
+    revenue: 4000,
+    createdAt: '2026-07-31T10:00:00.000Z',
+    updatedAt: '2026-07-31T10:00:00.000Z',
+  };
+
+  beforeEach(() => {
+    jest.useFakeTimers();
+    jest.setSystemTime(new Date('2026-08-15T10:00:00.000Z'));
+    resetAsyncStorage();
+    jest.spyOn(analytics, 'trackEvent').mockImplementation(() => Promise.resolve());
+    mockedStorage.listMonthlyRevenueEntries.mockResolvedValue([baseEntry]);
+    mockedStorage.upsertMonthlyRevenueEntry.mockResolvedValue([baseEntry]);
+    mockedStorage.deleteMonthlyRevenueEntry.mockResolvedValue([]);
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+    jest.restoreAllMocks();
+  });
+
+  it('shows an empty-state prompt when no charge is recorded yet', async () => {
+    renderPilotage();
+
+    await waitFor(() => {
+      expect(screen.getByText('Charges fixes recurrentes')).toBeTruthy();
+    });
+
+    expect(screen.getByText(/Ajoutez vos charges recurrentes/)).toBeTruthy();
+  });
+
+  it('adds a recurring charge, shows its annual total and tracks it', async () => {
+    renderPilotage();
+
+    await waitFor(() => {
+      expect(screen.getByText('Charges fixes recurrentes')).toBeTruthy();
+    });
+
+    fireEvent.press(screen.getAllByText('Ajouter')[0]);
+    fireEvent.changeText(screen.getByLabelText('Intitule'), 'Loyer');
+    fireEvent.changeText(screen.getByLabelText('Montant mensuel'), '500');
+    fireEvent.press(screen.getByText('Enregistrer'));
+
+    await waitFor(() => {
+      expect(screen.getByText('Loyer')).toBeTruthy();
+    });
+
+    expect(screen.getByText(`${formatMontant(500)} / mois`)).toBeTruthy();
+    expect(screen.getByText(formatMontant(500 * 12))).toBeTruthy();
+    expect(analytics.trackEvent).toHaveBeenCalledWith('fixed_charge_created');
+  });
+
+  it('edits and deletes a recurring charge', async () => {
+    renderPilotage();
+
+    await waitFor(() => {
+      expect(screen.getByText('Charges fixes recurrentes')).toBeTruthy();
+    });
+
+    fireEvent.press(screen.getAllByText('Ajouter')[0]);
+    fireEvent.changeText(screen.getByLabelText('Intitule'), 'Assurance');
+    fireEvent.changeText(screen.getByLabelText('Montant mensuel'), '60');
+    fireEvent.press(screen.getByText('Enregistrer'));
+
+    await waitFor(() => {
+      expect(screen.getByText('Assurance')).toBeTruthy();
+    });
+
+    fireEvent.press(screen.getByLabelText('Modifier Assurance'));
+    fireEvent.changeText(screen.getByLabelText('Montant mensuel'), '80');
+    fireEvent.press(screen.getByText('Enregistrer'));
+
+    await waitFor(() => {
+      expect(analytics.trackEvent).toHaveBeenCalledWith('fixed_charge_updated');
+    });
+
+    fireEvent.press(screen.getByLabelText('Supprimer Assurance'));
+
+    await waitFor(() => {
+      expect(analytics.trackEvent).toHaveBeenCalledWith('fixed_charge_deleted');
+    });
+
+    expect(screen.queryByText('Assurance')).toBeNull();
+    expect(screen.getByText(/Ajoutez vos charges recurrentes/)).toBeTruthy();
   });
 });

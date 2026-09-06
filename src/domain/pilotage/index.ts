@@ -1,4 +1,5 @@
 export * from './alerts';
+export * from './fixedCharges';
 export * from './objective';
 export * from './projection';
 export * from './reserves';

@@ -4,10 +4,17 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import {
   buildPilotageSummary,
   buildProjection,
+  FixedCharge,
   Month,
   MonthlyRevenueEntry,
   PilotageAlert,
+  sumAnnualFixedCharges,
 } from '../../domain/pilotage';
+import {
+  deleteFixedCharge,
+  listFixedCharges,
+  upsertFixedCharge,
+} from '../../storage/fixedChargesStorage';
 import {
   deleteMonthlyRevenueEntry,
   listMonthlyRevenueEntries,
@@ -48,6 +55,12 @@ interface EntryDraft {
   month: Month;
   revenue: string;
   existing?: MonthlyRevenueEntry | null;
+}
+
+interface ChargeDraft {
+  id?: string;
+  label: string;
+  monthlyAmount: string;
 }
 
 function SummaryMetric({
@@ -144,6 +157,8 @@ export function PilotageScreen({ onOpenSettings, onGoToSimulation }: PilotageScr
   const [entries, setEntries] = useState<MonthlyRevenueEntry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [draft, setDraft] = useState<EntryDraft | null>(null);
+  const [fixedCharges, setFixedCharges] = useState<FixedCharge[]>([]);
+  const [chargeDraft, setChargeDraft] = useState<ChargeDraft | null>(null);
   const [isObjectiveModalOpen, setIsObjectiveModalOpen] = useState(false);
   const [objectiveDraft, setObjectiveDraft] = useState('');
   const openedRef = useRef(false);
@@ -166,6 +181,8 @@ export function PilotageScreen({ onOpenSettings, onGoToSimulation }: PilotageScr
         setEntries(storedEntries.filter((entry) => entry.year === currentYear));
       })
       .finally(() => setIsLoading(false));
+
+    void listFixedCharges().then(setFixedCharges);
   }, [currentYear]);
 
   const projection = useMemo(
@@ -176,7 +193,10 @@ export function PilotageScreen({ onOpenSettings, onGoToSimulation }: PilotageScr
     () => calculateProjectedResult(form, projection.projectedAnnualRevenue),
     [form, projection.projectedAnnualRevenue]
   );
-  const annualFixedCharges = parseMontantSaisi(form.chargesFixesAnnuelles) ?? 0;
+  const annualFixedCharges =
+    fixedCharges.length > 0
+      ? sumAnnualFixedCharges(fixedCharges)
+      : parseMontantSaisi(form.chargesFixesAnnuelles) ?? 0;
   const objectiveNetMonthly = parseMontantSaisi(form.objectifNetMensuel);
   const activity = getActivityConfig(form.activity).activite;
 
@@ -292,6 +312,47 @@ export function PilotageScreen({ onOpenSettings, onGoToSimulation }: PilotageScr
 
   const closeDraft = () => setDraft(null);
 
+  const openCreateChargeModal = () => setChargeDraft({ label: '', monthlyAmount: '' });
+
+  const openEditChargeModal = (charge: FixedCharge) => {
+    setChargeDraft({
+      id: charge.id,
+      label: charge.label,
+      monthlyAmount: String(charge.monthlyAmount),
+    });
+  };
+
+  const closeChargeDraft = () => setChargeDraft(null);
+
+  const saveChargeDraft = async () => {
+    if (!chargeDraft) {
+      return;
+    }
+
+    const label = chargeDraft.label.trim();
+    const monthlyAmount = parseMontantSaisi(chargeDraft.monthlyAmount);
+    if (!label || monthlyAmount === null || monthlyAmount < 0) {
+      return;
+    }
+
+    const wasEditing = Boolean(chargeDraft.id);
+    const nextCharges = await upsertFixedCharge({
+      id: chargeDraft.id,
+      label,
+      monthlyAmount,
+    });
+
+    setFixedCharges(nextCharges);
+    await trackEvent(wasEditing ? 'fixed_charge_updated' : 'fixed_charge_created');
+    closeChargeDraft();
+  };
+
+  const deleteCharge = async (charge: FixedCharge) => {
+    const nextCharges = await deleteFixedCharge(charge.id);
+    setFixedCharges(nextCharges);
+    await trackEvent('fixed_charge_deleted');
+  };
+
   const openObjectiveModal = () => {
     setObjectiveDraft(form.objectifNetMensuel);
     setIsObjectiveModalOpen(true);
@@ -363,6 +424,12 @@ export function PilotageScreen({ onOpenSettings, onGoToSimulation }: PilotageScr
   const sortedEntries = [...entries].sort((left, right) => right.month - left.month);
   const draftRevenue = draft ? parseMontantSaisi(draft.revenue) : null;
   const canSaveDraft = draft !== null && draftRevenue !== null;
+  const chargeDraftAmount = chargeDraft ? parseMontantSaisi(chargeDraft.monthlyAmount) : null;
+  const canSaveCharge =
+    chargeDraft !== null &&
+    chargeDraft.label.trim().length > 0 &&
+    chargeDraftAmount !== null &&
+    chargeDraftAmount >= 0;
   const objectiveDraftValue = parseMontantSaisi(objectiveDraft);
   const canSaveObjective =
     objectiveDraft.trim().length === 0 || objectiveDraftValue !== null;
@@ -464,6 +531,63 @@ export function PilotageScreen({ onOpenSettings, onGoToSimulation }: PilotageScr
                   Projection indicative basee sur votre mois en cours.
                 </Text>
               ) : null}
+            </Card>
+
+            <Card style={styles.sectionCard}>
+              <View style={styles.sectionHeader}>
+                <View style={styles.sectionTitleBlock}>
+                  <Text style={styles.sectionEyebrow}>Budget</Text>
+                  <Text style={styles.sectionTitle}>Charges fixes recurrentes</Text>
+                </View>
+                <Button label="Ajouter" onPress={openCreateChargeModal} size="md" />
+              </View>
+
+              {fixedCharges.length === 0 ? (
+                <Text style={styles.bodyText}>
+                  Ajoutez vos charges recurrentes (loyer, assurance, abonnements...) pour un
+                  disponible et des reserves calcules au plus juste.
+                </Text>
+              ) : (
+                <>
+                  <View style={styles.historyStack}>
+                    {fixedCharges.map((charge) => (
+                      <View key={charge.id} style={styles.historyItem}>
+                        <View>
+                          <Text style={styles.historyMonth}>{charge.label}</Text>
+                          <Text style={styles.historyRevenue}>
+                            {formatMontant(charge.monthlyAmount)} / mois
+                          </Text>
+                        </View>
+                        <View style={styles.historyActions}>
+                          <PressableScale
+                            onPress={() => openEditChargeModal(charge)}
+                            scale={0.96}
+                            accessibilityLabel={`Modifier ${charge.label}`}
+                          >
+                            <Text style={styles.linkText}>Modifier</Text>
+                          </PressableScale>
+                          <PressableScale
+                            onPress={() => void deleteCharge(charge)}
+                            scale={0.96}
+                            accessibilityLabel={`Supprimer ${charge.label}`}
+                          >
+                            <Text style={styles.deleteText}>Supprimer</Text>
+                          </PressableScale>
+                        </View>
+                      </View>
+                    ))}
+                  </View>
+                  <CompactRow
+                    label="Total annuel"
+                    value={formatMontant(sumAnnualFixedCharges(fixedCharges))}
+                    tone="success"
+                  />
+                  <Text style={styles.helperText}>
+                    Ce total remplace le montant saisi dans les parametres pour vos reserves et
+                    votre disponible estime.
+                  </Text>
+                </>
+              )}
             </Card>
 
             <Card style={styles.sectionCard}>
@@ -664,6 +788,55 @@ export function PilotageScreen({ onOpenSettings, onGoToSimulation }: PilotageScr
               label="Enregistrer"
               onPress={() => void saveDraft()}
               disabled={!canSaveDraft}
+            />
+          </View>
+        </ModalContainer>
+      ) : null}
+
+      {chargeDraft ? (
+        <ModalContainer
+          title={chargeDraft.id ? 'Modifier une charge' : 'Ajouter une charge'}
+          onClose={closeChargeDraft}
+        >
+          <Input
+            label="Intitule"
+            value={chargeDraft.label}
+            onChangeText={(value) =>
+              setChargeDraft((current) => (current ? { ...current, label: value } : current))
+            }
+            placeholder="Loyer, assurance, abonnement..."
+          />
+          <Input
+            label="Montant mensuel"
+            value={chargeDraft.monthlyAmount}
+            onChangeText={(value) =>
+              setChargeDraft((current) =>
+                current ? { ...current, monthlyAmount: value } : current
+              )
+            }
+            placeholder="0"
+            suffix="EUR"
+          />
+          <View style={styles.modalActions}>
+            {chargeDraft.id ? (
+              <Button
+                label="Supprimer"
+                onPress={() => {
+                  const existing = fixedCharges.find((charge) => charge.id === chargeDraft.id);
+                  if (existing) {
+                    void deleteCharge(existing);
+                  }
+                  closeChargeDraft();
+                }}
+                variant="secondary"
+              />
+            ) : (
+              <Button label="Annuler" onPress={closeChargeDraft} variant="secondary" />
+            )}
+            <Button
+              label="Enregistrer"
+              onPress={() => void saveChargeDraft()}
+              disabled={!canSaveCharge}
             />
           </View>
         </ModalContainer>

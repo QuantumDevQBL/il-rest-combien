@@ -10,8 +10,9 @@ import { SegmentedTabs } from '../components/SegmentedTabs';
 import { useCalculatorContext } from '../context/CalculatorContext';
 import { Button, Card, Icon, ProgressBar } from '../design-system';
 import { getActivityLabel } from '../mapping';
+import { PremiumSource } from '../subscription/types';
 import { colors, radius, shadows, spacing, typography } from '../theme';
-import { PremiumIntroSource, trackEvent } from '../utils/analytics';
+import { trackEvent } from '../utils/analytics';
 import { formatMontant } from '../utils/format';
 import { hapticImpact } from '../utils/haptics';
 
@@ -21,7 +22,7 @@ interface ResultScreenProps {
   onOpenHistory: () => void;
   onOpenInverse: () => void;
   onOpenDetail: () => void;
-  onOpenPilotage?: (source: PremiumIntroSource) => void;
+  onOpenPilotage?: (source: PremiumSource) => void;
 }
 
 type ResultTabKey = 'summary' | 'details' | 'alerts';

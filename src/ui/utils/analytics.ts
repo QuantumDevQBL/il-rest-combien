@@ -5,8 +5,6 @@ import { getPostHogClient } from '../analytics/posthogClient';
 
 const FIRST_OPEN_KEY = 'analytics:first-open-tracked';
 
-export type PremiumIntroSource = 'monthly_tracking' | 'projection' | 'reserve';
-
 type AnalyticsEvent =
   | 'first_open'
   | 'simulation_completed'

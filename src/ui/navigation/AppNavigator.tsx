@@ -97,13 +97,13 @@ function ResultTabScreen({
       onOpenHistory={() => parent?.navigate('HistoryModal')}
       onOpenInverse={() => parent?.navigate('InverseModal')}
       onOpenDetail={() => parent?.navigate('DetailModal')}
-      onOpenPilotage={() => {
+      onOpenPilotage={(source) => {
         if (isPremiumActive) {
           navigation.navigate('Pilotage');
           return;
         }
 
-        openPaywall('result');
+        openPaywall(source);
         navigation.navigate('Pilotage');
       }}
     />

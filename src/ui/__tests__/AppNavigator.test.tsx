@@ -114,6 +114,15 @@ describe('AppNavigator', () => {
     await waitFor(() => {
       expect(screen.getByText(/Un vrai espace de pilotage/)).toBeTruthy();
     });
+
+    expect(analytics.trackEvent).toHaveBeenCalledWith(
+      'paywall_viewed',
+      expect.objectContaining({ source: 'monthly_tracking' })
+    );
+    expect(analytics.trackEvent).not.toHaveBeenCalledWith(
+      'paywall_viewed',
+      expect.objectContaining({ source: 'result' })
+    );
   });
 
   it('opens the locked Pilotage screen from the Pilotage tab when premium is inactive', async () => {

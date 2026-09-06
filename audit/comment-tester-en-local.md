@@ -47,11 +47,21 @@ npx expo export --platform android   # le bundle compile réellement (pas juste 
 tactiles, permissions), mais ça garantit que ce qui arrive sur la branche ne
 casse pas la compilation ni la logique testée.
 
-## Vers la publication (quand le développement sera prêt)
+Note sur l'abonnement Pilotage : le tester réellement (achat, restauration)
+nécessite un produit d'abonnement configuré côté Play Console / App Store
+Connect et un compte de test store — sans ça, l'écran verrouillé et les
+offres s'affichent mais l'achat n'aboutira pas.
 
-Une fois l'app validée en local :
-1. Build de test : `eas build --profile development` (ou `preview` pour un
-   APK partageable sans passer par Expo Go)
+## Recette avant v1
+
+Avant de déclarer l'app prête pour la mise en ligne, dérouler la checklist de
+test manuel : `audit/recette-v1.md`. Elle couvre chaque écran et les cas
+limites, pas seulement le chemin heureux.
+
+## Vers la publication (une fois la recette passée)
+
+1. Build de test élargi (partageable, sans Expo Go) :
+   `eas build --profile preview`
 2. Build de production : `eas build --profile production`
 3. Soumission : `eas submit`
 

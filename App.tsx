@@ -20,7 +20,7 @@ export default function App() {
         <SubscriptionProvider>
           <CalculatorProvider>
             <NavigationContainer>
-              <StatusBar style="light" />
+              <StatusBar style="dark" />
               <AppNavigator />
             </NavigationContainer>
           </CalculatorProvider>

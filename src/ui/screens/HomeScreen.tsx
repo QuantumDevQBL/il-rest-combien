@@ -1,5 +1,5 @@
 import React from 'react';
-import { KeyboardAvoidingView, Platform, StyleSheet, Text, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ActivityGrid } from '../components/ActivityGrid';
 import { FadeInView } from '../components/FadeInView';
@@ -50,55 +50,62 @@ export function HomeScreen({ onCalculate, onOpenHistory }: HomeScreenProps) {
       >
         <LogoHeader onHistory={onOpenHistory} />
 
-        <FadeInView duration={300} style={styles.content}>
-          <View style={styles.heroBlock}>
-            <Text style={styles.eyebrow}>Simulation</Text>
-            <Text style={styles.stepTitle}>Le vrai net, avant de le depenser.</Text>
-            <Text style={styles.stepSubtitle}>
-              Entrez votre CA, choisissez votre activite, puis obtenez votre vrai net.
-            </Text>
-          </View>
-
-          <Card style={styles.mainCard}>
-            <View style={styles.inputBlock}>
-              <View style={styles.sectionHeader}>
-                <Text style={styles.sectionLabel}>CA annuel HT estime</Text>
-                {previewAmount ? <Text style={styles.inlineBadge}>{previewAmount}</Text> : null}
-              </View>
-              <MoneyInput
-                value={form.caAnnuelHT}
-                onChangeText={(value) => setFormField('caAnnuelHT', value)}
-                placeholder="0"
-                size="hero"
-              />
-              <Text style={styles.amountHint}>
-                Le chiffre principal reste au centre du premier ecran.
+        <ScrollView
+          style={styles.scroll}
+          contentContainerStyle={styles.content}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
+          <FadeInView duration={300} style={styles.contentInner}>
+            <View style={styles.heroBlock}>
+              <Text style={styles.eyebrow}>Simulation</Text>
+              <Text style={styles.stepTitle}>Le vrai net, avant de le depenser.</Text>
+              <Text style={styles.stepSubtitle}>
+                Entrez votre CA, choisissez votre activite, puis obtenez votre vrai net.
               </Text>
             </View>
 
-            <Input
-              label="Nom de l'estimation"
-              value={form.label}
-              onChangeText={(value) => setFormField('label', value)}
-              placeholder="Ex : Projet client A"
-              keyboardType="default"
-            />
-          </Card>
+            <Card style={styles.mainCard}>
+              <View style={styles.inputBlock}>
+                <View style={styles.sectionHeader}>
+                  <Text style={styles.sectionLabel}>CA annuel HT estime</Text>
+                  {previewAmount ? <Text style={styles.inlineBadge}>{previewAmount}</Text> : null}
+                </View>
+                <MoneyInput
+                  value={form.caAnnuelHT}
+                  onChangeText={(value) => setFormField('caAnnuelHT', value)}
+                  placeholder="0"
+                  size="hero"
+                />
+                <Text style={styles.amountHint}>
+                  Le chiffre principal reste au centre du premier ecran.
+                </Text>
+              </View>
 
-          <View style={styles.activitySection}>
-            <View style={styles.sectionHeader}>
-              <Text style={styles.sectionLabel}>Activite</Text>
-              <Text style={styles.inlineBadge}>{selectedActivityLabel}</Text>
+              <Input
+                label="Nom de l'estimation"
+                value={form.label}
+                onChangeText={(value) => setFormField('label', value)}
+                placeholder="Ex : Projet client A"
+                keyboardType="default"
+              />
+            </Card>
+
+            <View style={styles.activitySection}>
+              <View style={styles.sectionHeader}>
+                <Text style={styles.sectionLabel}>Activite</Text>
+                <Text style={styles.inlineBadge}>{selectedActivityLabel}</Text>
+              </View>
+              <ActivityGrid selected={form.activity} onSelect={handleActivitySelect} />
+              <Text style={styles.activityHint}>{selectedActivityDescription}</Text>
             </View>
-            <ActivityGrid selected={form.activity} onSelect={handleActivitySelect} />
-            <Text style={styles.activityHint}>{selectedActivityDescription}</Text>
-          </View>
 
-          <View style={styles.infoRow}>
-            <Text style={styles.infoTitle}>Simulation Free complete</Text>
-            <Text style={styles.infoText}>Net, detail, impot et alertes essentielles.</Text>
-          </View>
-        </FadeInView>
+            <View style={styles.infoRow}>
+              <Text style={styles.infoTitle}>Simulation Free complete</Text>
+              <Text style={styles.infoText}>Net, detail, impot et alertes essentielles.</Text>
+            </View>
+          </FadeInView>
+        </ScrollView>
 
         <View style={[styles.footer, { paddingBottom: Math.max(insets.bottom, spacing.md) }]}>
           <Button
@@ -122,13 +129,17 @@ const styles = StyleSheet.create({
   keyboardView: {
     flex: 1,
   },
-  content: {
+  scroll: {
     flex: 1,
+  },
+  content: {
+    flexGrow: 1,
     paddingHorizontal: spacing.lg,
     paddingTop: spacing.xs,
-    paddingBottom: spacing.sm,
-    justifyContent: 'space-between',
-    gap: spacing.sm,
+    paddingBottom: spacing.lg,
+  },
+  contentInner: {
+    gap: spacing.md,
   },
   heroBlock: {
     gap: spacing.xxs,
